@@ -1,32 +1,40 @@
-//
-//  KinexaFitnessApp.swift
-//  KinexaFitness
-//
-//  Created by Rork on April 11, 2026.
-//
-
 import SwiftUI
-import SwiftData
+import AppIntents
+import RevenueCat
 
 @main
 struct KinexaFitnessApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var viewModel = AppViewModel()
+    @State private var store = StoreViewModel()
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    init() {
+        #if DEBUG
+        Purchases.logLevel = .debug
+        Purchases.configure(withAPIKey: Config.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY)
+        #else
+        Purchases.configure(withAPIKey: Config.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY)
+        #endif
+        KinexaFitnessShortcuts.updateAppShortcutParameters()
+    }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environment(viewModel)
+                .environment(store)
+                .preferredColorScheme(AppearanceMode(rawValue: appearanceModeRaw)?.colorScheme)
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        viewModel.pedometer.refreshTodaySteps()
+                        Task {
+                            try? await Task.sleep(for: .milliseconds(300))
+                            viewModel.syncTodaySteps()
+                        }
+                        viewModel.syncWidgetData()
+                    }
+                }
         }
-        .modelContainer(sharedModelContainer)
     }
 }

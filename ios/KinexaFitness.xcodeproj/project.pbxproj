@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		XX298127CFBB2CF3FA631BXX /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = XXDCC169DE7B2F3C1C8B10XX /* RevenueCat */; };
+		XXDB1E089E7A6A563E00DBXX /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = XXEAC818FB99284308FEDEXX /* RevenueCatUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		105FC58A2E9EAD3200EA8BCF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,29 +34,13 @@
 		105FC5932E9EAD3200EA8BCF /* KinexaFitnessUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KinexaFitnessUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		105FC57C2E9EAD3100EA8BCF /* KinexaFitness */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KinexaFitness;
-			sourceTree = "<group>";
-		};
-		105FC58C2E9EAD3200EA8BCF /* KinexaFitnessTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KinexaFitnessTests;
-			sourceTree = "<group>";
-		};
-		105FC5962E9EAD3200EA8BCF /* KinexaFitnessUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KinexaFitnessUITests;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
 		105FC5772E9EAD3100EA8BCF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				XX298127CFBB2CF3FA631BXX /* RevenueCat in Frameworks */,
+				XXDB1E089E7A6A563E00DBXX /* RevenueCatUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +59,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		105FC57C2E9EAD3100EA8BCF /* KinexaFitness */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KinexaFitness;
+			sourceTree = "<group>";
+		};
+		105FC58C2E9EAD3200EA8BCF /* KinexaFitnessTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KinexaFitnessTests;
+			sourceTree = "<group>";
+		};
+		105FC5962E9EAD3200EA8BCF /* KinexaFitnessUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KinexaFitnessUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXGroup section */
 		105FC5712E9EAD3100EA8BCF = {
@@ -112,6 +119,8 @@
 			);
 			name = KinexaFitness;
 			packageProductDependencies = (
+				XXDCC169DE7B2F3C1C8B10XX /* RevenueCat */,
+				XXEAC818FB99284308FEDEXX /* RevenueCatUI */,
 			);
 			productName = KinexaFitness;
 			productReference = 105FC57A2E9EAD3100EA8BCF /* KinexaFitness.app */;
@@ -203,6 +212,9 @@
 				105FC5792E9EAD3100EA8BCF /* KinexaFitness */,
 				105FC5882E9EAD3200EA8BCF /* KinexaFitnessTests */,
 				105FC5922E9EAD3200EA8BCF /* KinexaFitnessUITests */,
+			);
+			packageReferences = (
+				XX4AC81916604C4344ADC0XX /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 			);
 		};
 /* End PBXProject section */
@@ -400,7 +412,14 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				CODE_SIGN_ENTITLEMENTS = KinexaFitness/KinexaFitness.entitlements;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kinexa Fitness";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR codes to import workout plans.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Track distance and pace during outdoor activities like running, biking, and hiking.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Track your daily steps and activity.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose a profile photo or save share cards.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,12 +447,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = KinexaFitness/KinexaFitness.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kinexa Fitness";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR codes to import workout plans.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Track distance and pace during outdoor activities like running, biking, and hiking.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Track your daily steps and activity.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose a profile photo or save share cards.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -466,7 +492,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.rork.n7kn5gmg6dphg39y5eijf.tests";
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7kn5gmg6dphg39y5eijf.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -488,7 +514,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.rork.n7kn5gmg6dphg39y5eijf.tests";
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7kn5gmg6dphg39y5eijf.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -508,7 +534,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.rork.n7kn5gmg6dphg39y5eijf.uitests";
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7kn5gmg6dphg39y5eijf.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -528,7 +554,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.rork.n7kn5gmg6dphg39y5eijf.uitests";
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7kn5gmg6dphg39y5eijf.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -580,6 +606,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		XX4AC81916604C4344ADC0XX /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		XXDCC169DE7B2F3C1C8B10XX /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = XX4AC81916604C4344ADC0XX /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+		XXEAC818FB99284308FEDEXX /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = XX4AC81916604C4344ADC0XX /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCatUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 105FC5722E9EAD3100EA8BCF /* Project object */;
 }
