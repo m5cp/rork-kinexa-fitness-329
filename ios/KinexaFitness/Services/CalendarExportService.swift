@@ -49,7 +49,7 @@ final class CalendarExportService {
                 notes += " (\(exercise.notes))"
             }
         }
-        notes += "\n\nExported from GetFit"
+        notes += "\n\nExported from Kinexa Fitness"
         event.notes = notes
         event.calendar = store.defaultCalendarForNewEvents
 
@@ -88,7 +88,7 @@ final class CalendarExportService {
             for exercise in day.exercises {
                 notes += "\n• \(exercise.name) — \(exercise.displayDetail)"
             }
-            notes += "\n\nExported from GetFit"
+            notes += "\n\nExported from Kinexa Fitness"
             event.notes = notes
             event.calendar = store.defaultCalendarForNewEvents
 
@@ -134,7 +134,7 @@ final class CalendarExportService {
                     notes += "\n• \(movement.name)\(detail.isEmpty ? "" : " — \(detail)")"
                 }
             }
-            notes += "\n\nExported from GetFit"
+            notes += "\n\nExported from Kinexa Fitness"
             event.notes = notes
             event.calendar = store.defaultCalendarForNewEvents
 
@@ -176,7 +176,7 @@ final class CalendarExportService {
                 notes += "\n• \(movement.name)\(detail.isEmpty ? "" : " — \(detail)")"
             }
         }
-        notes += "\n\nExported from GetFit"
+        notes += "\n\nExported from Kinexa Fitness"
         event.notes = notes
         event.calendar = store.defaultCalendarForNewEvents
 
@@ -203,7 +203,7 @@ final class CalendarExportService {
         let affectedDays = plan.days.filter { cal.startOfDay(for: $0.date) >= dayStart }
 
         for day in affectedDays {
-            removeMVMEvents(on: day.date, prefix: "PT:")
+            removeKinexaEvents(on: day.date, prefix: "PT:")
         }
 
         var exported = 0
@@ -223,7 +223,7 @@ final class CalendarExportService {
             for exercise in day.exercises {
                 notes += "\n• \(exercise.name) — \(exercise.displayDetail)"
             }
-            notes += "\n\nExported from GetFit"
+            notes += "\n\nExported from Kinexa Fitness"
             event.notes = notes
             event.calendar = store.defaultCalendarForNewEvents
 
@@ -256,7 +256,7 @@ final class CalendarExportService {
         let affectedDays = plan.days.filter { cal.startOfDay(for: $0.date) >= dayStart }
 
         for day in affectedDays {
-            removeMVMEvents(on: day.date, prefix: "WOD:")
+            removeKinexaEvents(on: day.date, prefix: "WOD:")
         }
 
         var exported = 0
@@ -277,7 +277,7 @@ final class CalendarExportService {
                     notes += "\n• \(movement.name)\(detail.isEmpty ? "" : " — \(detail)")"
                 }
             }
-            notes += "\n\nExported from GetFit"
+            notes += "\n\nExported from Kinexa Fitness"
             event.notes = notes
             event.calendar = store.defaultCalendarForNewEvents
 
@@ -305,14 +305,14 @@ final class CalendarExportService {
         isExporting = true
         defer { isExporting = false }
 
-        removeMVMEvents(on: date, prefix: prefix)
+        removeKinexaEvents(on: date, prefix: prefix)
 
         let cal = Calendar.current
         let event = EKEvent(eventStore: store)
         event.title = "\(prefix) \(title)"
         event.startDate = cal.date(bySettingHour: 6, minute: 30, second: 0, of: date) ?? date
         event.endDate = cal.date(byAdding: .minute, value: max(durationMinutes, 15), to: event.startDate)
-        event.notes = notes + "\n\nExported from GetFit"
+        event.notes = notes + "\n\nExported from Kinexa Fitness"
         event.calendar = store.defaultCalendarForNewEvents
 
         do {
@@ -327,21 +327,21 @@ final class CalendarExportService {
         }
     }
 
-    func removeAllMVMEventsForPlan(dates: [Date], prefix: String) {
+    func removeAllKinexaEventsForPlan(dates: [Date], prefix: String) {
         guard EKEventStore.authorizationStatus(for: .event) == .fullAccess else { return }
         for date in dates {
-            removeMVMEvents(on: date, prefix: prefix)
+            removeKinexaEvents(on: date, prefix: prefix)
         }
     }
 
-    func removeAllMVMEventsOnDate(_ date: Date) {
+    func removeAllKinexaEventsOnDate(_ date: Date) {
         guard EKEventStore.authorizationStatus(for: .event) == .fullAccess else { return }
-        removeMVMEvents(on: date, prefix: "PT:")
-        removeMVMEvents(on: date, prefix: "WOD:")
-        removeMVMEvents(on: date, prefix: "Unit PT:")
+        removeKinexaEvents(on: date, prefix: "PT:")
+        removeKinexaEvents(on: date, prefix: "WOD:")
+        removeKinexaEvents(on: date, prefix: "Unit PT:")
     }
 
-    private func removeMVMEvents(on date: Date, prefix: String) {
+    private func removeKinexaEvents(on date: Date, prefix: String) {
         let cal = Calendar.current
         let dayStart = cal.startOfDay(for: date)
         guard let dayEnd = cal.date(byAdding: .day, value: 1, to: dayStart) else { return }
@@ -350,7 +350,7 @@ final class CalendarExportService {
         let existing = store.events(matching: predicate)
 
         for event in existing where event.title?.hasPrefix(prefix) == true {
-            if event.notes?.contains("Exported from GetFit") == true {
+            if event.notes?.contains("Exported from Kinexa Fitness") == true {
                 try? store.remove(event, span: .thisEvent)
             }
         }

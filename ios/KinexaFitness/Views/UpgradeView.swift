@@ -104,7 +104,7 @@ struct UpgradeView: View {
             .opacity(animateIn ? 1 : 0)
 
             VStack(spacing: 6) {
-                Text("Unlock MVM Pro")
+                Text("Unlock Kinexa Pro")
                     .font(.title2.weight(.bold))
                     .foregroundStyle(KinexaTheme.primaryText)
 

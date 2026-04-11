@@ -55,7 +55,7 @@ struct AFTShareSheet: View {
 
                         Button {
                             if let image = renderedImage {
-                                let text = "MVM Army — AFT Score: \(score.totalScore)/500\n#MVMArmy #ArmyFitness"
+                                let text = "Kinexa Fitness — AFT Score: \(score.totalScore)/500\n#KinexaFitness #Fitness"
                                 let activityVC = UIActivityViewController(activityItems: [image, text], applicationActivities: nil)
                                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                                       let rootVC = windowScene.windows.first?.rootViewController else { return }
@@ -187,7 +187,7 @@ enum AFTCardRenderer {
             .foregroundColor: UIColor.white.withAlphaComponent(0.7),
             .kern: 3.0
         ]
-        let titleStr = NSAttributedString(string: "MVM ARMY", attributes: titleAttrs)
+        let titleStr = NSAttributedString(string: "KINEXA FITNESS", attributes: titleAttrs)
         titleStr.draw(at: CGPoint(x: 100, y: 54))
 
         let dateFormatter = DateFormatter()
@@ -386,7 +386,7 @@ enum AFTCardRenderer {
             .font: UIFont.systemFont(ofSize: 20, weight: .medium),
             .foregroundColor: UIColor.white.withAlphaComponent(0.2)
         ]
-        let rightStr = NSAttributedString(string: "#MVMArmy", attributes: rightAttrs)
+        let rightStr = NSAttributedString(string: "#KinexaFitness", attributes: rightAttrs)
         let rightSize = rightStr.size()
         rightStr.draw(at: CGPoint(x: width - 60 - rightSize.width, y: y + 20))
     }

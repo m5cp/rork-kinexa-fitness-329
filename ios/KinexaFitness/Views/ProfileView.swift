@@ -235,7 +235,7 @@ struct ProfileView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(KinexaTheme.heroAmber)
                         .frame(width: 24)
-                    Text("MVM Pro Active")
+                    Text("Kinexa Pro Active")
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(KinexaTheme.primaryText)
                     Spacer()
@@ -482,7 +482,7 @@ struct ProfileView: View {
             NavigationLink {
                 CompetitorComparisonView()
             } label: {
-                settingsRow(icon: "medal.fill", title: "Why MVM?", color: KinexaTheme.heroAmber, showChevron: true)
+                settingsRow(icon: "medal.fill", title: "Why Kinexa?", color: KinexaTheme.heroAmber, showChevron: true)
             }
         }
     }
@@ -549,11 +549,11 @@ struct ProfileView: View {
 
     private var footer: some View {
         VStack(spacing: 6) {
-            Text("MVM GETFIT")
+            Text("KINEXA FITNESS")
                 .font(.caption.weight(.heavy))
                 .tracking(2.0)
                 .foregroundStyle(KinexaTheme.tertiaryText)
-            Text("Me vs Me")
+            Text("Rise Before The Sun")
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(KinexaTheme.tertiaryText.opacity(0.6))
             Text("Version 5.0")

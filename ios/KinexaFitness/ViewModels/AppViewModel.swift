@@ -1403,7 +1403,7 @@ final class AppViewModel {
 
         scheduledUnitPT.removeAll { cal.isDate($0.date, inSameDayAs: date) }
 
-        calendarService.removeAllMVMEventsOnDate(date)
+        calendarService.removeAllKinexaEventsOnDate(date)
         persistAll()
     }
 
@@ -1412,14 +1412,14 @@ final class AppViewModel {
         case .pt:
             if let p = currentPlan {
                 let dates = p.days.map(\.date)
-                calendarService.removeAllMVMEventsForPlan(dates: dates, prefix: plan.calendarPrefix)
+                calendarService.removeAllKinexaEventsForPlan(dates: dates, prefix: plan.calendarPrefix)
             }
             currentPlan = nil
 
         case .functionalFitness:
             if let p = wodPlan {
                 let dates = p.days.map(\.date)
-                calendarService.removeAllMVMEventsForPlan(dates: dates, prefix: plan.calendarPrefix)
+                calendarService.removeAllKinexaEventsForPlan(dates: dates, prefix: plan.calendarPrefix)
             }
             wodPlan = nil
             todayFunctionalWOD = nil
@@ -1427,10 +1427,10 @@ final class AppViewModel {
         case .unitPT:
             if let p = unitPTFullPlan {
                 let dates = p.allDays.map(\.date)
-                calendarService.removeAllMVMEventsForPlan(dates: dates, prefix: plan.calendarPrefix)
+                calendarService.removeAllKinexaEventsForPlan(dates: dates, prefix: plan.calendarPrefix)
             }
             let unitDates = scheduledUnitPT.map(\.date)
-            calendarService.removeAllMVMEventsForPlan(dates: unitDates, prefix: plan.calendarPrefix)
+            calendarService.removeAllKinexaEventsForPlan(dates: unitDates, prefix: plan.calendarPrefix)
             unitPTFullPlan = nil
             scheduledUnitPT = []
         }

@@ -7,8 +7,8 @@ struct CompetitorComparisonView: View {
 
     private let competitors: [Competitor] = [
         Competitor(
-            name: "MVM GetFit",
-            isMVM: true,
+            name: "Kinexa Fitness",
+            isKinexa: true,
             monthlyPrice: "$3.99",
             yearlyPrice: "$19.99",
             yearlyMonthly: "$1.67",
@@ -16,7 +16,7 @@ struct CompetitorComparisonView: View {
         ),
         Competitor(
             name: "Leading Fitness Tracker",
-            isMVM: false,
+            isKinexa: false,
             monthlyPrice: "$15.99",
             yearlyPrice: "$95.99",
             yearlyMonthly: "$8.00",
@@ -24,7 +24,7 @@ struct CompetitorComparisonView: View {
         ),
         Competitor(
             name: "Leading Workout Logger",
-            isMVM: false,
+            isKinexa: false,
             monthlyPrice: "$4.99",
             yearlyPrice: "$29.99",
             yearlyMonthly: "$2.50",
@@ -32,7 +32,7 @@ struct CompetitorComparisonView: View {
         ),
         Competitor(
             name: "Leading Fitness App",
-            isMVM: false,
+            isKinexa: false,
             monthlyPrice: "Free*",
             yearlyPrice: "$9.99+",
             yearlyMonthly: "per plan",
@@ -98,7 +98,7 @@ struct CompetitorComparisonView: View {
                 Image(systemName: "medal.fill")
                     .font(.title2.weight(.bold))
                     .foregroundStyle(KinexaTheme.heroAmber)
-                Text("WHY MVM?")
+                Text("WHY KINEXA?")
                     .font(.caption.weight(.heavy))
                     .tracking(2.0)
                     .foregroundStyle(KinexaTheme.heroAmber)
@@ -110,7 +110,7 @@ struct CompetitorComparisonView: View {
                 .multilineTextAlignment(.center)
                 .lineSpacing(2)
 
-            Text("See how MVM GetFit stacks up against the leading fitness apps.")
+            Text("See how Kinexa Fitness stacks up against the leading fitness apps.")
                 .font(.subheadline)
                 .foregroundStyle(KinexaTheme.secondaryText)
                 .multilineTextAlignment(.center)
@@ -538,7 +538,7 @@ struct CompetitorComparisonView: View {
                         Image(systemName: "shield.fill")
                             .font(.headline.weight(.bold))
                             .foregroundStyle(.white)
-                        Text("MVM GETFIT")
+                        Text("KINEXA FITNESS")
                             .font(.caption.weight(.heavy))
                             .tracking(1.5)
                             .foregroundStyle(.white.opacity(0.9))
@@ -719,7 +719,7 @@ struct CompetitorComparisonView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             HStack(spacing: 0) {
-                columnLabel("MVM", highlight: true)
+                columnLabel("Kinexa", highlight: true)
                 columnLabel("Tracker", highlight: false)
                 columnLabel("Logger", highlight: false)
                 columnLabel("Other", highlight: false)
@@ -873,7 +873,7 @@ struct CompetitorComparisonView: View {
 
 nonisolated struct Competitor: Sendable {
     let name: String
-    let isMVM: Bool
+    let isKinexa: Bool
     let monthlyPrice: String
     let yearlyPrice: String
     let yearlyMonthly: String

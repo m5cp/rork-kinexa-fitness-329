@@ -78,7 +78,7 @@ struct SplashView: View {
                 }
 
                 VStack(spacing: 8) {
-                    Text("MVM GETFIT")
+                    Text("KINEXA FITNESS")
                         .font(.system(size: 28, weight: .black, design: .rounded))
                         .tracking(4)
                         .foregroundStyle(
@@ -96,7 +96,7 @@ struct SplashView: View {
                             )
                             .offset(x: shimmerPhase)
                             .mask {
-                                Text("MVM GETFIT")
+                                Text("KINEXA FITNESS")
                                     .font(.system(size: 28, weight: .black, design: .rounded))
                                     .tracking(4)
                             }

@@ -50,7 +50,7 @@ struct PlanView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("MVM GETFIT")
+                Text("KINEXA FITNESS")
                     .font(.caption.weight(.heavy))
                     .tracking(2.4)
                     .foregroundStyle(KinexaTheme.secondaryText)
@@ -1030,7 +1030,7 @@ struct PlanView: View {
         case .partial(let exported, let failed):
             exportAlertMessage = "\(exported) exported, \(failed) failed. Try again for remaining."
         case .denied:
-            exportAlertMessage = "Calendar access denied. Go to Settings → MVM GetFit → Calendars to enable."
+            exportAlertMessage = "Calendar access denied. Go to Settings → Kinexa Fitness → Calendars to enable."
         case .error(let message):
             exportAlertMessage = "Export failed: \(message)"
         }
