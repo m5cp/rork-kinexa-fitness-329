@@ -10,6 +10,10 @@ struct SplashView: View {
     @State private var iconScale: Double = 0.0
     @State private var iconOpacity: Double = 0
     @State private var iconBlur: Double = 20
+    @State private var iconPulse: Double = 1.0
+    @State private var iconGlowPulse: Double = 0.7
+    @State private var iconRotation3D: Double = 0
+    @State private var iconYOffset: Double = 60
     @State private var ringScales: [Double] = [0.3, 0.2, 0.15]
     @State private var ringOpacities: [Double] = [0, 0, 0]
     @State private var ringRotations: [Double] = [-90, 60, -45]
@@ -196,13 +200,16 @@ struct SplashView: View {
                 Image("AppLogo")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 100, height: 100)
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                    .shadow(color: KinexaTheme.accent.opacity(0.7), radius: 30, y: 0)
-                    .shadow(color: KinexaTheme.brandGreen.opacity(0.4), radius: 60, y: 10)
-                    .scaleEffect(iconScale)
+                    .frame(width: 110, height: 110)
+                    .clipShape(RoundedRectangle(cornerRadius: 26))
+                    .shadow(color: KinexaTheme.accent.opacity(iconGlowPulse), radius: 40, y: 0)
+                    .shadow(color: KinexaTheme.brandGreen.opacity(iconGlowPulse * 0.6), radius: 70, y: 10)
+                    .shadow(color: KinexaTheme.accent.opacity(iconGlowPulse * 0.3), radius: 100, y: 0)
+                    .scaleEffect(iconScale * iconPulse)
                     .opacity(iconOpacity)
                     .blur(radius: iconBlur)
+                    .offset(y: iconYOffset)
+                    .rotation3DEffect(.degrees(iconRotation3D), axis: (x: 0, y: 1, z: 0))
             }
 
             Spacer().frame(height: 36)
@@ -312,26 +319,51 @@ struct SplashView: View {
             verticalBeamOffset = 0
         }
 
-        withAnimation(.spring(response: 0.7, dampingFraction: 0.65).delay(0.5)) {
-            iconScale = 1.0
+        withAnimation(.spring(response: 0.9, dampingFraction: 0.55).delay(0.6)) {
+            iconScale = 1.15
             iconOpacity = 1.0
             iconBlur = 0
+            iconYOffset = 0
         }
 
-        withAnimation(.easeOut(duration: 0.6).delay(0.5)) {
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(1.5)) {
+            iconScale = 1.0
+        }
+
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.5).delay(1.9)) {
+            iconScale = 1.12
+        }
+
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.65).delay(2.3)) {
+            iconScale = 1.0
+        }
+
+        withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true).delay(2.5)) {
+            iconPulse = 1.06
+            iconGlowPulse = 1.0
+        }
+
+        withAnimation(.easeInOut(duration: 0.4).delay(1.5)) {
+            iconRotation3D = 8
+        }
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(1.9)) {
+            iconRotation3D = 0
+        }
+
+        withAnimation(.easeOut(duration: 0.8).delay(0.6)) {
             glowIntensity = 1.0
         }
 
-        withAnimation(.spring(response: 0.8, dampingFraction: 0.5).delay(0.7)) {
+        withAnimation(.spring(response: 0.8, dampingFraction: 0.5).delay(1.0)) {
             shockwaveScale = 1.0
             shockwaveOpacity = 0.8
         }
-        withAnimation(.easeOut(duration: 0.8).delay(1.2)) {
+        withAnimation(.easeOut(duration: 1.0).delay(1.8)) {
             shockwaveOpacity = 0
         }
 
         for i in 0..<3 {
-            let delay = 0.6 + Double(i) * 0.15
+            let delay = 1.0 + Double(i) * 0.2
             withAnimation(.spring(response: 0.8, dampingFraction: 0.6).delay(delay)) {
                 ringScales[i] = 1.0
                 ringOpacities[i] = 1.0
@@ -342,42 +374,48 @@ struct SplashView: View {
         }
 
         for i in 0..<titleText.count {
-            let delay = 1.0 + Double(i) * 0.04
+            let delay = 2.6 + Double(i) * 0.05
             withAnimation(.spring(response: 0.4, dampingFraction: 0.7).delay(delay)) {
                 titleLetterOpacities[i] = 1.0
                 titleLetterOffsets[i] = 0
             }
         }
 
-        withAnimation(.easeOut(duration: 0.6).delay(1.5)) {
+        withAnimation(.easeOut(duration: 0.7).delay(3.5)) {
             lineWidth = 60
             lineOpacity = 1.0
         }
 
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(1.7)) {
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(3.8)) {
             subtitleOpacity = 1.0
             subtitleBlur = 0
         }
 
-        withAnimation(.easeInOut(duration: 1.0).delay(2.0)) {
+        withAnimation(.easeInOut(duration: 1.2).delay(4.0)) {
             shimmerX = 300
         }
 
-        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true).delay(1.0)) {
+        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true).delay(1.5)) {
             ambientPulse = 1.0
         }
 
-        withAnimation(.easeInOut(duration: 1.0).delay(1.2)) {
+        withAnimation(.easeInOut(duration: 1.5).delay(2.0)) {
             verticalBeamOpacity = 0
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-            withAnimation(.easeInOut(duration: 0.5)) {
-                exitScale = 1.08
-                exitOpacity = 0
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
+            withAnimation(.easeIn(duration: 0.3)) {
+                iconPulse = 1.15
+                iconGlowPulse = 1.3
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                onFinished()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.easeInOut(duration: 0.7)) {
+                    exitScale = 1.12
+                    exitOpacity = 0
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                    onFinished()
+                }
             }
         }
     }
