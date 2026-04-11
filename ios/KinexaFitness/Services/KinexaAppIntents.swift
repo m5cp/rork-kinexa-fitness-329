@@ -29,7 +29,7 @@ struct StartPTIntent: AppIntent {
             }
             return .result(dialog: "Opening today's workout: \(title)")
         }
-        return .result(dialog: "No workout scheduled for today. Open GetFit to generate a plan.")
+        return .result(dialog: "No workout scheduled for today. Open Kinexa Fitness to generate a plan.")
     }
 }
 

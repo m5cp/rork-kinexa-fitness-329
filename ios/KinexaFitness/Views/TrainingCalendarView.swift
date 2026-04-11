@@ -139,7 +139,7 @@ struct TrainingCalendarView: View {
                     .font(.title3.weight(.bold))
                     .foregroundStyle(KinexaTheme.primaryText)
 
-                Text("GetFit will add your scheduled workouts to your iOS Calendar so they appear alongside your other events.\n\nYou can turn this off at any time.")
+                Text("Kinexa Fitness will add your scheduled workouts to your iOS Calendar so they appear alongside your other events.\n\nYou can turn this off at any time.")
                     .font(.subheadline)
                     .foregroundStyle(KinexaTheme.secondaryText)
                     .multilineTextAlignment(.center)

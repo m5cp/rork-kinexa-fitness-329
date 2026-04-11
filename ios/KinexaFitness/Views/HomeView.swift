@@ -1284,7 +1284,7 @@ struct HomeView: View {
         case .partial(let exported, let failed):
             exportAlertMessage = "\(exported) exported, \(failed) failed. Try again for remaining."
         case .denied:
-            exportAlertMessage = "Calendar access denied. Go to Settings → GetFit → Calendars to enable."
+            exportAlertMessage = "Calendar access denied. Go to Settings → Kinexa Fitness → Calendars to enable."
         case .error(let message):
             exportAlertMessage = "Export failed: \(message)"
         }

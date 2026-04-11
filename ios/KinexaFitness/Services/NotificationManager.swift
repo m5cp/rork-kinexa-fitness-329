@@ -16,7 +16,7 @@ enum NotificationManager {
         center.removePendingNotificationRequests(withIdentifiers: ["mvm_daily_reminder"])
 
         let content = UNMutableNotificationContent()
-        content.title = "GetFit"
+        content.title = "Kinexa Fitness"
         content.body = "Me vs Me. Time to train."
         content.sound = .default
 

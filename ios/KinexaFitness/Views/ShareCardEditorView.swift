@@ -592,7 +592,7 @@ struct ShareCardEditorView: View {
             if let final = compositeImage {
                 ShareLink(
                     item: Image(uiImage: final),
-                    preview: SharePreview("GetFit", image: Image(uiImage: final))
+                    preview: SharePreview("Kinexa Fitness", image: Image(uiImage: final))
                 ) {
                     HStack(spacing: 8) {
                         Image(systemName: "square.and.arrow.up")

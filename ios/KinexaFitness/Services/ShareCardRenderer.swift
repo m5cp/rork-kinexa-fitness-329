@@ -70,20 +70,20 @@ enum ShareCardRenderer {
     static func fallbackText(cardType: ShareCardType) -> String {
         switch cardType {
         case .workout(let title, let exercises, _):
-            return "GetFit — \(title)\n\(exercises.count) exercises\n#GetFit"
+            return "Kinexa Fitness — \(title)\n\(exercises.count) exercises\n#KinexaFitness"
         case .progress(let completed, let planned, let streak, let steps):
-            return "GetFit — Weekly Progress\n\(completed)/\(planned) done · \(streak) day streak · \(steps) steps\n#GetFit"
+            return "Kinexa Fitness — Weekly Progress\n\(completed)/\(planned) done · \(streak) day streak · \(steps) steps\n#KinexaFitness"
         case .aft(let score, _):
-            return "GetFit — AFT Score: \(score.totalScore)\n#GetFit"
+            return "Kinexa Fitness — AFT Score: \(score.totalScore)\n#KinexaFitness"
         case .unitPT(let plan):
-            return "GetFit — \(plan.title)\n\(plan.objective)\n#GetFit"
+            return "Kinexa Fitness — \(plan.title)\n\(plan.objective)\n#KinexaFitness"
         case .completion(let title, let count, let duration):
-            return "GetFit — Completed: \(title)\n\(count) exercises · \(duration)\n#GetFit"
+            return "Kinexa Fitness — Completed: \(title)\n\(count) exercises · \(duration)\n#KinexaFitness"
         case .completedWorkout(let record):
             let prefix = record.source == .wod ? "FunctionFitness: " : ""
-            return "GetFit — \(prefix)\(record.title)\n\(record.exerciseCount) exercises\n#GetFit"
+            return "Kinexa Fitness — \(prefix)\(record.title)\n\(record.exerciseCount) exercises\n#KinexaFitness"
         case .quickStart(let record):
-            return "GetFit — \(record.activity.rawValue)\nDuration: \(record.formattedDuration)\n#GetFit"
+            return "Kinexa Fitness — \(record.activity.rawValue)\nDuration: \(record.formattedDuration)\n#KinexaFitness"
         }
     }
 }
@@ -164,14 +164,14 @@ enum ShareCardCGHelpers {
             .font: UIFont.systemFont(ofSize: 20, weight: .semibold),
             .foregroundColor: UIColor.white.withAlphaComponent(0.25)
         ]
-        let leftStr = NSAttributedString(string: "GetFit", attributes: leftAttrs)
+        let leftStr = NSAttributedString(string: "Kinexa Fitness", attributes: leftAttrs)
         leftStr.draw(at: CGPoint(x: 60, y: y + 20))
 
         let rightAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 20, weight: .medium),
             .foregroundColor: UIColor.white.withAlphaComponent(0.2)
         ]
-        let rightStr = NSAttributedString(string: "#GetFit", attributes: rightAttrs)
+        let rightStr = NSAttributedString(string: "#KinexaFitness", attributes: rightAttrs)
         let rightSize = rightStr.size()
         rightStr.draw(at: CGPoint(x: width - 60 - rightSize.width, y: y + 20))
     }

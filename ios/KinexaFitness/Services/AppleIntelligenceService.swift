@@ -58,7 +58,7 @@ final class AppleIntelligenceService {
         )
 
         let prompt = """
-        You are a concise military fitness advisor. Analyze this soldier's training data and provide a brief, actionable insight in 2-3 sentences. Focus on trends, strengths, or areas to improve. Be direct and motivating.
+        You are a concise fitness advisor. Analyze this athlete's training data and provide a brief, actionable insight in 2-3 sentences. Focus on trends, strengths, or areas to improve. Be direct and motivating.
 
         \(context)
 
@@ -67,7 +67,7 @@ final class AppleIntelligenceService {
 
         do {
             let session = LanguageModelSession {
-                "You are a military fitness advisor. Keep responses under 3 sentences. Be direct, motivating, and actionable. DO NOT use markdown formatting."
+                "You are a fitness advisor. Keep responses under 3 sentences. Be direct, motivating, and actionable. DO NOT use markdown formatting."
             }
             let response = try await session.respond(to: prompt)
             return response.content
@@ -98,7 +98,7 @@ final class AppleIntelligenceService {
         let latestScore = aftScores.first.map { "Latest AFT: \($0.totalScore) points" } ?? "No AFT scores recorded"
 
         let prompt = """
-        Summarize this soldier's training week in 3-4 sentences. Be specific about what was accomplished and give one forward-looking recommendation.
+        Summarize this athlete's training week in 3-4 sentences. Be specific about what was accomplished and give one forward-looking recommendation.
 
         Workouts completed this week: \(weekRecords.count)
         Sessions: \(workoutList.isEmpty ? "None" : workoutList)
@@ -111,7 +111,7 @@ final class AppleIntelligenceService {
 
         do {
             let session = LanguageModelSession {
-                "You are a military fitness advisor writing a brief weekly training summary. Keep it under 4 sentences. Be specific and motivating. DO NOT use markdown formatting."
+                "You are a fitness advisor writing a brief weekly training summary. Keep it under 4 sentences. Be specific and motivating. DO NOT use markdown formatting."
             }
             let response = try await session.respond(to: prompt)
             return response.content
@@ -135,7 +135,7 @@ final class AppleIntelligenceService {
         let recentList = recentWorkouts.prefix(5).map(\.title).joined(separator: ", ")
 
         let prompt = """
-        Based on this soldier's recent training, give one specific, actionable tip in 1-2 sentences.
+        Based on this athlete's recent training, give one specific, actionable tip in 1-2 sentences.
 
         Recent workouts: \(recentList.isEmpty ? "None yet" : recentList)
         Weak AFT events: \(weakEvents.isEmpty ? "None identified" : weakEvents.joined(separator: ", "))
@@ -146,7 +146,7 @@ final class AppleIntelligenceService {
 
         do {
             let session = LanguageModelSession {
-                "You are a military fitness coach. Give one brief, specific training tip. Keep it under 2 sentences. DO NOT use markdown formatting."
+                "You are a fitness coach. Give one brief, specific training tip. Keep it under 2 sentences. DO NOT use markdown formatting."
             }
             let response = try await session.respond(to: prompt)
             return response.content

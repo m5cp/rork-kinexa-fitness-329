@@ -263,7 +263,7 @@ struct OnboardingView: View {
         VStack(spacing: 32) {
             sectionHeader(icon: "shield.checkered", title: "Before You Begin")
 
-            Text("GetFit is a fitness tracking and accountability tool. All workout templates are based on publicly available fitness standards. This app does not provide medical advice, coaching, or exercise instruction. You choose and perform all exercises at your own risk.")
+            Text("Kinexa Fitness is a fitness tracking and accountability tool. All workout templates are based on publicly available fitness standards. This app does not provide medical advice, coaching, or exercise instruction. You choose and perform all exercises at your own risk.")
                 .font(.subheadline)
                 .foregroundStyle(KinexaTheme.secondaryText)
                 .multilineTextAlignment(.center)

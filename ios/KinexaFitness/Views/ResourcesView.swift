@@ -83,7 +83,7 @@ struct ResourcesView: View {
                     Text("Combat Standard")
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(KinexaTheme.primaryText)
-                    Text("Minimum 60 points per event, 350 points total to pass. Sex-neutral scoring — all soldiers use the same table.")
+                    Text("Minimum 60 points per event, 350 points total to pass. Sex-neutral scoring — everyone uses the same table.")
                         .font(.caption)
                         .foregroundStyle(KinexaTheme.secondaryText)
                 }
@@ -179,7 +179,7 @@ struct ResourcesView: View {
                     .foregroundStyle(KinexaTheme.tertiaryText)
             }
 
-            Text("This information is based on publicly available military fitness standards and is provided for general reference only. This app is not affiliated with, endorsed by, or sponsored by the U.S. Department of War or the Department of the Army.")
+            Text("This information is based on publicly available fitness standards and is provided for general reference only. This app is not affiliated with, endorsed by, or sponsored by any government entity.")
                 .font(.caption2)
                 .foregroundStyle(KinexaTheme.tertiaryText)
                 .lineSpacing(3)

@@ -83,7 +83,7 @@ struct WorkoutQRSheet: View {
                     .foregroundStyle(KinexaTheme.secondaryText)
             }
 
-            Text("Scan with GetFit to import this workout")
+            Text("Scan with Kinexa Fitness to import this workout")
                 .font(.caption)
                 .foregroundStyle(KinexaTheme.tertiaryText)
                 .multilineTextAlignment(.center)
