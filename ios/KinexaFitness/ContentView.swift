@@ -11,11 +11,14 @@ struct RootView: View {
 
             if showSplash {
                 SplashView {
-                    withAnimation(.easeInOut(duration: 0.5)) {
+                    withAnimation(.spring(response: 0.6, dampingFraction: 0.85)) {
                         showSplash = false
                     }
                 }
-                .transition(.opacity)
+                .transition(.asymmetric(
+                    insertion: .opacity,
+                    removal: .scale(scale: 1.05).combined(with: .opacity)
+                ))
                 .zIndex(1)
             }
         }

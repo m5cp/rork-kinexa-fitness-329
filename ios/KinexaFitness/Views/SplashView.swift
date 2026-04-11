@@ -1,184 +1,384 @@
 import SwiftUI
 
 struct SplashView: View {
-    @State private var iconScale: Double = 0.3
-    @State private var iconOpacity: Double = 0
-    @State private var iconRotation: Double = -30
-    @State private var ringScale: Double = 0.5
-    @State private var ringOpacity: Double = 0
-    @State private var ring2Scale: Double = 0.4
-    @State private var ring2Opacity: Double = 0
-    @State private var titleOpacity: Double = 0
-    @State private var titleOffset: Double = 20
-    @State private var subtitleOpacity: Double = 0
-    @State private var shimmerPhase: Double = -200
-    @State private var particlesVisible: Bool = false
-    @State private var pulseScale: Double = 1.0
-
     var onFinished: () -> Void
+
+    @State private var phase: SplashPhase = .dark
+    @State private var meshT: Float = 0.0
+    @State private var orbOffsets: [CGSize] = Array(repeating: .zero, count: 6)
+    @State private var orbOpacities: [Double] = Array(repeating: 0, count: 6)
+    @State private var iconScale: Double = 0.0
+    @State private var iconOpacity: Double = 0
+    @State private var iconBlur: Double = 20
+    @State private var ringScales: [Double] = [0.3, 0.2, 0.15]
+    @State private var ringOpacities: [Double] = [0, 0, 0]
+    @State private var ringRotations: [Double] = [-90, 60, -45]
+    @State private var shockwaveScale: Double = 0.1
+    @State private var shockwaveOpacity: Double = 0
+    @State private var glowIntensity: Double = 0
+    @State private var titleLetterOpacities: [Double] = Array(repeating: 0, count: 15)
+    @State private var titleLetterOffsets: [Double] = Array(repeating: 30, count: 15)
+    @State private var subtitleOpacity: Double = 0
+    @State private var subtitleBlur: Double = 10
+    @State private var lineWidth: Double = 0
+    @State private var lineOpacity: Double = 0
+    @State private var shimmerX: Double = -300
+    @State private var ambientPulse: Double = 0.6
+    @State private var exitScale: Double = 1.0
+    @State private var exitOpacity: Double = 1.0
+    @State private var verticalBeamOpacity: Double = 0
+    @State private var verticalBeamOffset: Double = 200
+
+    private let titleText = "KINEXA FITNESS"
+
+    nonisolated private enum SplashPhase {
+        case dark, reveal, hold, exit
+    }
 
     var body: some View {
         ZStack {
-            KinexaTheme.background.ignoresSafeArea()
+            backgroundLayer
+            orbField
+            verticalLightBeam
+            centralContent
+        }
+        .scaleEffect(exitScale)
+        .opacity(exitOpacity)
+        .ignoresSafeArea()
+        .onAppear { runCinematicSequence() }
+    }
 
-            backgroundParticles
+    private var backgroundLayer: some View {
+        ZStack {
+            Color(hex: "#050807").ignoresSafeArea()
 
-            VStack(spacing: 24) {
-                Spacer()
+            MeshGradient(
+                width: 3,
+                height: 3,
+                points: [
+                    [0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
+                    [0.0, 0.5], [Float(0.5 + sin(Double(meshT)) * 0.15), Float(0.5 + cos(Double(meshT)) * 0.15)], [1.0, 0.5],
+                    [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]
+                ],
+                colors: [
+                    Color(hex: "#050807"), Color(hex: "#0A1210"), Color(hex: "#050807"),
+                    Color(hex: "#0A1210"), Color(hex: "#1B5E3B").opacity(Double(ambientPulse)), Color(hex: "#0A1210"),
+                    Color(hex: "#050807"), Color(hex: "#0F1F18"), Color(hex: "#050807")
+                ]
+            )
+            .ignoresSafeArea()
 
-                ZStack {
+            RadialGradient(
+                colors: [
+                    KinexaTheme.accent.opacity(glowIntensity * 0.35),
+                    KinexaTheme.brandGreen.opacity(glowIntensity * 0.15),
+                    Color.clear
+                ],
+                center: .center,
+                startRadius: 20,
+                endRadius: 300
+            )
+            .ignoresSafeArea()
+        }
+    }
+
+    private var orbField: some View {
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            let origins: [(x: Double, y: Double, size: Double)] = [
+                (0.12, 0.18, 6), (0.88, 0.12, 4), (0.25, 0.75, 5),
+                (0.78, 0.82, 7), (0.55, 0.25, 3), (0.08, 0.55, 5)
+            ]
+
+            ForEach(0..<6, id: \.self) { i in
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                (i % 2 == 0 ? KinexaTheme.accent : KinexaTheme.accent2).opacity(0.6),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: origins[i].size * 3
+                        )
+                    )
+                    .frame(width: origins[i].size * 2, height: origins[i].size * 2)
+                    .blur(radius: origins[i].size)
+                    .position(
+                        x: origins[i].x * w + orbOffsets[i].width,
+                        y: origins[i].y * h + orbOffsets[i].height
+                    )
+                    .opacity(orbOpacities[i])
+            }
+        }
+    }
+
+    private var verticalLightBeam: some View {
+        Rectangle()
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.clear,
+                        KinexaTheme.accent.opacity(0.08),
+                        KinexaTheme.accent.opacity(0.15),
+                        KinexaTheme.accent.opacity(0.08),
+                        Color.clear
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+            .frame(width: 2)
+            .blur(radius: 8)
+            .opacity(verticalBeamOpacity)
+            .offset(y: verticalBeamOffset)
+    }
+
+    private var centralContent: some View {
+        VStack(spacing: 0) {
+            Spacer()
+
+            ZStack {
+                ForEach(0..<3, id: \.self) { i in
                     Circle()
                         .stroke(
-                            LinearGradient(
-                                colors: [KinexaTheme.accent.opacity(0.3), KinexaTheme.accent2.opacity(0.1)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+                            AngularGradient(
+                                colors: [
+                                    KinexaTheme.accent.opacity(0.4 - Double(i) * 0.1),
+                                    KinexaTheme.accent2.opacity(0.2),
+                                    Color.clear,
+                                    KinexaTheme.brandGreen.opacity(0.3 - Double(i) * 0.08),
+                                    KinexaTheme.accent.opacity(0.4 - Double(i) * 0.1)
+                                ],
+                                center: .center
                             ),
-                            lineWidth: 2
+                            lineWidth: 1.5 - Double(i) * 0.3
                         )
-                        .frame(width: 160, height: 160)
-                        .scaleEffect(ring2Scale)
-                        .opacity(ring2Opacity)
+                        .frame(width: 140 + Double(i) * 40, height: 140 + Double(i) * 40)
+                        .scaleEffect(ringScales[i])
+                        .opacity(ringOpacities[i])
+                        .rotationEffect(.degrees(ringRotations[i]))
+                }
 
-                    Circle()
-                        .stroke(
-                            LinearGradient(
-                                colors: [KinexaTheme.accent.opacity(0.5), KinexaTheme.accent2.opacity(0.3)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 2.5
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                KinexaTheme.accent.opacity(shockwaveOpacity * 0.5),
+                                KinexaTheme.accent.opacity(shockwaveOpacity * 0.2),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 180
                         )
-                        .frame(width: 130, height: 130)
-                        .scaleEffect(ringScale)
-                        .opacity(ringOpacity)
+                    )
+                    .frame(width: 360, height: 360)
+                    .scaleEffect(shockwaveScale)
 
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [KinexaTheme.accent.opacity(0.15), Color.clear],
-                                center: .center,
-                                startRadius: 20,
-                                endRadius: 60
-                            )
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                KinexaTheme.accent.opacity(0.2),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 10,
+                            endRadius: 55
                         )
-                        .frame(width: 120, height: 120)
-                        .scaleEffect(pulseScale)
-                        .opacity(ringOpacity * 0.6)
+                    )
+                    .frame(width: 110, height: 110)
+                    .opacity(iconOpacity)
 
-                    Image("AppLogo")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 90, height: 90)
-                        .clipShape(RoundedRectangle(cornerRadius: 22))
-                        .shadow(color: KinexaTheme.accent.opacity(0.5), radius: 20, y: 5)
+                Image("AppLogo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 100, height: 100)
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .shadow(color: KinexaTheme.accent.opacity(0.7), radius: 30, y: 0)
+                    .shadow(color: KinexaTheme.brandGreen.opacity(0.4), radius: 60, y: 10)
                     .scaleEffect(iconScale)
                     .opacity(iconOpacity)
-                    .rotationEffect(.degrees(iconRotation))
+                    .blur(radius: iconBlur)
+            }
+
+            Spacer().frame(height: 36)
+
+            VStack(spacing: 14) {
+                HStack(spacing: 2.5) {
+                    ForEach(Array(titleText.enumerated()), id: \.offset) { index, char in
+                        Text(String(char))
+                            .font(.system(size: 30, weight: .black, design: .default))
+                            .tracking(1)
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.white, .white.opacity(0.75)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .opacity(titleLetterOpacities[index])
+                            .offset(y: titleLetterOffsets[index])
+                    }
+                }
+                .overlay {
+                    LinearGradient(
+                        colors: [.clear, .white.opacity(0.6), .clear],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: 80)
+                    .offset(x: shimmerX)
+                    .mask {
+                        HStack(spacing: 2.5) {
+                            ForEach(Array(titleText.enumerated()), id: \.offset) { _, char in
+                                Text(String(char))
+                                    .font(.system(size: 30, weight: .black, design: .default))
+                                    .tracking(1)
+                            }
+                        }
+                    }
                 }
 
-                VStack(spacing: 8) {
-                    Text("KINEXA FITNESS")
-                        .font(.system(size: 28, weight: .black, design: .rounded))
-                        .tracking(4)
-                        .foregroundStyle(
+                HStack(spacing: 0) {
+                    Rectangle()
+                        .fill(
                             LinearGradient(
-                                colors: [.white, .white.opacity(0.8)],
+                                colors: [Color.clear, KinexaTheme.accent.opacity(0.5)],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
                         )
-                        .overlay {
+                        .frame(width: lineWidth, height: 1)
+                    Rectangle()
+                        .fill(KinexaTheme.accent)
+                        .frame(width: 4, height: 4)
+                        .clipShape(Circle())
+                        .opacity(lineOpacity)
+                    Rectangle()
+                        .fill(
                             LinearGradient(
-                                colors: [.clear, .white.opacity(0.4), .clear],
+                                colors: [KinexaTheme.accent.opacity(0.5), Color.clear],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
-                            .offset(x: shimmerPhase)
-                            .mask {
-                                Text("KINEXA FITNESS")
-                                    .font(.system(size: 28, weight: .black, design: .rounded))
-                                    .tracking(4)
-                            }
-                        }
-                        .opacity(titleOpacity)
-                        .offset(y: titleOffset)
-
-                    Text("OUTWORK YESTERDAY")
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .tracking(3)
-                        .foregroundStyle(KinexaTheme.secondaryText)
-                        .opacity(subtitleOpacity)
+                        )
+                        .frame(width: lineWidth, height: 1)
                 }
+                .frame(height: 4)
 
-                Spacer()
-                Spacer()
+                Text("RISE BEFORE THE SUN")
+                    .font(.system(size: 12, weight: .medium, design: .default))
+                    .tracking(6)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [KinexaTheme.accent2, KinexaTheme.secondaryText],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .opacity(subtitleOpacity)
+                    .blur(radius: subtitleBlur)
             }
-        }
-        .onAppear {
-            runAnimation()
+
+            Spacer()
+            Spacer()
         }
     }
 
-    private var backgroundParticles: some View {
-        Canvas { context, size in
-            guard particlesVisible else { return }
-            let positions: [(x: Double, y: Double, r: Double)] = [
-                (0.15, 0.2, 2), (0.85, 0.15, 1.5), (0.3, 0.7, 2.5),
-                (0.7, 0.8, 1.8), (0.5, 0.35, 1.2), (0.9, 0.5, 2),
-                (0.1, 0.55, 1.8), (0.6, 0.15, 1.5), (0.4, 0.85, 2),
-                (0.8, 0.4, 1.3), (0.2, 0.9, 1.6), (0.95, 0.7, 1.4),
-            ]
-            for p in positions {
-                let point = CGPoint(x: p.x * size.width, y: p.y * size.height)
-                let rect = CGRect(x: point.x - p.r, y: point.y - p.r, width: p.r * 2, height: p.r * 2)
-                context.fill(Circle().path(in: rect), with: .color(KinexaTheme.accent.opacity(0.25)))
+    private func runCinematicSequence() {
+        withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
+            meshT = 6.28
+        }
+
+        for i in 0..<6 {
+            let delay = 0.2 + Double(i) * 0.12
+            withAnimation(.easeOut(duration: 1.5).delay(delay)) {
+                orbOpacities[i] = 1.0
+            }
+            withAnimation(.easeInOut(duration: Double.random(in: 3...5)).repeatForever(autoreverses: true).delay(delay)) {
+                orbOffsets[i] = CGSize(
+                    width: Double.random(in: -30...30),
+                    height: Double.random(in: -30...30)
+                )
             }
         }
-        .opacity(particlesVisible ? 1 : 0)
-        .animation(.easeIn(duration: 1.0), value: particlesVisible)
-    }
 
-    private func runAnimation() {
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.6).delay(0.2)) {
+        withAnimation(.easeInOut(duration: 1.2).delay(0.3)) {
+            verticalBeamOpacity = 1.0
+            verticalBeamOffset = 0
+        }
+
+        withAnimation(.spring(response: 0.7, dampingFraction: 0.65).delay(0.5)) {
             iconScale = 1.0
             iconOpacity = 1.0
-            iconRotation = 0
+            iconBlur = 0
         }
 
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.4)) {
-            ringScale = 1.0
-            ringOpacity = 1.0
+        withAnimation(.easeOut(duration: 0.6).delay(0.5)) {
+            glowIntensity = 1.0
         }
 
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.55)) {
-            ring2Scale = 1.0
-            ring2Opacity = 1.0
+        withAnimation(.spring(response: 0.8, dampingFraction: 0.5).delay(0.7)) {
+            shockwaveScale = 1.0
+            shockwaveOpacity = 0.8
+        }
+        withAnimation(.easeOut(duration: 0.8).delay(1.2)) {
+            shockwaveOpacity = 0
         }
 
-        withAnimation(.easeOut(duration: 0.5).delay(0.7)) {
-            titleOpacity = 1.0
-            titleOffset = 0
+        for i in 0..<3 {
+            let delay = 0.6 + Double(i) * 0.15
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.6).delay(delay)) {
+                ringScales[i] = 1.0
+                ringOpacities[i] = 1.0
+            }
+            withAnimation(.linear(duration: Double(12 + i * 8)).repeatForever(autoreverses: false).delay(delay)) {
+                ringRotations[i] += (i % 2 == 0 ? 360 : -360)
+            }
         }
 
-        withAnimation(.easeOut(duration: 0.4).delay(0.9)) {
+        for i in 0..<titleText.count {
+            let delay = 1.0 + Double(i) * 0.04
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7).delay(delay)) {
+                titleLetterOpacities[i] = 1.0
+                titleLetterOffsets[i] = 0
+            }
+        }
+
+        withAnimation(.easeOut(duration: 0.6).delay(1.5)) {
+            lineWidth = 60
+            lineOpacity = 1.0
+        }
+
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(1.7)) {
             subtitleOpacity = 1.0
+            subtitleBlur = 0
         }
 
-        withAnimation(.easeInOut(duration: 0.8).delay(1.0)) {
-            shimmerPhase = 400
+        withAnimation(.easeInOut(duration: 1.0).delay(2.0)) {
+            shimmerX = 300
         }
 
-        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true).delay(0.6)) {
-            pulseScale = 1.15
+        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true).delay(1.0)) {
+            ambientPulse = 1.0
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            particlesVisible = true
+        withAnimation(.easeInOut(duration: 1.0).delay(1.2)) {
+            verticalBeamOpacity = 0
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
-            onFinished()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                exitScale = 1.08
+                exitOpacity = 0
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                onFinished()
+            }
         }
     }
 }
