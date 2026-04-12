@@ -441,6 +441,15 @@ struct UpgradeView: View {
                         .foregroundStyle(KinexaTheme.tertiaryText)
                         .underline()
                 }
+
+                NavigationLink {
+                    LegalTextView(title: "EULA", content: LegalContent.eula)
+                } label: {
+                    Text("EULA")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .underline()
+                }
             }
 
             Text("Payment will be charged to your Apple ID account at confirmation of purchase. Subscriptions automatically renew unless cancelled at least 24 hours before the end of the current period. Manage subscriptions in Settings > Apple ID > Subscriptions.")

@@ -41,6 +41,8 @@ struct FunctionalFitnessBrowserView: View {
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 14) {
+                        disclaimerBanner
+
                         if !searchText.isEmpty {
                             searchResults
                         } else {
@@ -72,6 +74,25 @@ struct FunctionalFitnessBrowserView: View {
                     }
                 }
             }
+        }
+    }
+
+    private var disclaimerBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "info.circle.fill")
+                .font(.caption)
+                .foregroundStyle(Color(hex: "#F59E0B").opacity(0.7))
+
+            Text("These functional fitness workouts are templates for tracking and accountability only. They are not coaching, instruction, or personalized exercise recommendations. Consult a professional before beginning any exercise program.")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(KinexaTheme.tertiaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .background(Color(hex: "#F59E0B").opacity(0.06))
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12).stroke(Color(hex: "#F59E0B").opacity(0.1))
         }
     }
 

@@ -278,6 +278,7 @@ struct WorkoutsTabView: View {
             .shadow(color: shadowColor.opacity(0.2), radius: 12, y: 8)
         }
         .buttonStyle(PressScaleButtonStyle())
+        .accessibilityLabel("Browse \(title) workouts")
     }
 
     private func smallPlanCard(title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
@@ -305,5 +306,6 @@ struct WorkoutsTabView: View {
             }
         }
         .buttonStyle(PressScaleButtonStyle())
+        .accessibilityLabel(title)
     }
 }

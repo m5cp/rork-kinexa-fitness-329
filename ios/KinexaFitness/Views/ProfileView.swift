@@ -611,7 +611,7 @@ struct ProfileView: View {
             Text("Rise Before The Sun")
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(KinexaTheme.tertiaryText.opacity(0.6))
-            Text("Version 5.0")
+            Text("Version 1.0.0")
                 .font(.caption2)
                 .foregroundStyle(KinexaTheme.tertiaryText.opacity(0.4))
                 .onTapGesture {

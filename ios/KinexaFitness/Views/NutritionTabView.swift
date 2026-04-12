@@ -153,6 +153,7 @@ struct NutritionTabView: View {
                     .shadow(color: Color(hex: "#22C55E").opacity(0.4), radius: 8, y: 4)
             }
             .buttonStyle(PressScaleButtonStyle())
+            .accessibilityLabel("Log a new meal")
         }
     }
 

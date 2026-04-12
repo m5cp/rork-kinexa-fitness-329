@@ -3,8 +3,8 @@ import SwiftUI
 struct NutritionPartnerView: View {
     @Environment(\.dismiss) private var dismiss
 
-    private let partnerWebsite: String = "https://www.yournutritionpartner.com"
-    private let partnerEmail: String = "nutrition@yourpartner.com"
+    private let partnerWebsite: String = "https://www.kinexafit.com/nutrition"
+    private let partnerEmail: String = "nutrition@kinexafit.com"
 
     var body: some View {
         NavigationStack {
@@ -157,7 +157,7 @@ struct NutritionPartnerView: View {
                             Text("Visit Website")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(KinexaTheme.primaryText)
-                            Text(partnerWebsite.replacingOccurrences(of: "https://www.", with: ""))
+                            Text(partnerWebsite.replacingOccurrences(of: "https://www.", with: "").replacingOccurrences(of: "https://", with: ""))
                                 .font(.caption2.weight(.medium))
                                 .foregroundStyle(KinexaTheme.tertiaryText)
                                 .lineLimit(1)

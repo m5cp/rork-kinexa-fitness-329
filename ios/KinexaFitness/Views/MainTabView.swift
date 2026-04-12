@@ -80,6 +80,8 @@ struct MainTabView: View {
         ))
     }
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     private var customTabBar: some View {
         HStack(spacing: 0) {
             ForEach(AppTab.allCases, id: \.rawValue) { tab in
@@ -100,20 +102,25 @@ struct MainTabView: View {
                 } label: {
                     VStack(spacing: 4) {
                         Image(systemName: tab.icon)
-                            .font(.system(size: 18, weight: selectedTab == tab ? .bold : .regular))
+                            .font(.system(size: horizontalSizeClass == .regular ? 22 : 18, weight: selectedTab == tab ? .bold : .regular))
                             .symbolEffect(.bounce, value: selectedTab == tab)
                         Text(tab.title)
-                            .font(.system(size: 10, weight: selectedTab == tab ? .bold : .medium))
+                            .font(.system(size: horizontalSizeClass == .regular ? 12 : 10, weight: selectedTab == tab ? .bold : .medium))
                     }
                     .foregroundStyle(selectedTab == tab ? KinexaTheme.accent : KinexaTheme.tertiaryText)
                     .frame(maxWidth: .infinity)
+                    .frame(minHeight: 44)
                     .padding(.top, 10)
                     .padding(.bottom, 2)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(tab.title)
+                .accessibilityAddTraits(selectedTab == tab ? .isSelected : [])
             }
         }
-        .padding(.bottom, 20)
+        .frame(maxWidth: horizontalSizeClass == .regular ? 600 : .infinity)
+        .frame(maxWidth: .infinity)
+        .safeAreaPadding(.bottom)
         .background {
             KinexaTheme.background
                 .overlay(alignment: .top) {
