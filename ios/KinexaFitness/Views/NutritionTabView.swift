@@ -7,6 +7,8 @@ struct NutritionTabView: View {
     @State private var showDailyInsight: Bool = false
     @State private var selectedMeal: MealEntry?
     @State private var animateRings: Bool = false
+    @State private var showExportSheet: Bool = false
+    @State private var exportedPDFURL: URL?
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -16,9 +18,15 @@ struct NutritionTabView: View {
                     dateSelector
                     calorieRingCard
                     macroProgressRow
+                    if nutritionVM.todayNutrition.alcohol > 0 {
+                        alcoholBadge
+                    }
                     mealsSection
                     if nutritionVM.isGeminiConfigured && !nutritionVM.mealsForSelectedDate.isEmpty {
                         aiInsightButton
+                    }
+                    if !nutritionVM.mealsForSelectedDate.isEmpty {
+                        exportButton
                     }
                 }
                 .padding(.horizontal, 20)
@@ -37,12 +45,21 @@ struct NutritionTabView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showGoalSheet = true
-                } label: {
-                    Image(systemName: "target")
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(KinexaTheme.accent)
+                HStack(spacing: 12) {
+                    Button {
+                        exportWeekPDF()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(KinexaTheme.secondaryText)
+                    }
+                    Button {
+                        showGoalSheet = true
+                    } label: {
+                        Image(systemName: "target")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(KinexaTheme.accent)
+                    }
                 }
             }
         }
@@ -57,6 +74,12 @@ struct NutritionTabView: View {
         }
         .sheet(isPresented: $showDailyInsight) {
             DailyInsightSheet(nutritionVM: nutritionVM)
+        }
+        .sheet(isPresented: $showExportSheet) {
+            if let url = exportedPDFURL {
+                ShareSheet(items: [url])
+                    .presentationDetents([.medium])
+            }
         }
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.3)) {
@@ -437,6 +460,104 @@ struct NutritionTabView: View {
             .clipShape(.rect(cornerRadius: 18))
         }
         .buttonStyle(PressScaleButtonStyle())
+    }
+
+    private var alcoholBadge: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "wineglass.fill")
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Color(hex: "#A855F7"))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Alcohol")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.secondaryText)
+                Text("\(String(format: "%.1f", nutritionVM.todayNutrition.alcohol))g today")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+
+            Spacer()
+
+            Text("\(Int(nutritionVM.todayNutrition.alcohol * 7)) cal")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color(hex: "#A855F7"))
+        }
+        .padding(14)
+        .background {
+            ZStack {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(KinexaTheme.card)
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(hex: "#A855F7").opacity(0.05))
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(Color(hex: "#A855F7").opacity(0.15))
+            }
+        }
+        .clipShape(.rect(cornerRadius: 14))
+    }
+
+    private var exportButton: some View {
+        Button {
+            exportWeekPDF()
+        } label: {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(KinexaTheme.accent.opacity(0.15))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: "doc.text.fill")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.accent)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Export Meal Plan")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("PDF day-by-day tracker")
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+
+                Spacer()
+
+                Image(systemName: "square.and.arrow.up")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(KinexaTheme.accent)
+            }
+            .padding(16)
+            .background(KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 18))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(KinexaTheme.border)
+            }
+        }
+        .buttonStyle(PressScaleButtonStyle())
+    }
+
+    private func exportWeekPDF() {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+        let weekStart = calendar.date(byAdding: .day, value: -6, to: today) ?? today
+
+        let pdfData = NutritionPDFService.generateMealPlanPDF(
+            meals: nutritionVM.meals,
+            goal: nutritionVM.dailyGoal,
+            startDate: weekStart,
+            endDate: today
+        )
+
+        let tempDir = FileManager.default.temporaryDirectory
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let fileName = "Kinexa_Nutrition_\(formatter.string(from: today)).pdf"
+        let fileURL = tempDir.appendingPathComponent(fileName)
+
+        try? pdfData.write(to: fileURL)
+        exportedPDFURL = fileURL
+        showExportSheet = true
     }
 
     private var nutritionAmbience: some View {

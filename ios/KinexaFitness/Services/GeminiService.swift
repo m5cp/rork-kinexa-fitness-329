@@ -12,9 +12,31 @@ nonisolated struct GeminiContent: Codable, Sendable {
 
 nonisolated struct GeminiPart: Codable, Sendable {
     let text: String?
+    let inlineData: GeminiInlineData?
 
     init(text: String) {
         self.text = text
+        self.inlineData = nil
+    }
+
+    init(mimeType: String, data: String) {
+        self.text = nil
+        self.inlineData = GeminiInlineData(mimeType: mimeType, data: data)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case text
+        case inlineData = "inline_data"
+    }
+}
+
+nonisolated struct GeminiInlineData: Codable, Sendable {
+    let mimeType: String
+    let data: String
+
+    enum CodingKeys: String, CodingKey {
+        case mimeType = "mime_type"
+        case data
     }
 }
 
@@ -102,6 +124,48 @@ final class GeminiService {
         }
 
         return text
+    }
+
+    func generateJSONWithImage<T: Decodable & Sendable>(prompt: String, imageData: Data, mimeType: String = "image/jpeg", systemPrompt: String? = nil, type: T.Type) async throws -> T {
+        guard !apiKey.isEmpty else { throw GeminiError.missingAPIKey }
+
+        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"
+        guard let url = URL(string: urlString) else { throw GeminiError.invalidURL }
+
+        let base64Image = imageData.base64EncodedString()
+        let contents = [GeminiContent(parts: [
+            GeminiPart(mimeType: mimeType, data: base64Image),
+            GeminiPart(text: prompt)
+        ], role: "user")]
+        let config = GeminiGenerationConfig(temperature: 0.4, maxOutputTokens: 4096, responseMimeType: "application/json")
+        let systemInstruction = systemPrompt.map { GeminiContent(parts: [GeminiPart(text: $0)]) }
+
+        let requestBody = GeminiRequest(contents: contents, generationConfig: config, systemInstruction: systemInstruction)
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(requestBody)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+            let body = String(data: data, encoding: .utf8) ?? ""
+            throw GeminiError.networkError("Status \(statusCode): \(body)")
+        }
+
+        let geminiResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)
+
+        guard let jsonText = geminiResponse.candidates?.first?.content?.parts.first?.text else {
+            throw GeminiError.noContent
+        }
+
+        guard let jsonData = jsonText.data(using: String.Encoding.utf8) else {
+            throw GeminiError.decodingError("Could not convert response to data")
+        }
+
+        return try JSONDecoder().decode(T.self, from: jsonData)
     }
 
     func generateJSON<T: Decodable & Sendable>(prompt: String, systemPrompt: String? = nil, type: T.Type) async throws -> T {

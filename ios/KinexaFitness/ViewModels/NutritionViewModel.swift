@@ -11,6 +11,7 @@ final class NutritionViewModel {
     var mealInsights: [UUID: GeminiMealInsight] = [:]
 
     private let gemini = GeminiService()
+    private let barcodeService = BarcodeLookupService()
 
     var isGeminiConfigured: Bool { gemini.isConfigured }
 
@@ -32,7 +33,8 @@ final class NutritionViewModel {
             carbs: dayMeals.map(\.totalNutrition.carbs).reduce(0, +),
             fat: dayMeals.map(\.totalNutrition.fat).reduce(0, +),
             fiber: dayMeals.map(\.totalNutrition.fiber).reduce(0, +),
-            sugar: dayMeals.map(\.totalNutrition.sugar).reduce(0, +)
+            sugar: dayMeals.map(\.totalNutrition.sugar).reduce(0, +),
+            alcohol: dayMeals.map(\.totalNutrition.alcohol).reduce(0, +)
         )
     }
 
@@ -56,6 +58,25 @@ final class NutritionViewModel {
         return min(todayNutrition.fat / dailyGoal.fat, 1.0)
     }
 
+    func mealsForDate(_ date: Date) -> [MealEntry] {
+        let calendar = Calendar.current
+        return meals.filter { calendar.isDate($0.date, inSameDayAs: date) }
+            .sorted { $0.date < $1.date }
+    }
+
+    func nutritionForDate(_ date: Date) -> NutritionInfo {
+        let dayMeals = mealsForDate(date)
+        return NutritionInfo(
+            calories: dayMeals.map(\.totalNutrition.calories).reduce(0, +),
+            protein: dayMeals.map(\.totalNutrition.protein).reduce(0, +),
+            carbs: dayMeals.map(\.totalNutrition.carbs).reduce(0, +),
+            fat: dayMeals.map(\.totalNutrition.fat).reduce(0, +),
+            fiber: dayMeals.map(\.totalNutrition.fiber).reduce(0, +),
+            sugar: dayMeals.map(\.totalNutrition.sugar).reduce(0, +),
+            alcohol: dayMeals.map(\.totalNutrition.alcohol).reduce(0, +)
+        )
+    }
+
     func addMeal(_ meal: MealEntry) {
         meals.insert(meal, at: 0)
         persistData()
@@ -74,12 +95,12 @@ final class NutritionViewModel {
 
     func estimateFoodFromText(_ description: String) async throws -> [FoodItem] {
         let prompt = """
-        Estimate the nutritional information for the following food description. Return a JSON object with a "foods" array. Each food item should have: name (string), quantity (string like "1 cup", "200g"), calories (int), protein (double), carbs (double), fat (double), fiber (double), sugar (double). Be realistic with portion sizes and nutritional values.
+        Estimate the nutritional information for the following food description. Return a JSON object with a "foods" array. Each food item should have: name (string), quantity (string like "1 cup", "200g"), calories (int), protein (double), carbs (double), fat (double), fiber (double), sugar (double), alcohol (double, grams of alcohol - use 0 for non-alcoholic items, estimate for alcoholic beverages). Be realistic with portion sizes and nutritional values.
 
         Food description: \(description)
         """
 
-        let systemPrompt = "You are a nutrition expert. Provide accurate nutritional estimates based on USDA data. Always return valid JSON matching the requested format. All nutritional values should be realistic."
+        let systemPrompt = "You are a nutrition expert. Provide accurate nutritional estimates based on USDA data. Always return valid JSON matching the requested format. All nutritional values should be realistic. For alcoholic drinks, estimate alcohol content in grams."
 
         let result = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiFoodEstimate.self)
 
@@ -93,10 +114,68 @@ final class NutritionViewModel {
                     carbs: item.carbs,
                     fat: item.fat,
                     fiber: item.fiber,
-                    sugar: item.sugar
-                )
+                    sugar: item.sugar,
+                    alcohol: item.alcohol ?? 0
+                ),
+                source: .aiText
             )
         }
+    }
+
+    func estimateFoodFromImage(_ imageData: Data) async throws -> [FoodItem] {
+        let prompt = """
+        Analyze this food photo and estimate the nutritional information for each visible food item. Return a JSON object with a "foods" array. Each food item should have: name (string), quantity (string like "1 cup", "200g"), calories (int), protein (double), carbs (double), fat (double), fiber (double), sugar (double), alcohol (double, grams of alcohol - use 0 for non-alcoholic items). Be realistic with portion sizes based on what you see in the image.
+        """
+
+        let systemPrompt = "You are an expert food recognition and nutrition AI. Analyze food photos to identify each item and provide accurate USDA-based nutritional estimates. Estimate portion sizes visually. Always return valid JSON. For drinks that appear alcoholic, estimate alcohol content in grams."
+
+        let result = try await gemini.generateJSONWithImage(
+            prompt: prompt,
+            imageData: imageData,
+            systemPrompt: systemPrompt,
+            type: GeminiFoodEstimate.self
+        )
+
+        return result.foods.map { item in
+            FoodItem(
+                name: item.name,
+                quantity: item.quantity,
+                nutrition: NutritionInfo(
+                    calories: item.calories,
+                    protein: item.protein,
+                    carbs: item.carbs,
+                    fat: item.fat,
+                    fiber: item.fiber,
+                    sugar: item.sugar,
+                    alcohol: item.alcohol ?? 0
+                ),
+                source: .aiPhoto
+            )
+        }
+    }
+
+    func lookupBarcode(_ code: String) async throws -> FoodItem {
+        let product = try await barcodeService.lookup(barcode: code)
+        let displayName = [product.brand, product.name]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .joined(separator: " — ")
+
+        return FoodItem(
+            name: displayName.isEmpty ? product.name : displayName,
+            quantity: product.servingSize ?? "100g",
+            nutrition: NutritionInfo(
+                calories: product.calories,
+                protein: product.protein,
+                carbs: product.carbs,
+                fat: product.fat,
+                fiber: product.fiber,
+                sugar: product.sugar,
+                alcohol: product.alcohol ?? 0
+            ),
+            barcode: code,
+            source: .barcode
+        )
     }
 
     func analyzeMeal(_ meal: MealEntry) async {
@@ -120,9 +199,7 @@ final class NutritionViewModel {
         do {
             let insight = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiMealInsight.self)
             mealInsights[meal.id] = insight
-        } catch {
-            // silently fail
-        }
+        } catch {}
     }
 
     func generateDailyInsight() async {
@@ -153,9 +230,7 @@ final class NutritionViewModel {
         do {
             let insight = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiDailyInsight.self)
             dailyInsight = insight
-        } catch {
-            // silently fail
-        }
+        } catch {}
     }
 
     private func persistData() {

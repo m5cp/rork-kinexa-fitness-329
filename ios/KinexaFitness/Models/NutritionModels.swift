@@ -32,8 +32,19 @@ nonisolated struct NutritionInfo: Codable, Sendable {
     var fat: Double
     var fiber: Double
     var sugar: Double
+    var alcohol: Double
 
-    static let zero = NutritionInfo(calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0)
+    static let zero = NutritionInfo(calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, alcohol: 0)
+
+    init(calories: Int, protein: Double, carbs: Double, fat: Double, fiber: Double, sugar: Double, alcohol: Double = 0) {
+        self.calories = calories
+        self.protein = protein
+        self.carbs = carbs
+        self.fat = fat
+        self.fiber = fiber
+        self.sugar = sugar
+        self.alcohol = alcohol
+    }
 }
 
 nonisolated struct FoodItem: Codable, Identifiable, Sendable {
@@ -41,13 +52,24 @@ nonisolated struct FoodItem: Codable, Identifiable, Sendable {
     var name: String
     var quantity: String
     var nutrition: NutritionInfo
+    var barcode: String?
+    var source: FoodSource
 
-    init(id: UUID = UUID(), name: String, quantity: String, nutrition: NutritionInfo) {
+    init(id: UUID = UUID(), name: String, quantity: String, nutrition: NutritionInfo, barcode: String? = nil, source: FoodSource = .manual) {
         self.id = id
         self.name = name
         self.quantity = quantity
         self.nutrition = nutrition
+        self.barcode = barcode
+        self.source = source
     }
+}
+
+nonisolated enum FoodSource: String, Codable, Sendable {
+    case manual
+    case aiText
+    case aiPhoto
+    case barcode
 }
 
 nonisolated struct MealEntry: Codable, Identifiable, Sendable {
@@ -56,13 +78,15 @@ nonisolated struct MealEntry: Codable, Identifiable, Sendable {
     var mealType: MealType
     var foods: [FoodItem]
     var notes: String
+    var photoData: Data?
 
-    init(id: UUID = UUID(), date: Date = .now, mealType: MealType, foods: [FoodItem], notes: String = "") {
+    init(id: UUID = UUID(), date: Date = .now, mealType: MealType, foods: [FoodItem], notes: String = "", photoData: Data? = nil) {
         self.id = id
         self.date = date
         self.mealType = mealType
         self.foods = foods
         self.notes = notes
+        self.photoData = photoData
     }
 
     var totalNutrition: NutritionInfo {
@@ -72,7 +96,8 @@ nonisolated struct MealEntry: Codable, Identifiable, Sendable {
             carbs: foods.map(\.nutrition.carbs).reduce(0, +),
             fat: foods.map(\.nutrition.fat).reduce(0, +),
             fiber: foods.map(\.nutrition.fiber).reduce(0, +),
-            sugar: foods.map(\.nutrition.sugar).reduce(0, +)
+            sugar: foods.map(\.nutrition.sugar).reduce(0, +),
+            alcohol: foods.map(\.nutrition.alcohol).reduce(0, +)
         )
     }
 }
@@ -99,6 +124,20 @@ nonisolated struct GeminiFoodItem: Codable, Sendable {
     let fat: Double
     let fiber: Double
     let sugar: Double
+    let alcohol: Double?
+}
+
+nonisolated struct BarcodeProduct: Codable, Sendable {
+    let name: String
+    let brand: String?
+    let servingSize: String?
+    let calories: Int
+    let protein: Double
+    let carbs: Double
+    let fat: Double
+    let fiber: Double
+    let sugar: Double
+    let alcohol: Double?
 }
 
 nonisolated struct GeminiMealInsight: Codable, Sendable {

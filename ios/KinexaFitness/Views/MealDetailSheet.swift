@@ -14,6 +14,9 @@ struct MealDetailSheet: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
                     mealHeader
+                    if meal.photoData != nil {
+                        mealPhotoCard
+                    }
                     nutritionSummaryCard
                     foodItemsList
                     if nutritionVM.isGeminiConfigured { aiAnalysisSection }
@@ -85,17 +88,72 @@ struct MealDetailSheet: View {
         }
     }
 
-    private var nutritionSummaryCard: some View {
-        HStack(spacing: 0) {
-            macroColumn("Protein", value: meal.totalNutrition.protein, color: Color(hex: "#3B82F6"))
-            divider
-            macroColumn("Carbs", value: meal.totalNutrition.carbs, color: Color(hex: "#F59E0B"))
-            divider
-            macroColumn("Fat", value: meal.totalNutrition.fat, color: Color(hex: "#EC4899"))
-            divider
-            macroColumn("Fiber", value: meal.totalNutrition.fiber, color: Color(hex: "#22C55E"))
+    private var mealPhotoCard: some View {
+        Group {
+            if let data = meal.photoData, let uiImage = UIImage(data: data) {
+                Color(.secondarySystemBackground)
+                    .frame(height: 200)
+                    .overlay {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .allowsHitTesting(false)
+                    }
+                    .clipShape(.rect(cornerRadius: 16))
+                    .overlay(alignment: .bottomLeading) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "camera.fill")
+                                .font(.system(size: 10, weight: .bold))
+                            Text("AI Scanned")
+                                .font(.system(size: 10, weight: .bold))
+                        }
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
+                        .padding(10)
+                    }
+            }
         }
-        .padding(.vertical, 18)
+    }
+
+    private var nutritionSummaryCard: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                macroColumn("Protein", value: meal.totalNutrition.protein, color: Color(hex: "#3B82F6"))
+                divider
+                macroColumn("Carbs", value: meal.totalNutrition.carbs, color: Color(hex: "#F59E0B"))
+                divider
+                macroColumn("Fat", value: meal.totalNutrition.fat, color: Color(hex: "#EC4899"))
+                divider
+                macroColumn("Fiber", value: meal.totalNutrition.fiber, color: Color(hex: "#22C55E"))
+            }
+            .padding(.vertical, 18)
+
+            if meal.totalNutrition.alcohol > 0 {
+                Rectangle()
+                    .fill(KinexaTheme.border)
+                    .frame(height: 0.5)
+                HStack(spacing: 8) {
+                    Image(systemName: "wineglass.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color(hex: "#A855F7"))
+                    Text("Alcohol")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                    Spacer()
+                    Text("\(String(format: "%.1f", meal.totalNutrition.alcohol))g")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color(hex: "#A855F7"))
+                    Text("(\(Int(meal.totalNutrition.alcohol * 7)) cal)")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+            }
+        }
         .background(KinexaTheme.card)
         .overlay {
             RoundedRectangle(cornerRadius: 18)
@@ -143,9 +201,16 @@ struct MealDetailSheet: View {
                         Text("\(food.nutrition.calories) cal")
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(KinexaTheme.primaryText)
-                        Text("P:\(String(format: "%.0f", food.nutrition.protein)) C:\(String(format: "%.0f", food.nutrition.carbs)) F:\(String(format: "%.0f", food.nutrition.fat))")
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundStyle(KinexaTheme.tertiaryText)
+                        HStack(spacing: 4) {
+                            Text("P:\(String(format: "%.0f", food.nutrition.protein)) C:\(String(format: "%.0f", food.nutrition.carbs)) F:\(String(format: "%.0f", food.nutrition.fat))")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(KinexaTheme.tertiaryText)
+                            if food.nutrition.alcohol > 0 {
+                                Text("A:\(String(format: "%.0f", food.nutrition.alcohol))")
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundStyle(Color(hex: "#A855F7"))
+                            }
+                        }
                     }
                 }
                 .padding(14)
