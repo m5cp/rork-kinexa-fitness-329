@@ -36,7 +36,6 @@ final class AppleIntelligenceService {
     }
 
     func generateProgressInsight(
-        aftScores: [AFTScoreRecord],
         completedRecords: [CompletedWorkoutRecord],
         streak: Int,
         weeklyStepAverage: Int,
@@ -50,7 +49,6 @@ final class AppleIntelligenceService {
         defer { isGenerating = false }
 
         let context = buildProgressContext(
-            aftScores: aftScores,
             completedRecords: completedRecords,
             streak: streak,
             weeklyStepAverage: weeklyStepAverage,
@@ -78,7 +76,6 @@ final class AppleIntelligenceService {
 
     func generateWeeklySummary(
         completedRecords: [CompletedWorkoutRecord],
-        aftScores: [AFTScoreRecord],
         streak: Int,
         stepsThisWeek: Int
     ) async -> String {
@@ -95,8 +92,6 @@ final class AppleIntelligenceService {
 
         let workoutList = weekRecords.map { "\($0.title) (\($0.exerciseCount) exercises)" }.joined(separator: ", ")
 
-        let latestScore = aftScores.first.map { "Latest AFT: \($0.totalScore) points" } ?? "No AFT scores recorded"
-
         let prompt = """
         Summarize this athlete's training week in 3-4 sentences. Be specific about what was accomplished and give one forward-looking recommendation.
 
@@ -104,7 +99,6 @@ final class AppleIntelligenceService {
         Sessions: \(workoutList.isEmpty ? "None" : workoutList)
         Current streak: \(streak) days
         Steps this week: \(stepsThisWeek.formatted())
-        \(latestScore)
 
         Write a brief after-action summary:
         """
@@ -122,7 +116,6 @@ final class AppleIntelligenceService {
 
     func generateAdaptiveCoachingTip(
         recentWorkouts: [CompletedWorkoutRecord],
-        weakEvents: [String],
         currentFocus: String
     ) async -> String {
         guard isAvailable else {
@@ -138,7 +131,6 @@ final class AppleIntelligenceService {
         Based on this athlete's recent training, give one specific, actionable tip in 1-2 sentences.
 
         Recent workouts: \(recentList.isEmpty ? "None yet" : recentList)
-        Weak AFT events: \(weakEvents.isEmpty ? "None identified" : weakEvents.joined(separator: ", "))
         Training focus: \(currentFocus)
 
         Give a short coaching tip:
@@ -156,7 +148,6 @@ final class AppleIntelligenceService {
     }
 
     private func buildProgressContext(
-        aftScores: [AFTScoreRecord],
         completedRecords: [CompletedWorkoutRecord],
         streak: Int,
         weeklyStepAverage: Int,
@@ -170,20 +161,6 @@ final class AppleIntelligenceService {
 
         if let plan = currentPlan {
             parts.append("Current plan: Week \(plan.currentWeek) of \(plan.totalWeeks), \(plan.completedCount)/\(plan.totalWorkoutDays) sessions done")
-        }
-
-        if let latest = aftScores.first {
-            parts.append("Latest AFT score: \(latest.totalScore) (MDL:\(latest.deadliftPoints) HRP:\(latest.pushUpPoints) SDC:\(latest.sdcPoints) PLK:\(latest.plankPoints) 2MR:\(latest.runPoints))")
-
-            if !latest.weakestEvents.isEmpty {
-                parts.append("Weakest events: \(latest.weakestEvents.joined(separator: ", "))")
-            }
-
-            if aftScores.count >= 2 {
-                let previous = aftScores[1]
-                let diff = latest.totalScore - previous.totalScore
-                parts.append("Score change: \(diff >= 0 ? "+" : "")\(diff) from previous test")
-            }
         }
 
         let calendar = Calendar.current

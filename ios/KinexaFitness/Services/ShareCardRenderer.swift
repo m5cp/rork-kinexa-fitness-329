@@ -4,8 +4,6 @@ import UIKit
 enum ShareCardType {
     case workout(title: String, exercises: [WorkoutExercise], tags: [String])
     case progress(completed: Int, planned: Int, streak: Int, steps: Int)
-    case aft(score: AFTScoreRecord, previous: AFTScoreRecord?)
-    case unitPT(plan: UnitPTPlan)
     case completion(title: String, exerciseCount: Int, duration: String)
     case completedWorkout(record: CompletedWorkoutRecord)
     case quickStart(record: QuickStartRecord)
@@ -24,12 +22,8 @@ enum ShareCardRenderer {
             return CompletedWorkoutCGRenderer.render(record: record, date: date)
         case .quickStart(let record):
             return QuickStartCardCGRenderer.render(record: record, date: date)
-        case .aft(let score, let previous):
-            return AFTCardRenderer.render(score: score, previous: previous)
         case .progress(let completed, let planned, let streak, let steps):
             return ProgressCardCGRenderer.render(completed: completed, planned: planned, streak: streak, steps: steps, date: date)
-        case .unitPT(let plan):
-            return UnitPTCardCGRenderer.render(plan: plan, date: date)
         }
     }
 
@@ -73,10 +67,6 @@ enum ShareCardRenderer {
             return "Kinexa Fitness — \(title)\n\(exercises.count) exercises\n#KinexaFitness"
         case .progress(let completed, let planned, let streak, let steps):
             return "Kinexa Fitness — Weekly Progress\n\(completed)/\(planned) done · \(streak) day streak · \(steps) steps\n#KinexaFitness"
-        case .aft(let score, _):
-            return "Kinexa Fitness — AFT Score: \(score.totalScore)\n#KinexaFitness"
-        case .unitPT(let plan):
-            return "Kinexa Fitness — \(plan.title)\n\(plan.objective)\n#KinexaFitness"
         case .completion(let title, let count, let duration):
             return "Kinexa Fitness — Completed: \(title)\n\(count) exercises · \(duration)\n#KinexaFitness"
         case .completedWorkout(let record):
@@ -586,76 +576,6 @@ enum ProgressCardCGRenderer {
 
             let stepsStr = steps >= 1000 ? String(format: "%.1fk", Double(steps) / 1000) : "\(steps)"
             ShareCardCGHelpers.drawStatBox(context: context, x: 60 + (boxWidth + 20) * 2, y: statsY, boxWidth: boxWidth, boxHeight: boxHeight, value: stepsStr, label: "Steps", valueColor: ShareCardCGHelpers.accentBlue)
-
-            ShareCardCGHelpers.drawFooter(context: context, width: w, height: h)
-        }
-    }
-}
-
-@MainActor
-enum UnitPTCardCGRenderer {
-    static func render(plan: UnitPTPlan, date: Date) -> UIImage? {
-        let w = ShareCardCGHelpers.width
-        let blockRows = min(plan.mainEffort.count, 4)
-        let h: CGFloat = CGFloat(600 + blockRows * 50)
-        let renderer = ShareCardCGHelpers.makeRenderer(width: w, height: h)
-
-        return renderer.image { ctx in
-            let context = ctx.cgContext
-            ShareCardCGHelpers.drawBackground(context: context, width: w, height: h)
-            ShareCardCGHelpers.drawHeader(context: context, width: w, date: date)
-
-            let tagAttrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 18, weight: .bold),
-                .foregroundColor: ShareCardCGHelpers.accentBlue.withAlphaComponent(0.8)
-            ]
-            let tagStr = NSAttributedString(string: "Formation PT", attributes: tagAttrs)
-            let tagSize = tagStr.size()
-            let pillRect = CGRect(x: 60, y: 130, width: tagSize.width + 20, height: 30)
-            let pillPath = UIBezierPath(roundedRect: pillRect, cornerRadius: 15)
-            context.setFillColor(ShareCardCGHelpers.accentBlue.withAlphaComponent(0.12).cgColor)
-            context.addPath(pillPath.cgPath)
-            context.fillPath()
-            tagStr.draw(at: CGPoint(x: 70, y: 134))
-
-            let titleAttrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 40, weight: .bold),
-                .foregroundColor: UIColor.white
-            ]
-            let titleStr = NSAttributedString(string: plan.title, attributes: titleAttrs)
-            titleStr.draw(with: CGRect(x: 60, y: 180, width: w - 120, height: 100), options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine], context: nil)
-
-            let objAttrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 22, weight: .regular),
-                .foregroundColor: UIColor.white.withAlphaComponent(0.6)
-            ]
-            let objStr = NSAttributedString(string: plan.objective, attributes: objAttrs)
-            objStr.draw(with: CGRect(x: 60, y: 280, width: w - 120, height: 80), options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine], context: nil)
-
-            if !plan.mainEffort.isEmpty {
-                var rowY: CGFloat = 380
-
-                context.setStrokeColor(UIColor.white.withAlphaComponent(0.06).cgColor)
-                context.setLineWidth(1)
-                context.move(to: CGPoint(x: 60, y: rowY - 10))
-                context.addLine(to: CGPoint(x: w - 60, y: rowY - 10))
-                context.strokePath()
-
-                for block in plan.mainEffort.prefix(4) {
-                    let dotRect = CGRect(x: 70, y: rowY + 10, width: 10, height: 10)
-                    context.setFillColor(ShareCardCGHelpers.accentBlue.withAlphaComponent(0.5).cgColor)
-                    context.fillEllipse(in: dotRect)
-
-                    let blockAttrs: [NSAttributedString.Key: Any] = [
-                        .font: UIFont.systemFont(ofSize: 20, weight: .medium),
-                        .foregroundColor: UIColor.white.withAlphaComponent(0.7)
-                    ]
-                    let blockStr = NSAttributedString(string: block.description, attributes: blockAttrs)
-                    blockStr.draw(with: CGRect(x: 95, y: rowY + 2, width: w - 160, height: 40), options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine], context: nil)
-
-                    rowY += 50
-                }
-            }
 
             ShareCardCGHelpers.drawFooter(context: context, width: w, height: h)
         }

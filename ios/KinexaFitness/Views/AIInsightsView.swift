@@ -353,7 +353,6 @@ struct AIInsightsCardContent: View {
         isLoadingTip = true
 
         async let insight = aiService.generateProgressInsight(
-            aftScores: vm.aftScores,
             completedRecords: vm.completedRecords,
             streak: vm.streak,
             weeklyStepAverage: vm.weeklyStepAverage,
@@ -365,7 +364,6 @@ struct AIInsightsCardContent: View {
 
         weeklySummary = await aiService.generateWeeklySummary(
             completedRecords: vm.completedRecords,
-            aftScores: vm.aftScores,
             streak: vm.streak,
             stepsThisWeek: vm.weeklyStepAverage * 7
         )
@@ -373,7 +371,6 @@ struct AIInsightsCardContent: View {
 
         coachingTip = await aiService.generateAdaptiveCoachingTip(
             recentWorkouts: Array(vm.completedRecords.prefix(5)),
-            weakEvents: vm.aftWeakestEvents,
             currentFocus: vm.currentFocus.rawValue
         )
         isLoadingTip = false

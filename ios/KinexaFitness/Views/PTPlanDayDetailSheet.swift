@@ -244,9 +244,9 @@ struct PTPlanDayDetailSheet: View {
         .scrollDismissesKeyboard(.interactively)
         .sensoryFeedback(.selection, trigger: exercises.count)
         .sheet(isPresented: $showAddExercise) {
-            ArmyPTExercisePickerSheet { exerciseName in
+            AddMovementSheet { movement in
                 let exercise = WorkoutExercise(
-                    name: exerciseName,
+                    name: movement.name,
                     sets: 3,
                     reps: 10
                 )

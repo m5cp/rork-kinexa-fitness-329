@@ -9,7 +9,7 @@ struct MyPTPlanSheet: View {
     @State private var animateCards: Bool = false
     @State private var refreshTrigger: Bool = false
 
-    @State private var selectedGoal: PTGoal = .aftScoreImprovement
+    @State private var selectedGoal: PTGoal = .generalFitness
     @State private var selectedWeeks: Int = 4
     @State private var showGoalSetup: Bool = false
 
@@ -1108,12 +1108,12 @@ struct PlanShareSheet: View {
     }
 
     private func generateQR() {
-        let payload = PTPlanQRPayload(from: plan)
-        guard let data = payload.compactJSON else { return }
+        guard let jsonData = try? JSONEncoder().encode(plan),
+              let compactJSON = String(data: jsonData, encoding: .utf8)?.data(using: .utf8) else { return }
 
         let context = CIContext()
         let filter = CIFilter.qrCodeGenerator()
-        filter.message = data
+        filter.message = compactJSON
         filter.correctionLevel = "L"
 
         guard let outputImage = filter.outputImage else { return }

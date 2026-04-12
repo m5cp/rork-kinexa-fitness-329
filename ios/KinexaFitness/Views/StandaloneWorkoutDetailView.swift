@@ -23,7 +23,7 @@ struct StandaloneWorkoutDetailView: View {
                     if !workout.isCompleted {
                         Button {
                             completeTrigger.toggle()
-                            vm.markUnitPTCompleted(id: workout.id)
+                            vm.completeStandaloneWorkout(workout)
                             dismiss()
                         } label: {
                             HStack(spacing: 8) {

@@ -12,10 +12,8 @@ struct HomeView: View {
     @State private var showWODPlanSheet: Bool = false
     @State private var showWorkoutDetail: Bool = false
     @State private var showActiveSession: Bool = false
-    @State private var showUnitPTSheet: Bool = false
     @State private var showMyPTPlanSheet: Bool = false
     @State private var showScanSheet: Bool = false
-    @State private var showAFTCalculator: Bool = false
     @State private var showRecoveryDetail: Bool = false
     @State private var showEditSheet: Bool = false
     @State private var showCalendarSheet: Bool = false
@@ -32,13 +30,11 @@ struct HomeView: View {
     @State private var planDetailDayIndex: Int = 0
     @State private var navigateToPlanSession: Bool = false
     @State private var planSessionDayIndex: Int = 0
-    @State private var navigateToUnitPTDetail: Bool = false
-    @State private var selectedUnitPTDay: WorkoutDay?
+
     @State private var calendarService = CalendarExportService()
     @State private var showCompletionShare: Bool = false
     @State private var completedWorkoutTitle: String = ""
     @State private var completedExerciseCount: Int = 0
-    @State private var showPTWorkoutSheet: Bool = false
     @State private var navigateToCalendarDay: Bool = false
     @State private var calendarDayDate: Date = .now
     @State private var navigateToTrainingCalendar: Bool = false
@@ -200,18 +196,6 @@ struct HomeView: View {
                 }
             }
         }
-        .navigationDestination(isPresented: $showAFTCalculator) {
-            AFTCalculatorView()
-        }
-        .navigationDestination(isPresented: $navigateToUnitPTDetail) {
-            if let unitDay = selectedUnitPTDay {
-                StandaloneWorkoutDetailView(workout: unitDay)
-            } else {
-                UnavailableFallbackView(title: "Unit PT Unavailable", message: "Could not load unit PT details.", action: "Go Back") {
-                    navigateToUnitPTDetail = false
-                }
-            }
-        }
         .navigationDestination(isPresented: $navigateToCalendarDay) {
             CalendarDayDetailView(date: calendarDayDate)
         }
@@ -224,17 +208,11 @@ struct HomeView: View {
         .sheet(isPresented: $showWODSheet) {
             WODDetailView()
         }
-        .sheet(isPresented: $showPTWorkoutSheet) {
-            PTWODDetailView()
-        }
         .sheet(isPresented: $showWODPlanSheet) {
             WODPlanSheet()
         }
         .sheet(isPresented: $showMyPTPlanSheet) {
             MyPTPlanSheet()
-        }
-        .sheet(isPresented: $showUnitPTSheet) {
-            UnitPTBuilderSheet()
         }
         .sheet(isPresented: $showScanSheet) {
             QRScannerSheet()
@@ -520,7 +498,7 @@ struct HomeView: View {
     private func todayWorkoutCard(_ workout: WorkoutDay) -> some View {
         Button {
             startWorkoutTrigger.toggle()
-            showPTWorkoutSheet = true
+            showFunctionalWODSheet = true
         } label: {
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {

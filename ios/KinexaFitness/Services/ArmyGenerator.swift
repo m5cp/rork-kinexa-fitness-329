@@ -72,7 +72,7 @@ enum ArmyGenerator {
             return [.tactical, .workCapacity, .tactical, .endurance, .coreRun]
         case .recovery:
             return [.recovery, .coreRun, .recovery, .endurance, .recovery]
-        case .generalArmyFitness:
+        case .generalFitness:
             return [.aftPrep, .endurance, .tactical, .lowerStrength, .upperEndurance, .coreRun]
         }
     }
@@ -249,35 +249,4 @@ enum ArmyGenerator {
         return nextTemplate(mode: .workoutOfDay, focus: primaryFocus, equipment: equipment, excluding: lastTitle)
     }
 
-    static func convertToUnitPTPlan(_ template: ArmyWorkoutTemplate) -> UnitPTPlan {
-        let warmupText = template.warmup.map { ex in
-            "\(ex.name)\(ex.reps.map { " — \($0)" } ?? "")\(ex.duration.map { " — \($0)" } ?? "")"
-        }.joined(separator: "\n")
-
-        let cooldownText = template.cooldown.map { ex in
-            "\(ex.name)\(ex.duration.map { " — \($0)" } ?? "")"
-        }.joined(separator: "\n")
-
-        let blocks = template.mainEffort.map { ex in
-            var desc = ex.name
-            if let sets = ex.sets { desc += " — \(sets) sets" }
-            if let reps = ex.reps { desc += " x \(reps)" }
-            if let dur = ex.duration { desc += " (\(dur))" }
-            if let notes = ex.notes, !notes.isEmpty { desc += ". \(notes)" }
-            return UnitPTBlock(desc)
-        }
-
-        let equipmentText = template.equipment.map(\.rawValue).joined(separator: ", ")
-
-        return UnitPTPlan(
-            title: template.title,
-            objective: template.objective,
-            formationNotes: "Form up in groups. Conduct accountability, safety brief, and session overview. Designate group leaders for station-based work.",
-            equipment: equipmentText.isEmpty ? "Cones, timer, water source" : "Cones, timer, water source. \(equipmentText) as available.",
-            warmup: warmupText.isEmpty ? "Preparation Drill (PD): 10 exercises, 5 reps each" : warmupText,
-            mainEffort: blocks,
-            cooldown: cooldownText.isEmpty ? "Recovery Drill (RD): Full sequence" : cooldownText,
-            leaderNotes: template.leaderNotes ?? "Keep transitions tight. Monitor form on all lifts. Adjust intensity for ability groups as needed."
-        )
-    }
 }

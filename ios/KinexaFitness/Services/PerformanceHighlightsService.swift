@@ -44,25 +44,12 @@ nonisolated struct InstantRecap: Identifiable, Sendable {
 enum PerformanceHighlightsService {
 
     static func generateHighlights(
-        aftScores: [AFTScoreRecord],
         completedRecords: [CompletedWorkoutRecord],
         currentPlan: WeeklyPlan?,
         wodPlan: WODPlan?,
         streak: Int
     ) -> [PerformanceHighlight] {
         var highlights: [PerformanceHighlight] = []
-
-        if let pb = personalBestHighlight(aftScores: aftScores) {
-            highlights.append(pb)
-        }
-
-        if let sc = scoreChangeHighlight(aftScores: aftScores) {
-            highlights.append(sc)
-        }
-
-        if let ev = bestEventImprovementHighlight(aftScores: aftScores) {
-            highlights.append(ev)
-        }
 
         if let pp = planProgressHighlight(currentPlan: currentPlan) {
             highlights.append(pp)
@@ -91,46 +78,6 @@ enum PerformanceHighlightsService {
         )
     }
 
-    static func aftScoreRecap(
-        newScore: AFTScoreRecord,
-        previousScores: [AFTScoreRecord]
-    ) -> InstantRecap {
-        let allScores = previousScores
-        let isPersonalBest = allScores.allSatisfy { $0.totalScore <= newScore.totalScore }
-
-        if isPersonalBest && !allScores.isEmpty {
-            return InstantRecap(
-                title: "New Personal Best: \(newScore.totalScore)",
-                detail: nil,
-                icon: "trophy.fill"
-            )
-        }
-
-        if let previous = allScores.first {
-            let diff = newScore.totalScore - previous.totalScore
-            if diff > 0 {
-                return InstantRecap(
-                    title: "+\(diff) pts since last test",
-                    detail: "Total: \(newScore.totalScore)",
-                    icon: "arrow.up.right"
-                )
-            } else if diff < 0 {
-                return InstantRecap(
-                    title: "\(diff) pts since last test",
-                    detail: "Total: \(newScore.totalScore)",
-                    icon: "arrow.down.right",
-                    isPositive: false
-                )
-            }
-        }
-
-        return InstantRecap(
-            title: "AFT Score: \(newScore.totalScore)",
-            detail: nil,
-            icon: "shield.fill"
-        )
-    }
-
     static func planDayRecap(dayNumber: Int, totalDays: Int) -> InstantRecap {
         InstantRecap(
             title: "Day \(dayNumber) of \(totalDays) completed",
@@ -140,59 +87,6 @@ enum PerformanceHighlightsService {
     }
 
     // MARK: - Private
-
-    private static func personalBestHighlight(aftScores: [AFTScoreRecord]) -> PerformanceHighlight? {
-        guard aftScores.count >= 2 else { return nil }
-        let latest = aftScores[0]
-        let previousBest = aftScores.dropFirst().max(by: { $0.totalScore < $1.totalScore })
-        guard let best = previousBest, latest.totalScore > best.totalScore else { return nil }
-
-        return PerformanceHighlight(
-            type: .personalBest,
-            title: "Personal Best: \(latest.totalScore)",
-            icon: "trophy.fill"
-        )
-    }
-
-    private static func scoreChangeHighlight(aftScores: [AFTScoreRecord]) -> PerformanceHighlight? {
-        guard aftScores.count >= 2 else { return nil }
-        let diff = aftScores[0].totalScore - aftScores[1].totalScore
-        guard diff != 0 else { return nil }
-
-        if personalBestHighlight(aftScores: aftScores) != nil && diff > 0 {
-            return nil
-        }
-
-        let sign = diff > 0 ? "+" : ""
-        return PerformanceHighlight(
-            type: .scoreChange,
-            title: "\(sign)\(diff) pts since last test",
-            icon: diff > 0 ? "arrow.up.right" : "arrow.down.right",
-            isPositive: diff > 0
-        )
-    }
-
-    private static func bestEventImprovementHighlight(aftScores: [AFTScoreRecord]) -> PerformanceHighlight? {
-        guard aftScores.count >= 2 else { return nil }
-        let latest = aftScores[0]
-        let previous = aftScores[1]
-
-        let events: [(String, Int)] = [
-            ("MDL", latest.deadliftPoints - previous.deadliftPoints),
-            ("HRP", latest.pushUpPoints - previous.pushUpPoints),
-            ("SDC", latest.sdcPoints - previous.sdcPoints),
-            ("PLK", latest.plankPoints - previous.plankPoints),
-            ("2MR", latest.runPoints - previous.runPoints)
-        ]
-
-        guard let best = events.max(by: { $0.1 < $1.1 }), best.1 > 0 else { return nil }
-
-        return PerformanceHighlight(
-            type: .eventImprovement,
-            title: "+\(best.1) pts (\(best.0))",
-            icon: "chart.line.uptrend.xyaxis"
-        )
-    }
 
     private static func planProgressHighlight(currentPlan: WeeklyPlan?) -> PerformanceHighlight? {
         guard let plan = currentPlan else { return nil }

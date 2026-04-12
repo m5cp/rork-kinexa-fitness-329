@@ -3,7 +3,7 @@ import SwiftUI
 struct OnboardingView: View {
     @AppStorage("onboardingComplete") private var onboardingComplete: Bool = false
     @AppStorage("ptMode") private var ptModeRaw: String = PTMode.both.rawValue
-    @AppStorage("trainingFocus") private var trainingFocusRaw: String = TrainingFocus.generalArmyFitness.rawValue
+    @AppStorage("trainingFocus") private var trainingFocusRaw: String = TrainingFocus.generalFitness.rawValue
     @AppStorage("fitnessLevel") private var fitnessLevelRaw: String = FitnessLevel.intermediate.rawValue
     @AppStorage("equipment") private var equipmentRaw: String = EquipmentOption.bodyweight.rawValue
     @AppStorage("daysPerWeek") private var daysPerWeek: Int = 3

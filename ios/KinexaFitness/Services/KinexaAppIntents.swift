@@ -1,21 +1,6 @@
 import AppIntents
 import SwiftUI
 
-struct ShowAFTScoreIntent: AppIntent {
-    static var title: LocalizedStringResource = "Show AFT Score"
-    static var description = IntentDescription("Shows your latest AFT score")
-    static var openAppWhenRun: Bool = true
-
-    func perform() async throws -> some IntentResult & ProvidesDialog {
-        let data = SharedDataManager.readWidgetData()
-        if let score = data.aftScore {
-            let passStatus = data.aftPassed == true ? "PASS" : "NEEDS WORK"
-            return .result(dialog: "Your latest AFT score is \(score) — \(passStatus)")
-        }
-        return .result(dialog: "No AFT score recorded yet. Open the AFT Calculator to calculate your score.")
-    }
-}
-
 struct StartPTIntent: AppIntent {
     static var title: LocalizedStringResource = "Start My PT"
     static var description = IntentDescription("Opens today's PT workout")
@@ -60,16 +45,6 @@ struct CheckStepsIntent: AppIntent {
 
 struct KinexaFitnessShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
-        AppShortcut(
-            intent: ShowAFTScoreIntent(),
-            phrases: [
-                "Show my AFT score in \(.applicationName)",
-                "What's my AFT score on \(.applicationName)",
-                "Check my fitness test score in \(.applicationName)"
-            ],
-            shortTitle: "AFT Score",
-            systemImageName: "shield.checkered"
-        )
         AppShortcut(
             intent: StartPTIntent(),
             phrases: [

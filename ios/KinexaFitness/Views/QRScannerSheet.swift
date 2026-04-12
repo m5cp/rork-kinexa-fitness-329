@@ -5,7 +5,6 @@ struct QRScannerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppViewModel.self) private var vm
 
-    @State private var scannedPlan: UnitPTPlan?
     @State private var scannedWorkout: WorkoutDay?
     @State private var errorMessage: String?
     @State private var savedConfirmation = false
@@ -17,12 +16,8 @@ struct QRScannerSheet: View {
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 20) {
-                        if scannedPlan == nil && scannedWorkout == nil {
+                        if scannedWorkout == nil {
                             cameraSection
-                        }
-
-                        if let scannedPlan {
-                            importedPlanCard(scannedPlan)
                         }
 
                         if let scannedWorkout {
@@ -100,97 +95,6 @@ struct QRScannerSheet: View {
         .premiumCard()
     }
 
-    private func importedPlanCard(_ plan: UnitPTPlan) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 8) {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(KinexaTheme.success)
-                Text("Imported PT Plan")
-                    .font(.headline)
-                    .foregroundStyle(KinexaTheme.success)
-            }
-
-            Text(plan.title)
-                .font(.title3.weight(.bold))
-                .foregroundStyle(KinexaTheme.primaryText)
-
-            Text(plan.objective)
-                .font(.subheadline)
-                .foregroundStyle(KinexaTheme.secondaryText)
-
-            if !plan.equipment.isEmpty {
-                HStack(spacing: 6) {
-                    Image(systemName: "wrench.and.screwdriver")
-                        .font(.caption)
-                        .foregroundStyle(KinexaTheme.accent)
-                    Text(plan.equipment)
-                        .font(.caption)
-                        .foregroundStyle(KinexaTheme.secondaryText)
-                }
-            }
-
-            Text("\(plan.mainEffort.count) exercise blocks")
-                .font(.subheadline)
-                .foregroundStyle(KinexaTheme.accent)
-
-            if !plan.mainEffort.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    ForEach(Array(plan.mainEffort.prefix(5).enumerated()), id: \.element.id) { index, block in
-                        Text("\(index + 1). \(block.description)")
-                            .font(.caption)
-                            .foregroundStyle(KinexaTheme.secondaryText)
-                            .lineLimit(2)
-                    }
-                    if plan.mainEffort.count > 5 {
-                        Text("+ \(plan.mainEffort.count - 5) more...")
-                            .font(.caption)
-                            .foregroundStyle(KinexaTheme.tertiaryText)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-                .background(KinexaTheme.cardSoft)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-            }
-
-            Button {
-                vm.unitPTPlans.insert(plan, at: 0)
-                vm.persistAll()
-                savedConfirmation.toggle()
-                dismiss()
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "square.and.arrow.down.on.square")
-                    Text("Save to My Plans")
-                }
-                .font(.headline)
-                .foregroundStyle(.white)
-                .frame(height: 52)
-                .frame(maxWidth: .infinity)
-                .background(KinexaTheme.heroGradient)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-            }
-            .buttonStyle(PressScaleButtonStyle())
-
-            Button {
-                scannedPlan = nil
-                scannedWorkout = nil
-                errorMessage = nil
-            } label: {
-                Text("Scan Another")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(KinexaTheme.accent)
-                    .frame(height: 44)
-                    .frame(maxWidth: .infinity)
-                    .background(KinexaTheme.accent.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-            }
-            .buttonStyle(PressScaleButtonStyle())
-        }
-        .padding(18)
-        .premiumCard()
-    }
-
     private func importedWorkoutCard(_ workout: WorkoutDay) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 8) {
@@ -248,7 +152,6 @@ struct QRScannerSheet: View {
             .buttonStyle(PressScaleButtonStyle())
 
             Button {
-                scannedPlan = nil
                 scannedWorkout = nil
                 errorMessage = nil
             } label: {
@@ -285,7 +188,6 @@ struct QRScannerSheet: View {
 
     private func handleScannedCode(_ code: String) {
         errorMessage = nil
-        scannedPlan = nil
         scannedWorkout = nil
 
         guard let data = code.data(using: .utf8) else {
@@ -297,17 +199,6 @@ struct QRScannerSheet: View {
 
         if let workoutPayload = try? decoder.decode(WorkoutQRPayload.self, from: data), workoutPayload.v == 1 {
             scannedWorkout = workoutPayload.toWorkoutDay()
-            return
-        }
-
-        if let payload = try? decoder.decode(UnitPTQRCodePayload.self, from: data) {
-            scannedPlan = payload.toUnitPTPlan()
-            return
-        }
-
-        decoder.dateDecodingStrategy = .iso8601
-        if let plan = try? decoder.decode(UnitPTPlan.self, from: data) {
-            scannedPlan = plan
             return
         }
 

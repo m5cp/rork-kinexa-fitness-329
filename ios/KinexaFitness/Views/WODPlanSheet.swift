@@ -5,7 +5,7 @@ struct WODPlanSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppViewModel.self) private var vm
 
-    @State private var selectedGoal: PTGoal = .aftScoreImprovement
+    @State private var selectedGoal: PTGoal = .generalFitness
     @State private var selectedWeeks: Int = 4
     @State private var selectedHeroPreference: WODHeroPreference = .regular
     @State private var selectedTrainingFrequency: Int = 5

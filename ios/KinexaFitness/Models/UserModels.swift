@@ -17,12 +17,12 @@ nonisolated enum DutyType: String, CaseIterable, Codable, Identifiable, Sendable
 }
 
 nonisolated enum TrainingFocus: String, CaseIterable, Codable, Identifiable, Sendable {
-    case aftPrep = "AFT Prep"
+    case aftPrep = "General Conditioning"
     case strength = "Strength"
     case endurance = "Endurance"
     case tacticalConditioning = "Functional Conditioning"
     case recovery = "Recovery"
-    case generalArmyFitness = "General Fitness"
+    case generalFitness = "General Fitness"
 
     var id: String { rawValue }
 
@@ -33,7 +33,7 @@ nonisolated enum TrainingFocus: String, CaseIterable, Codable, Identifiable, Sen
         case .endurance: return "figure.run"
         case .tacticalConditioning: return "bolt.heart.fill"
         case .recovery: return "figure.cooldown"
-        case .generalArmyFitness: return "figure.mixed.cardio"
+        case .generalFitness: return "figure.mixed.cardio"
         }
     }
 }
@@ -47,7 +47,7 @@ nonisolated enum FitnessLevel: String, CaseIterable, Codable, Identifiable, Send
 }
 
 nonisolated enum PTGoal: String, CaseIterable, Codable, Identifiable, Sendable {
-    case aftScoreImprovement = "AFT Score Improvement"
+    case generalFitness = "General Fitness"
     case endurance = "Endurance"
     case power = "Power"
     case speed = "Speed"
@@ -57,7 +57,7 @@ nonisolated enum PTGoal: String, CaseIterable, Codable, Identifiable, Sendable {
 
     var icon: String {
         switch self {
-        case .aftScoreImprovement: return "figure.mixed.cardio"
+        case .generalFitness: return "figure.mixed.cardio"
         case .endurance: return "figure.run"
         case .power: return "figure.strengthtraining.traditional"
         case .speed: return "bolt.fill"
@@ -67,7 +67,7 @@ nonisolated enum PTGoal: String, CaseIterable, Codable, Identifiable, Sendable {
 
     var displayName: String {
         switch self {
-        case .aftScoreImprovement: return "General Fitness"
+        case .generalFitness: return "General Fitness"
         case .endurance: return "Endurance"
         case .power: return "Power"
         case .speed: return "Speed"
@@ -77,7 +77,7 @@ nonisolated enum PTGoal: String, CaseIterable, Codable, Identifiable, Sendable {
 
     var subtitle: String {
         switch self {
-        case .aftScoreImprovement: return "Well-rounded fitness across all areas"
+        case .generalFitness: return "Well-rounded fitness across all areas"
         case .endurance: return "Build stamina for long-distance and sustained effort"
         case .power: return "Increase explosive strength and max lifts"
         case .speed: return "Improve sprint times, agility, and quickness"
@@ -91,7 +91,7 @@ nonisolated enum PTGoal: String, CaseIterable, Codable, Identifiable, Sendable {
 
     var armyFocuses: [ArmyFocus] {
         switch self {
-        case .aftScoreImprovement:
+        case .generalFitness:
             return [.lowerStrength, .upperEndurance, .workCapacity, .coreRun, .aftPrep, .endurance]
         case .endurance:
             return [.endurance, .coreRun, .endurance, .workCapacity, .endurance, .recovery]
