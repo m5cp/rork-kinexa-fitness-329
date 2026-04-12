@@ -1,0 +1,116 @@
+import Foundation
+
+nonisolated enum MealType: String, Codable, CaseIterable, Sendable {
+    case breakfast = "Breakfast"
+    case lunch = "Lunch"
+    case dinner = "Dinner"
+    case snack = "Snack"
+
+    var icon: String {
+        switch self {
+        case .breakfast: return "sunrise.fill"
+        case .lunch: return "sun.max.fill"
+        case .dinner: return "moon.stars.fill"
+        case .snack: return "leaf.fill"
+        }
+    }
+
+    var color: String {
+        switch self {
+        case .breakfast: return "#F59E0B"
+        case .lunch: return "#22C55E"
+        case .dinner: return "#6366F1"
+        case .snack: return "#EC4899"
+        }
+    }
+}
+
+nonisolated struct NutritionInfo: Codable, Sendable {
+    var calories: Int
+    var protein: Double
+    var carbs: Double
+    var fat: Double
+    var fiber: Double
+    var sugar: Double
+
+    static let zero = NutritionInfo(calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0)
+}
+
+nonisolated struct FoodItem: Codable, Identifiable, Sendable {
+    let id: UUID
+    var name: String
+    var quantity: String
+    var nutrition: NutritionInfo
+
+    init(id: UUID = UUID(), name: String, quantity: String, nutrition: NutritionInfo) {
+        self.id = id
+        self.name = name
+        self.quantity = quantity
+        self.nutrition = nutrition
+    }
+}
+
+nonisolated struct MealEntry: Codable, Identifiable, Sendable {
+    let id: UUID
+    var date: Date
+    var mealType: MealType
+    var foods: [FoodItem]
+    var notes: String
+
+    init(id: UUID = UUID(), date: Date = .now, mealType: MealType, foods: [FoodItem], notes: String = "") {
+        self.id = id
+        self.date = date
+        self.mealType = mealType
+        self.foods = foods
+        self.notes = notes
+    }
+
+    var totalNutrition: NutritionInfo {
+        NutritionInfo(
+            calories: foods.map(\.nutrition.calories).reduce(0, +),
+            protein: foods.map(\.nutrition.protein).reduce(0, +),
+            carbs: foods.map(\.nutrition.carbs).reduce(0, +),
+            fat: foods.map(\.nutrition.fat).reduce(0, +),
+            fiber: foods.map(\.nutrition.fiber).reduce(0, +),
+            sugar: foods.map(\.nutrition.sugar).reduce(0, +)
+        )
+    }
+}
+
+nonisolated struct DailyNutritionGoal: Codable, Sendable {
+    var calories: Int
+    var protein: Double
+    var carbs: Double
+    var fat: Double
+
+    static let `default` = DailyNutritionGoal(calories: 2200, protein: 150, carbs: 250, fat: 75)
+}
+
+nonisolated struct GeminiFoodEstimate: Codable, Sendable {
+    let foods: [GeminiFoodItem]
+}
+
+nonisolated struct GeminiFoodItem: Codable, Sendable {
+    let name: String
+    let quantity: String
+    let calories: Int
+    let protein: Double
+    let carbs: Double
+    let fat: Double
+    let fiber: Double
+    let sugar: Double
+}
+
+nonisolated struct GeminiMealInsight: Codable, Sendable {
+    let summary: String
+    let strengths: [String]
+    let improvements: [String]
+    let tip: String
+}
+
+nonisolated struct GeminiDailyInsight: Codable, Sendable {
+    let overview: String
+    let macroBalance: String
+    let recommendations: [String]
+    let mealTimingTip: String
+}

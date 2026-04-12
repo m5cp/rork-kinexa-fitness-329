@@ -3,13 +3,15 @@ import SwiftUI
 nonisolated enum AppTab: Int, CaseIterable, Sendable {
     case home = 0
     case workouts = 1
-    case progress = 2
-    case profile = 3
+    case nutrition = 2
+    case progress = 3
+    case profile = 4
 
     var title: String {
         switch self {
         case .home: return "Home"
         case .workouts: return "Workouts"
+        case .nutrition: return "Nutrition"
         case .progress: return "Progress"
         case .profile: return "Profile"
         }
@@ -19,6 +21,7 @@ nonisolated enum AppTab: Int, CaseIterable, Sendable {
         switch self {
         case .home: return "house.fill"
         case .workouts: return "dumbbell.fill"
+        case .nutrition: return "fork.knife"
         case .progress: return "chart.line.uptrend.xyaxis"
         case .profile: return "person.crop.circle.fill"
         }
@@ -30,6 +33,7 @@ struct MainTabView: View {
     @State private var selectedTab: AppTab = .home
     @State private var homePath = NavigationPath()
     @State private var workoutsPath = NavigationPath()
+    @State private var nutritionPath = NavigationPath()
     @State private var progressPath = NavigationPath()
     @State private var profilePath = NavigationPath()
 
@@ -47,6 +51,12 @@ struct MainTabView: View {
                 }
                 .opacity(selectedTab == .workouts ? 1 : 0)
                 .zIndex(selectedTab == .workouts ? 1 : 0)
+
+                NavigationStack(path: $nutritionPath) {
+                    NutritionTabView()
+                }
+                .opacity(selectedTab == .nutrition ? 1 : 0)
+                .zIndex(selectedTab == .nutrition ? 1 : 0)
 
                 NavigationStack(path: $progressPath) {
                     ProgressViewScreen()
@@ -78,6 +88,7 @@ struct MainTabView: View {
                         switch tab {
                         case .home: homePath = NavigationPath()
                         case .workouts: workoutsPath = NavigationPath()
+                        case .nutrition: nutritionPath = NavigationPath()
                         case .progress: progressPath = NavigationPath()
                         case .profile: profilePath = NavigationPath()
                         }
