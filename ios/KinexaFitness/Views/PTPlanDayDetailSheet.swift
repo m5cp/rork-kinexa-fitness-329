@@ -378,7 +378,7 @@ struct PTPlanDayDetailSheet: View {
                             set: { exercises[index].name = $0; hasChanges = true }
                         ),
                         accentColor: KinexaTheme.accent,
-                        armyOnly: true,
+                        ptOnly: true,
                         onChanged: { hasChanges = true }
                     )
                     .zIndex(10)

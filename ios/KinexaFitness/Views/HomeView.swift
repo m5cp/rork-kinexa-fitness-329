@@ -400,7 +400,7 @@ struct HomeView: View {
         if title.contains("run") || title.contains("cardio") || title.contains("endurance") { return "figure.run" }
         if title.contains("strength") || title.contains("push") || title.contains("pull") { return "figure.strengthtraining.traditional" }
         if title.contains("recovery") || title.contains("stretch") || title.contains("mobility") { return "figure.cooldown" }
-        if title.contains("unit") || title.contains("formation") { return "person.3.fill" }
+        if title.contains("unit") || title.contains("group") { return "person.3.fill" }
         return "figure.mixed.cardio"
     }
 

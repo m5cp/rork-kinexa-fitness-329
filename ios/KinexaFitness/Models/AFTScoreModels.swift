@@ -1,23 +1,23 @@
 import Foundation
 
-nonisolated struct AFTEvent: Sendable {
+nonisolated struct FitnessTestEvent: Sendable {
     let name: String
     let abbreviation: String
     let unit: String
     let icon: String
 }
 
-nonisolated enum AFTEvents: Sendable {
-    static let deadlift = AFTEvent(name: "3-Rep Max Deadlift", abbreviation: "MDL", unit: "lbs", icon: "figure.strengthtraining.traditional")
-    static let handReleasePushUp = AFTEvent(name: "Hand-Release Push-Up", abbreviation: "HRP", unit: "reps", icon: "figure.core.training")
-    static let sprintDragCarry = AFTEvent(name: "Sprint-Drag-Carry", abbreviation: "SDC", unit: "sec", icon: "figure.run")
-    static let plank = AFTEvent(name: "Plank", abbreviation: "PLK", unit: "sec", icon: "figure.pilates")
-    static let twoMileRun = AFTEvent(name: "2-Mile Run", abbreviation: "2MR", unit: "sec", icon: "figure.outdoor.cycle")
+nonisolated enum FitnessTestEvents: Sendable {
+    static let deadlift = FitnessTestEvent(name: "3-Rep Max Deadlift", abbreviation: "MDL", unit: "lbs", icon: "figure.strengthtraining.traditional")
+    static let handReleasePushUp = FitnessTestEvent(name: "Hand-Release Push-Up", abbreviation: "HRP", unit: "reps", icon: "figure.core.training")
+    static let sprintDragCarry = FitnessTestEvent(name: "Sprint-Drag-Carry", abbreviation: "SDC", unit: "sec", icon: "figure.run")
+    static let plank = FitnessTestEvent(name: "Plank", abbreviation: "PLK", unit: "sec", icon: "figure.pilates")
+    static let twoMileRun = FitnessTestEvent(name: "2-Mile Run", abbreviation: "2MR", unit: "sec", icon: "figure.outdoor.cycle")
 
-    static let all: [AFTEvent] = [deadlift, handReleasePushUp, sprintDragCarry, plank, twoMileRun]
+    static let all: [FitnessTestEvent] = [deadlift, handReleasePushUp, sprintDragCarry, plank, twoMileRun]
 }
 
-nonisolated struct AFTScoreRecord: Codable, Identifiable, Hashable, Sendable {
+nonisolated struct FitnessTestScoreRecord: Codable, Identifiable, Hashable, Sendable {
     let id: UUID
     var date: Date
     var deadliftLbs: Int
@@ -64,4 +64,8 @@ nonisolated struct AFTScoreRecord: Codable, Identifiable, Hashable, Sendable {
         self.weakestEvents = weakestEvents
     }
 }
+
+typealias AFTEvent = FitnessTestEvent
+typealias AFTEvents = FitnessTestEvents
+typealias AFTScoreRecord = FitnessTestScoreRecord
 

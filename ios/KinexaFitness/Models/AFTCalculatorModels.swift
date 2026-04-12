@@ -1,14 +1,9 @@
 import Foundation
 
-nonisolated enum SoldierSex: String, CaseIterable, Codable, Identifiable, Sendable {
-    case male = "Male"
-    case female = "Female"
+typealias SoldierSex = BiologicalSex
 
-    var id: String { rawValue }
-}
-
-nonisolated enum AFTStandard: String, CaseIterable, Codable, Identifiable, Sendable {
-    case combat = "Combat"
+nonisolated enum FitnessTestStandard: String, CaseIterable, Codable, Identifiable, Sendable {
+    case combat = "Advanced"
     case general = "General"
 
     var id: String { rawValue }
@@ -28,13 +23,16 @@ nonisolated enum AFTStandard: String, CaseIterable, Codable, Identifiable, Senda
     }
 }
 
-nonisolated struct AFTCalculatorResult: Codable, Identifiable, Hashable, Sendable {
+typealias AFTStandard = FitnessTestStandard
+typealias AFTCalculatorResult = FitnessTestResult
+
+nonisolated struct FitnessTestResult: Codable, Identifiable, Hashable, Sendable {
     let id: UUID
     var date: Date
-    var soldierName: String
+    var athleteName: String
     var age: Int
-    var sex: SoldierSex
-    var standard: AFTStandard
+    var sex: BiologicalSex
+    var standard: FitnessTestStandard
     var deadliftLbs: Int
     var pushUpReps: Int
     var sdcSeconds: Int
@@ -51,10 +49,10 @@ nonisolated struct AFTCalculatorResult: Codable, Identifiable, Hashable, Sendabl
 
     init(
         date: Date = .now,
-        soldierName: String,
+        athleteName: String,
         age: Int,
-        sex: SoldierSex,
-        standard: AFTStandard,
+        sex: BiologicalSex,
+        standard: FitnessTestStandard,
         deadliftLbs: Int,
         pushUpReps: Int,
         sdcSeconds: Int,
@@ -71,7 +69,7 @@ nonisolated struct AFTCalculatorResult: Codable, Identifiable, Hashable, Sendabl
     ) {
         self.id = UUID()
         self.date = date
-        self.soldierName = soldierName
+        self.athleteName = athleteName
         self.age = age
         self.sex = sex
         self.standard = standard

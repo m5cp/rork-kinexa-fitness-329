@@ -116,7 +116,7 @@ struct UnitPTDayDetailView: View {
     }
 
     private var formationSection: some View {
-        editableSection(title: "Formation", icon: "person.3.sequence.fill", text: $dayPlan.formationNotes)
+        editableSection(title: "Group Setup", icon: "person.3.sequence.fill", text: $dayPlan.formationNotes)
     }
 
     private var equipmentSection: some View {

@@ -80,7 +80,7 @@ struct ResourcesView: View {
                 Divider().overlay(KinexaTheme.border)
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Combat Standard")
+                    Text("Advanced Standard")
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(KinexaTheme.primaryText)
                     Text("Minimum 60 points per event, 350 points total to pass. Sex-neutral scoring — everyone uses the same table.")
@@ -117,7 +117,7 @@ struct ResourcesView: View {
 
     private var scoringQuickRefMale: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("100-Point Benchmarks — Male / Combat (17–21)")
+            Text("100-Point Benchmarks — Male / Advanced (17–21)")
                 .font(.caption.weight(.bold))
                 .foregroundStyle(KinexaTheme.accent)
 
@@ -145,7 +145,7 @@ struct ResourcesView: View {
                 quickRefRow(event: "2MR", benchmark: "15:36", tint: KinexaTheme.accent2)
             }
 
-            Text("Benchmarks vary by age group and sex. Use the AFT Calculator for personalized scoring.")
+            Text("Benchmarks vary by age group and sex. Use the Fitness Test Calculator for personalized scoring.")
                 .font(.caption2)
                 .foregroundStyle(KinexaTheme.tertiaryText)
         }
@@ -179,7 +179,7 @@ struct ResourcesView: View {
                     .foregroundStyle(KinexaTheme.tertiaryText)
             }
 
-            Text("This information is based on publicly available fitness standards and is provided for general reference only. This app is not affiliated with, endorsed by, or sponsored by any government entity.")
+            Text("This information is based on publicly available fitness standards and is provided for general reference only. Scores are approximations based on publicly available fitness standards.")
                 .font(.caption2)
                 .foregroundStyle(KinexaTheme.tertiaryText)
                 .lineSpacing(3)

@@ -22,7 +22,7 @@ struct ArmyPTExercisePickerSheet: View {
                         Image(systemName: "magnifyingglass")
                             .font(.subheadline)
                             .foregroundStyle(KinexaTheme.tertiaryText)
-                        TextField("Search Army PT exercises...", text: $searchText)
+                        TextField("Search exercises...", text: $searchText)
                             .font(.subheadline)
                             .foregroundStyle(KinexaTheme.primaryText)
                             .focused($isSearchFocused)
@@ -52,7 +52,7 @@ struct ArmyPTExercisePickerSheet: View {
                         Image(systemName: "shield.fill")
                             .font(.caption2.weight(.bold))
                             .foregroundStyle(KinexaTheme.accent)
-                        Text("ARMY PRT EXERCISES ONLY")
+                        Text("EXERCISE LIBRARY")
                             .font(.caption2.weight(.heavy))
                             .tracking(0.6)
                             .foregroundStyle(KinexaTheme.tertiaryText)
@@ -98,7 +98,7 @@ struct ArmyPTExercisePickerSheet: View {
                     }
                 }
             }
-            .navigationTitle("Add Army PT Exercise")
+            .navigationTitle("Add Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

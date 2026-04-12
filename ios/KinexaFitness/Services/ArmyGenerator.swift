@@ -222,8 +222,8 @@ enum ArmyGenerator {
         case .workCapacity: return "Work Capacity"
         case .coreRun: return "Core Endurance"
         case .endurance: return "Running Endurance"
-        case .aftPrep: return "AFT Prep"
-        case .tactical: return "Tactical Conditioning"
+        case .aftPrep: return "Fitness Test Prep"
+        case .tactical: return "Functional Conditioning"
         case .recovery: return "Recovery"
         }
     }
@@ -272,12 +272,12 @@ enum ArmyGenerator {
         return UnitPTPlan(
             title: template.title,
             objective: template.objective,
-            formationNotes: "Form up by squad in extended rectangular formation. Conduct accountability, safety brief, and session overview. Designate lane NCOs for station-based work.",
+            formationNotes: "Form up in groups. Conduct accountability, safety brief, and session overview. Designate group leaders for station-based work.",
             equipment: equipmentText.isEmpty ? "Cones, timer, water source" : "Cones, timer, water source. \(equipmentText) as available.",
             warmup: warmupText.isEmpty ? "Preparation Drill (PD): 10 exercises, 5 reps each" : warmupText,
             mainEffort: blocks,
             cooldown: cooldownText.isEmpty ? "Recovery Drill (RD): Full sequence" : cooldownText,
-            leaderNotes: template.leaderNotes ?? "Maintain lane assignments and keep transitions tight. Monitor form on all lifts. Adjust intensity for ability groups as needed."
+            leaderNotes: template.leaderNotes ?? "Keep transitions tight. Monitor form on all lifts. Adjust intensity for ability groups as needed."
         )
     }
 }

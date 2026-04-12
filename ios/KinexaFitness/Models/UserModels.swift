@@ -20,9 +20,9 @@ nonisolated enum TrainingFocus: String, CaseIterable, Codable, Identifiable, Sen
     case aftPrep = "AFT Prep"
     case strength = "Strength"
     case endurance = "Endurance"
-    case tacticalConditioning = "Tactical Conditioning"
+    case tacticalConditioning = "Functional Conditioning"
     case recovery = "Recovery"
-    case generalArmyFitness = "General Army Fitness"
+    case generalArmyFitness = "General Fitness"
 
     var id: String { rawValue }
 
@@ -83,6 +83,10 @@ nonisolated enum PTGoal: String, CaseIterable, Codable, Identifiable, Sendable {
         case .speed: return "Improve sprint times, agility, and quickness"
         case .cardio: return "Strengthen cardiovascular fitness and recovery"
         }
+    }
+
+    var workoutFocuses: [ArmyFocus] {
+        armyFocuses
     }
 
     var armyFocuses: [ArmyFocus] {

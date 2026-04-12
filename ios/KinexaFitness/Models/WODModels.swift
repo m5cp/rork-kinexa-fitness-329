@@ -39,9 +39,9 @@ nonisolated enum WODFormat: String, Codable, CaseIterable, Sendable {
 }
 
 nonisolated enum WODCategory: String, Codable, CaseIterable, Sendable {
-    case crossfit = "FunctionFitness"
-    case aftStyle = "AFT-Style"
-    case tactical = "Tactical"
+    case crossfit = "Functional Fitness"
+    case aftStyle = "Test Prep"
+    case tactical = "Conditioning"
     case bodyweight = "Bodyweight"
     case freeWeight = "Free Weight"
 }

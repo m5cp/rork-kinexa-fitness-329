@@ -122,7 +122,7 @@ struct OnboardingView: View {
                     selectionRow("Individual PT", icon: "person.fill", subtitle: "Personal sessions", isSelected: ptModeRaw == PTMode.individual.rawValue) {
                         ptModeRaw = PTMode.individual.rawValue
                     }
-                    selectionRow("Unit PT", icon: "person.3.fill", subtitle: "Lead formation PT", isSelected: ptModeRaw == PTMode.unit.rawValue) {
+                    selectionRow("Group PT", icon: "person.3.fill", subtitle: "Lead group training", isSelected: ptModeRaw == PTMode.unit.rawValue) {
                         ptModeRaw = PTMode.unit.rawValue
                     }
                     selectionRow("Both", icon: "person.2.fill", subtitle: "Individual + Unit PT", isSelected: ptModeRaw == PTMode.both.rawValue) {

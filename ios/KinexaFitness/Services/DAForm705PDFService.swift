@@ -18,7 +18,7 @@ enum DAForm705PDFService {
 
             y = drawHeader(in: context.cgContext, at: y, margin: margin, contentWidth: contentWidth, pageWidth: pageWidth)
             y = drawUnofficialBanner(in: context.cgContext, at: y, margin: margin, contentWidth: contentWidth)
-            y = drawSoldierInfo(in: context.cgContext, at: y, margin: margin, contentWidth: contentWidth, data: data)
+            y = drawAthleteInfo(in: context.cgContext, at: y, margin: margin, contentWidth: contentWidth, data: data)
             y = drawTestInfo(in: context.cgContext, at: y, margin: margin, contentWidth: contentWidth, data: data)
             y = drawEventScores(in: context.cgContext, at: y, margin: margin, contentWidth: contentWidth, data: data)
             y = drawTotalAndResult(in: context.cgContext, at: y, margin: margin, contentWidth: contentWidth, data: data)
@@ -27,10 +27,10 @@ enum DAForm705PDFService {
         }
     }
 
-    static func savePDFToTemp(data: Data, soldierName: String) -> URL? {
-        let sanitized = soldierName.isEmpty ? "Soldier" : soldierName.replacingOccurrences(of: " ", with: "_")
+    static func savePDFToTemp(data: Data, athleteName: String) -> URL? {
+        let sanitized = athleteName.isEmpty ? "Athlete" : athleteName.replacingOccurrences(of: " ", with: "_")
         let dateStr = DateFormatter.shortFileDate.string(from: .now)
-        let fileName = "AFT_Score_Report_\(sanitized)_\(dateStr).pdf"
+        let fileName = "Score_Report_\(sanitized)_\(dateStr).pdf"
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
         do {
             try data.write(to: url)
@@ -54,7 +54,7 @@ enum DAForm705PDFService {
             .foregroundColor: UIColor.darkGray
         ]
 
-        let title = "AFT SCORE REPORT — UNOFFICIAL"
+        let title = "FITNESS TEST SCORE REPORT"
         let titleSize = (title as NSString).size(withAttributes: titleAttrs)
         let titleX = (pageWidth - titleSize.width) / 2
         (title as NSString).draw(at: CGPoint(x: titleX, y: currentY), withAttributes: titleAttrs)
@@ -83,7 +83,7 @@ enum DAForm705PDFService {
             .font: UIFont.boldSystemFont(ofSize: 8),
             .foregroundColor: UIColor(red: 0.5, green: 0.3, blue: 0.0, alpha: 1.0)
         ]
-        let bannerText = "UNOFFICIAL — FOR PERSONAL REFERENCE ONLY — NOT AN OFFICIAL ARMY RECORD"
+        let bannerText = "FOR PERSONAL REFERENCE ONLY"
         let bannerSize = (bannerText as NSString).size(withAttributes: bannerAttrs)
         let bannerX = margin + (contentWidth - bannerSize.width) / 2
         (bannerText as NSString).draw(at: CGPoint(x: bannerX, y: currentY + 6), withAttributes: bannerAttrs)
@@ -92,15 +92,15 @@ enum DAForm705PDFService {
         return currentY
     }
 
-    private static func drawSoldierInfo(in ctx: CGContext, at y: CGFloat, margin: CGFloat, contentWidth: CGFloat, data: DAForm705ExportData) -> CGFloat {
+    private static func drawAthleteInfo(in ctx: CGContext, at y: CGFloat, margin: CGFloat, contentWidth: CGFloat, data: DAForm705ExportData) -> CGFloat {
         var currentY = y
 
-        currentY = drawSectionHeader(in: ctx, at: currentY, margin: margin, contentWidth: contentWidth, title: "I. SOLDIER INFORMATION")
+        currentY = drawSectionHeader(in: ctx, at: currentY, margin: margin, contentWidth: contentWidth, title: "I. ATHLETE INFORMATION")
 
         let halfWidth = (contentWidth - 8) / 2
         let thirdWidth = (contentWidth - 16) / 3
 
-        currentY = drawLabeledField(in: ctx, at: currentY, x: margin, width: contentWidth, label: "1. NAME", value: data.soldierName)
+        currentY = drawLabeledField(in: ctx, at: currentY, x: margin, width: contentWidth, label: "1. NAME", value: data.athleteName)
 
         let row3Y = currentY
         drawLabeledField(in: ctx, at: row3Y, x: margin, width: thirdWidth, label: "2. AGE", value: "\(data.age)")
@@ -292,22 +292,22 @@ enum DAForm705PDFService {
         dateFormatter.dateFormat = "dd MMM yyyy"
 
         let row1Y = currentY
-        drawLabeledField(in: ctx, at: row1Y, x: margin, width: halfWidth, label: "SOLDIER NAME", value: data.soldierName)
+        drawLabeledField(in: ctx, at: row1Y, x: margin, width: halfWidth, label: "ATHLETE NAME", value: data.athleteName)
         currentY = drawLabeledField(in: ctx, at: row1Y, x: margin + halfWidth + 8, width: halfWidth, label: "DATE", value: dateFormatter.string(from: data.testDate))
 
-        let hasOIC = !data.oicName.isEmpty || !data.oicDate.isEmpty
-        let hasNCOIC = !data.ncoicName.isEmpty || !data.ncoicDate.isEmpty
+        let hasSupervisor = !data.supervisorName.isEmpty || !data.supervisorDate.isEmpty
+        let hasWitness = !data.witnessName.isEmpty || !data.witnessDate.isEmpty
 
-        if hasOIC {
+        if hasSupervisor {
             let row2Y = currentY
-            drawLabeledField(in: ctx, at: row2Y, x: margin, width: halfWidth, label: "OIC / NCOIC NAME", value: data.oicName)
-            currentY = drawLabeledField(in: ctx, at: row2Y, x: margin + halfWidth + 8, width: halfWidth, label: "DATE", value: data.oicDate)
+            drawLabeledField(in: ctx, at: row2Y, x: margin, width: halfWidth, label: "SUPERVISOR NAME", value: data.supervisorName)
+            currentY = drawLabeledField(in: ctx, at: row2Y, x: margin + halfWidth + 8, width: halfWidth, label: "DATE", value: data.supervisorDate)
         }
 
-        if hasNCOIC {
+        if hasWitness {
             let row3Y = currentY
-            drawLabeledField(in: ctx, at: row3Y, x: margin, width: halfWidth, label: "NCOIC NAME", value: data.ncoicName)
-            currentY = drawLabeledField(in: ctx, at: row3Y, x: margin + halfWidth + 8, width: halfWidth, label: "DATE", value: data.ncoicDate)
+            drawLabeledField(in: ctx, at: row3Y, x: margin, width: halfWidth, label: "WITNESS NAME", value: data.witnessName)
+            currentY = drawLabeledField(in: ctx, at: row3Y, x: margin + halfWidth + 8, width: halfWidth, label: "DATE", value: data.witnessDate)
         }
 
         let sigLineY = currentY + 10
@@ -322,12 +322,12 @@ enum DAForm705PDFService {
         ctx.move(to: CGPoint(x: margin, y: sigLineY + 14))
         ctx.addLine(to: CGPoint(x: margin + halfWidth, y: sigLineY + 14))
         ctx.strokePath()
-        ("SOLDIER'S SIGNATURE" as NSString).draw(at: CGPoint(x: margin, y: sigLineY + 16), withAttributes: sigLabelAttrs)
+        ("ATHLETE'S SIGNATURE" as NSString).draw(at: CGPoint(x: margin, y: sigLineY + 16), withAttributes: sigLabelAttrs)
 
         ctx.move(to: CGPoint(x: margin + halfWidth + 8, y: sigLineY + 14))
         ctx.addLine(to: CGPoint(x: margin + contentWidth, y: sigLineY + 14))
         ctx.strokePath()
-        ("OIC / NCOIC SIGNATURE" as NSString).draw(at: CGPoint(x: margin + halfWidth + 8, y: sigLineY + 16), withAttributes: sigLabelAttrs)
+        ("SUPERVISOR SIGNATURE" as NSString).draw(at: CGPoint(x: margin + halfWidth + 8, y: sigLineY + 16), withAttributes: sigLabelAttrs)
 
         currentY = sigLineY + 32
         return currentY
@@ -341,7 +341,7 @@ enum DAForm705PDFService {
         let footerY = pageHeight - margin + 4
         let dateStr = DateFormatter.shortFileDate.string(from: .now)
 
-        let leftText = "AFT SCORE REPORT — UNOFFICIAL"
+        let leftText = "FITNESS TEST SCORE REPORT"
         (leftText as NSString).draw(at: CGPoint(x: margin, y: footerY), withAttributes: footerAttrs)
 
         let rightText = "Generated \(dateStr) — Kinexa Fitness"

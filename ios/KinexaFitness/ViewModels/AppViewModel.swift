@@ -349,15 +349,15 @@ final class AppViewModel {
             weekIndex: weekIndex,
             title: template.title,
             objective: template.objective,
-            formationNotes: "Form up by squad in extended rectangular formation. Conduct accountability, safety brief, and session overview. Designate lane NCOs for station-based work.",
+            formationNotes: "Form up in groups. Conduct accountability, safety brief, and session overview. Designate group leaders for station-based work.",
             equipment: equipmentText.isEmpty ? "Cones, timer, water source" : "Cones, timer, water source. \(equipmentText) as available.",
             warmup: warmupText.isEmpty ? "Preparation Drill (PD): 10 exercises, 5 reps each" : warmupText,
             mainEffort: blocks,
             cooldown: cooldownText.isEmpty ? "Recovery Drill (RD): Full sequence" : cooldownText,
             leaderNotes: template.leaderNotes ?? "Maintain lane assignments and keep transitions tight. Monitor form on all lifts. Adjust intensity for ability groups as needed.",
             task: "Conduct Unit PRT session focused on \(template.focus.rawValue.lowercased()) to support \(goal.rawValue.lowercased()) (Week \(weekIndex + 1) \u{2014} \(phaseLabel)).",
-            condition: "Given standard PRT equipment, a designated training area, and supervision by a qualified PRT leader, Soldiers will execute the prescribed session IAW FM 7-22.",
-            standard: "All Soldiers complete warm-up, main effort, and cool-down with proper form. Leaders correct unsafe movement patterns. Session completed within the allocated time window."
+            condition: "Given standard training equipment, a designated training area, and supervision by a qualified leader, participants will execute the prescribed session.",
+            standard: "All participants complete warm-up, main effort, and cool-down with proper form. Leaders correct unsafe movement patterns. Session completed within the allocated time window."
         )
         unitPTFullPlan = plan
         persistAll()
@@ -754,7 +754,7 @@ final class AppViewModel {
             plan.days[idx] = WorkoutDay(
                 dayIndex: dayIndex,
                 date: plan.days[idx].date,
-                title: "General Army PT",
+                title: "General Fitness PT",
                 exercises: [
                     WorkoutExercise(name: "Preparation Drill", sets: 1, durationSeconds: 300, notes: "PD: 10 exercises, 5 reps each", category: .timed),
                     WorkoutExercise(name: "Push-Up", sets: 4, reps: 15, category: .bodyweight),

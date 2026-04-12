@@ -19,7 +19,7 @@ struct AFTSavedResultsView: View {
                         .font(.title3.weight(.bold))
                         .foregroundStyle(KinexaTheme.primaryText)
 
-                    Text("Calculate an AFT score and save it to see your history here.")
+                    Text("Calculate a fitness test score and save it to see your history here.")
                         .font(.subheadline)
                         .foregroundStyle(KinexaTheme.secondaryText)
                         .multilineTextAlignment(.center)
@@ -45,7 +45,7 @@ struct AFTSavedResultsView: View {
                 }
             }
         }
-        .navigationTitle("AFT History")
+        .navigationTitle("Score History")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -74,8 +74,8 @@ struct AFTSavedResultsView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    if !result.soldierName.isEmpty {
-                        Text(result.soldierName)
+                    if !result.athleteName.isEmpty {
+                        Text(result.athleteName)
                             .font(.headline)
                             .foregroundStyle(KinexaTheme.primaryText)
                     }

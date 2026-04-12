@@ -1,12 +1,12 @@
 import Foundation
 
 nonisolated struct DAForm705ExportData: Codable, Sendable {
-    var soldierName: String
+    var athleteName: String
     var age: Int
-    var sex: SoldierSex
+    var sex: BiologicalSex
     var standard: AFTStandard
-    var mos: String
-    var payGrade: String
+    var occupation: String
+    var level: String
     var unit: String
     var testDate: Date
     var testType: TestType
@@ -26,10 +26,10 @@ nonisolated struct DAForm705ExportData: Codable, Sendable {
     var weight: String
     var bodyFatPercent: String
     var bodyCompDate: String
-    var oicName: String
-    var oicDate: String
-    var ncoicName: String
-    var ncoicDate: String
+    var supervisorName: String
+    var supervisorDate: String
+    var witnessName: String
+    var witnessDate: String
 
     nonisolated enum TestType: String, Codable, CaseIterable, Identifiable, Sendable {
         case record = "Record"
@@ -40,12 +40,12 @@ nonisolated struct DAForm705ExportData: Codable, Sendable {
     }
 
     init(from result: AFTCalculatorResult) {
-        self.soldierName = result.soldierName
+        self.athleteName = result.athleteName
         self.age = result.age
         self.sex = result.sex
         self.standard = result.standard
-        self.mos = ""
-        self.payGrade = ""
+        self.occupation = ""
+        self.level = ""
         self.unit = ""
         self.testDate = result.date
         self.testType = .record
@@ -65,9 +65,9 @@ nonisolated struct DAForm705ExportData: Codable, Sendable {
         self.weight = ""
         self.bodyFatPercent = ""
         self.bodyCompDate = ""
-        self.oicName = ""
-        self.oicDate = ""
-        self.ncoicName = ""
-        self.ncoicDate = ""
+        self.supervisorName = ""
+        self.supervisorDate = ""
+        self.witnessName = ""
+        self.witnessDate = ""
     }
 }

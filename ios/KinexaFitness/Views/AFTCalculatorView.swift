@@ -84,7 +84,7 @@ struct AFTCalculatorView: View {
         let weakest = eventScores.sorted { $0.1 < $1.1 }.prefix(2).map(\.0)
 
         return AFTCalculatorResult(
-            soldierName: soldierName,
+            athleteName: soldierName,
             age: scoringAge,
             sex: sex,
             standard: standard,
@@ -126,7 +126,7 @@ struct AFTCalculatorView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 18) {
-                    soldierInfoCard
+                    athleteInfoCard
                     deadliftEventCard
                     pushUpEventCard
                     sdcEventCard
@@ -142,7 +142,7 @@ struct AFTCalculatorView: View {
             }
             .scrollDismissesKeyboard(.interactively)
         }
-        .navigationTitle("AFT Calculator")
+        .navigationTitle("Fitness Test Calculator")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -176,16 +176,16 @@ struct AFTCalculatorView: View {
         }
     }
 
-    // MARK: - Soldier Info
+    // MARK: - Athlete Info
 
-    private var soldierInfoCard: some View {
+    private var athleteInfoCard: some View {
         VStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Name")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(KinexaTheme.primaryText)
 
-                TextField("Soldier Name", text: $soldierName)
+                TextField("Your Name", text: $soldierName)
                     .font(.body)
                     .foregroundStyle(KinexaTheme.primaryText)
                     .focused($focusedField, equals: .name)
@@ -711,7 +711,7 @@ struct AFTCalculatorView: View {
                 vm.saveAFTCalculatorResult(preview)
                 didSave = true
             } label: {
-                Text(didSave ? "Saved" : "Save AFT Result")
+                Text(didSave ? "Saved" : "Save Result")
                     .font(.headline)
                     .foregroundStyle(.white)
                     .frame(height: 56)
@@ -728,7 +728,7 @@ struct AFTCalculatorView: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "square.and.arrow.up")
-                    Text("Share AFT Score")
+                    Text("Share Score")
                 }
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.white)

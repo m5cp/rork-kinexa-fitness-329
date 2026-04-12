@@ -55,7 +55,7 @@ struct AFTShareSheet: View {
 
                         Button {
                             if let image = renderedImage {
-                                let text = "Kinexa Fitness — AFT Score: \(score.totalScore)/500\n#KinexaFitness #Fitness"
+                                let text = "Kinexa Fitness — Fitness Score: \(score.totalScore)/500\n#KinexaFitness #Fitness"
                                 let activityVC = UIActivityViewController(activityItems: [image, text], applicationActivities: nil)
                                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                                       let rootVC = windowScene.windows.first?.rootViewController else { return }
@@ -89,7 +89,7 @@ struct AFTShareSheet: View {
                     .padding(.vertical, 20)
                 }
             }
-            .navigationTitle("AFT Score Card")
+            .navigationTitle("Score Card")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -213,7 +213,7 @@ enum AFTCardRenderer {
             .font: UIFont.systemFont(ofSize: 26, weight: .semibold),
             .foregroundColor: UIColor.white.withAlphaComponent(0.5)
         ]
-        let label = NSAttributedString(string: "AFT TOTAL SCORE", attributes: labelAttrs)
+        let label = NSAttributedString(string: "TOTAL SCORE", attributes: labelAttrs)
         let labelSize = label.size()
         label.draw(at: CGPoint(x: (width - labelSize.width) / 2, y: 140))
 

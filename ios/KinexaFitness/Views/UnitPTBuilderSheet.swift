@@ -115,7 +115,7 @@ struct UnitPTBuilderSheet: View {
                     .font(.title3.weight(.bold))
                     .foregroundStyle(KinexaTheme.primaryText)
 
-                Text("Build a multi-week Unit PT program. Each day is fully customizable with objectives, formations, exercises, and leader notes.")
+                Text("Build a multi-week group training program. Each day is fully customizable with objectives, exercises, and notes.")
                     .font(.caption)
                     .foregroundStyle(KinexaTheme.secondaryText)
                     .multilineTextAlignment(.center)

@@ -67,7 +67,7 @@ struct AFTScoreSheet: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 18) {
                         infoCard
-                        soldierInfoCard
+                        athleteInfoCard
                         eventInputs
                         scorePreview
                         weakestCard
@@ -76,7 +76,7 @@ struct AFTScoreSheet: View {
                             vm.saveAFTScore(preview)
                             didSave = true
                         } label: {
-                            Text(didSave ? "Saved" : "Save AFT Score")
+                            Text(didSave ? "Saved" : "Save Score")
                                 .font(.headline)
                                 .foregroundStyle(.white)
                                 .frame(height: 56)
@@ -92,7 +92,7 @@ struct AFTScoreSheet: View {
                     .padding(.bottom, 36)
                 }
             }
-            .navigationTitle("AFT Score")
+            .navigationTitle("Fitness Score")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -110,12 +110,12 @@ struct AFTScoreSheet: View {
             HStack(spacing: 8) {
                 Image(systemName: "shield.fill")
                     .foregroundStyle(KinexaTheme.accent)
-                Text("Army Fitness Test")
+                Text("Fitness Test")
                     .font(.headline)
                     .foregroundStyle(KinexaTheme.primaryText)
             }
 
-            Text("Log your AFT event results to track progress and identify weak events. Scores use age- and sex-normed AFT tables.")
+            Text("Log your fitness test event results to track progress and identify weak events. Scores use age- and sex-normed tables.")
                 .font(.subheadline)
                 .foregroundStyle(KinexaTheme.secondaryText)
         }
@@ -123,7 +123,7 @@ struct AFTScoreSheet: View {
         .premiumCard()
     }
 
-    private var soldierInfoCard: some View {
+    private var athleteInfoCard: some View {
         VStack(spacing: 14) {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 8) {

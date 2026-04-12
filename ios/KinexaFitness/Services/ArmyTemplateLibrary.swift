@@ -6,7 +6,7 @@ enum ArmyTemplateLibrary {
     // MARK: - On-Duty Individual (30 total: 10 original + 20 new)
     static let onDutyIndividual: [ArmyWorkoutTemplate] = [
         ArmyWorkoutTemplate(
-            title: "On-Duty AFT Lower Strength 1",
+            title: "Lower Strength Session 1",
             mode: .onDutyIndividual,
             focus: .lowerStrength,
             equipment: [.minimal, .gym, .field],
@@ -22,7 +22,7 @@ enum ArmyTemplateLibrary {
             leaderNotes: "Keep transitions tight and reinforce safe lift mechanics."
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty AFT Upper Endurance 1",
+            title: "Upper Endurance Session 1",
             mode: .onDutyIndividual,
             focus: .upperEndurance,
             equipment: [.bodyweight, .minimal],
@@ -37,7 +37,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Work Capacity 1",
+            title: "Work Capacity Session 1",
             mode: .onDutyIndividual,
             focus: .workCapacity,
             equipment: [.field, .minimal],
@@ -52,7 +52,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Core + Run 1",
+            title: "Core + Run Session 1",
             mode: .onDutyIndividual,
             focus: .coreRun,
             equipment: [.running, .field],
@@ -67,7 +67,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Running Intervals 1",
+            title: "Running Intervals 1",
             mode: .onDutyIndividual,
             focus: .endurance,
             equipment: [.running, .field],
@@ -82,11 +82,11 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Tactical Circuit 1",
+            title: "Conditioning Circuit 1",
             mode: .onDutyIndividual,
             focus: .tactical,
             equipment: [.field, .bodyweight],
-            objective: "Build tactical conditioning with simple field-friendly movements.",
+            objective: "Build functional conditioning with simple field-friendly movements.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Push-Up", sets: 4, reps: "15"),
@@ -97,7 +97,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Recovery / PMCS 1",
+            title: "Recovery / Mobility 1",
             mode: .onDutyIndividual,
             focus: .recovery,
             equipment: [.bodyweight, .field],
@@ -111,7 +111,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty AFT Hybrid 1",
+            title: "Full-Body Hybrid 1",
             mode: .onDutyIndividual,
             focus: .aftPrep,
             equipment: [.minimal, .field],
@@ -127,25 +127,25 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Military Movement 1",
+            title: "Agility Movement 1",
             mode: .onDutyIndividual,
             focus: .tactical,
             equipment: [.field],
-            objective: "Use military movement and shuttle patterns for movement quality and intensity.",
+            objective: "Use agility and shuttle patterns for movement quality and intensity.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
-                ArmyExercise(name: "Military Movement Drill 1", sets: 1, duration: "through sequence"),
-                ArmyExercise(name: "Military Movement Drill 2", sets: 1, duration: "through sequence"),
+                ArmyExercise(name: "Agility Movement Drill 1", sets: 1, duration: "through sequence"),
+                ArmyExercise(name: "Agility Movement Drill 2", sets: 1, duration: "through sequence"),
                 ArmyExercise(name: "Sprint", sets: 6, duration: "40 m")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Conditioning Drill 1 Session",
+            title: "Conditioning Drill 1 Session",
             mode: .onDutyIndividual,
             focus: .tactical,
             equipment: [.bodyweight, .field],
-            objective: "Use Army conditioning drill structure for a short sharp PT block.",
+            objective: "Use conditioning drill structure for a short sharp PT block.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Conditioning Drill 1", sets: 2, duration: "through sequence"),
@@ -156,7 +156,7 @@ enum ArmyTemplateLibrary {
 
         // NEW On-Duty Individual (20 new)
         ArmyWorkoutTemplate(
-            title: "On-Duty AFT Lower Strength 2",
+            title: "Lower Strength Session 2",
             mode: .onDutyIndividual,
             focus: .lowerStrength,
             equipment: [.minimal, .field],
@@ -172,7 +172,7 @@ enum ArmyTemplateLibrary {
             leaderNotes: "Emphasize hip hinge mechanics and bracing."
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty AFT Lower Strength 3",
+            title: "Lower Strength Session 3",
             mode: .onDutyIndividual,
             focus: .lowerStrength,
             equipment: [.gym, .minimal],
@@ -187,7 +187,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty AFT Upper Endurance 2",
+            title: "Upper Endurance Session 2",
             mode: .onDutyIndividual,
             focus: .upperEndurance,
             equipment: [.bodyweight, .field],
@@ -203,7 +203,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty AFT Upper Endurance 3",
+            title: "Upper Endurance Session 3",
             mode: .onDutyIndividual,
             focus: .upperEndurance,
             equipment: [.bodyweight, .minimal],
@@ -218,7 +218,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Work Capacity 2",
+            title: "Work Capacity Session 2",
             mode: .onDutyIndividual,
             focus: .workCapacity,
             equipment: [.field, .bodyweight],
@@ -234,7 +234,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Work Capacity 3",
+            title: "Work Capacity Session 3",
             mode: .onDutyIndividual,
             focus: .workCapacity,
             equipment: [.field, .minimal],
@@ -249,7 +249,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Core + Run 2",
+            title: "Core + Run Session 2",
             mode: .onDutyIndividual,
             focus: .coreRun,
             equipment: [.running, .bodyweight],
@@ -265,7 +265,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Core + Run 3",
+            title: "Core + Run Session 3",
             mode: .onDutyIndividual,
             focus: .coreRun,
             equipment: [.running, .field],
@@ -280,7 +280,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Running Intervals 2",
+            title: "Running Intervals 2",
             mode: .onDutyIndividual,
             focus: .endurance,
             equipment: [.running],
@@ -295,7 +295,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Running Tempo 1",
+            title: "Running Tempo 1",
             mode: .onDutyIndividual,
             focus: .endurance,
             equipment: [.running, .field],
@@ -309,11 +309,11 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Tactical Circuit 2",
+            title: "Conditioning Circuit 2",
             mode: .onDutyIndividual,
             focus: .tactical,
             equipment: [.field, .bodyweight],
-            objective: "EMOM-style tactical conditioning for sustained output.",
+            objective: "EMOM-style functional conditioning for sustained output.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Push-Up", sets: 1, reps: "10 every minute on the minute x 10 min"),
@@ -324,7 +324,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Tactical Circuit 3",
+            title: "Conditioning Circuit 3",
             mode: .onDutyIndividual,
             focus: .tactical,
             equipment: [.bodyweight, .field],
@@ -339,7 +339,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Recovery / PMCS 2",
+            title: "Recovery / Mobility 2",
             mode: .onDutyIndividual,
             focus: .recovery,
             equipment: [.bodyweight],
@@ -355,7 +355,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty AFT Hybrid 2",
+            title: "Full-Body Hybrid 2",
             mode: .onDutyIndividual,
             focus: .aftPrep,
             equipment: [.field, .minimal],
@@ -371,7 +371,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty AFT Hybrid 3",
+            title: "Full-Body Hybrid 3",
             mode: .onDutyIndividual,
             focus: .aftPrep,
             equipment: [.minimal, .field],
@@ -387,11 +387,11 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Military Movement 2",
+            title: "Agility Movement 2",
             mode: .onDutyIndividual,
             focus: .tactical,
             equipment: [.field],
-            objective: "Agility and lateral quickness using Army movement drills.",
+            objective: "Agility and lateral quickness using movement drills.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Lateral Shuffle", sets: 6, duration: "25 m each"),
@@ -402,7 +402,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Conditioning Drill 2 Session",
+            title: "Conditioning Drill 2 Session",
             mode: .onDutyIndividual,
             focus: .tactical,
             equipment: [.bodyweight, .field],
@@ -416,7 +416,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Lower + Carry Emphasis",
+            title: "Lower + Carry Emphasis",
             mode: .onDutyIndividual,
             focus: .lowerStrength,
             equipment: [.field, .minimal],
@@ -431,7 +431,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Push + Pull Field Day",
+            title: "Push + Pull Field Day",
             mode: .onDutyIndividual,
             focus: .upperEndurance,
             equipment: [.field, .minimal],
@@ -447,7 +447,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "On-Duty Sprint Repeats",
+            title: "Sprint Repeats",
             mode: .onDutyIndividual,
             focus: .endurance,
             equipment: [.running, .field],
@@ -555,7 +555,7 @@ enum ArmyTemplateLibrary {
             mode: .offDutyIndividual,
             focus: .aftPrep,
             equipment: [.gym, .minimal],
-            objective: "Use circuit sequencing for all-around Army readiness.",
+            objective: "Use circuit sequencing for all-around fitness readiness.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Strength Training Circuit Station 1", sets: 1, duration: "work through"),
@@ -565,7 +565,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "Off-Duty Tactical Carry Day",
+            title: "Loaded Carry Day",
             mode: .offDutyIndividual,
             focus: .tactical,
             equipment: [.field, .minimal],
@@ -867,7 +867,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "Off-Duty Tactical Carry Day 2",
+            title: "Loaded Carry Day 2",
             mode: .offDutyIndividual,
             focus: .tactical,
             equipment: [.field, .minimal],
@@ -883,7 +883,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "Off-Duty Tactical Circuit 1",
+            title: "Conditioning Circuit 1",
             mode: .offDutyIndividual,
             focus: .tactical,
             equipment: [.gym, .field],
@@ -1049,7 +1049,7 @@ enum ArmyTemplateLibrary {
             mode: .unitPT,
             focus: .aftPrep,
             equipment: [.field, .minimal],
-            objective: "Prepare the formation for major AFT movement patterns.",
+            objective: "Prepare the group for major fitness test movement patterns.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Sprint Relay", sets: 4, duration: "50 m"),
@@ -1068,7 +1068,7 @@ enum ArmyTemplateLibrary {
             objective: "Improve unit aerobic endurance and pacing discipline.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
-                ArmyExercise(name: "Formation Run", sets: 1, duration: "15-20 min"),
+                ArmyExercise(name: "Group Run", sets: 1, duration: "15-20 min"),
                 ArmyExercise(name: "Stride Intervals", sets: 6, duration: "20 sec")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
@@ -1079,7 +1079,7 @@ enum ArmyTemplateLibrary {
             mode: .unitPT,
             focus: .tactical,
             equipment: [.field, .bodyweight],
-            objective: "Build general work capacity in formation.",
+            objective: "Build general work capacity in a group setting.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Conditioning Drill 1", sets: 1, duration: "through sequence"),
@@ -1101,15 +1101,15 @@ enum ArmyTemplateLibrary {
             leaderNotes: "Use for lower intensity or post-event recovery."
         ),
         ArmyWorkoutTemplate(
-            title: "Unit PT Military Movement 1",
+            title: "Group Agility Movement 1",
             mode: .unitPT,
             focus: .tactical,
             equipment: [.field],
             objective: "Improve movement skill and short-burst effort.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
-                ArmyExercise(name: "Military Movement Drill 1", sets: 1, duration: "through sequence"),
-                ArmyExercise(name: "Military Movement Drill 2", sets: 1, duration: "through sequence"),
+                ArmyExercise(name: "Agility Movement Drill 1", sets: 1, duration: "through sequence"),
+                ArmyExercise(name: "Agility Movement Drill 2", sets: 1, duration: "through sequence"),
                 ArmyExercise(name: "Sprint", sets: 6, duration: "40 m")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
@@ -1136,7 +1136,7 @@ enum ArmyTemplateLibrary {
             mode: .unitPT,
             focus: .upperEndurance,
             equipment: [.bodyweight],
-            objective: "Build upper-body endurance in a simple formation session.",
+            objective: "Build upper-body endurance in a simple group session.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Push-Up", sets: 5, reps: "15"),
@@ -1179,11 +1179,11 @@ enum ArmyTemplateLibrary {
             leaderNotes: "Mirror AFT work-capacity demands."
         ),
         ArmyWorkoutTemplate(
-            title: "Unit PT Recovery Formation",
+            title: "Group Recovery Session",
             mode: .unitPT,
             focus: .recovery,
             equipment: [.bodyweight],
-            objective: "Light formation recovery and maintenance.",
+            objective: "Light recovery and mobility maintenance.",
             warmup: ArmyDrillLibrary.pmcs,
             mainEffort: [
                 ArmyExercise(name: "Hip Stability Drill", sets: 1, duration: "through sequence"),
@@ -1234,7 +1234,7 @@ enum ArmyTemplateLibrary {
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Four for the Core", sets: 1, duration: "through sequence"),
-                ArmyExercise(name: "Easy Formation Run", sets: 1, duration: "15 min")
+                ArmyExercise(name: "Easy Group Run", sets: 1, duration: "15 min")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
             leaderNotes: "Ideal for lower-intensity midweek PT."
@@ -1278,7 +1278,7 @@ enum ArmyTemplateLibrary {
             mode: .unitPT,
             focus: .aftPrep,
             equipment: [.field, .minimal],
-            objective: "Rotate through AFT domains in a formation-friendly circuit.",
+            objective: "Rotate through fitness test domains in a group-friendly circuit.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Deadlift Station", sets: 3, reps: "5"),
@@ -1305,14 +1305,14 @@ enum ArmyTemplateLibrary {
                 ArmyExercise(name: "300 m Shuttle", sets: 2, duration: "timed")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
-            leaderNotes: "Pair Soldiers by similar fitness level for competitive element."
+            leaderNotes: "Pair participants by similar fitness level for competitive element."
         ),
         ArmyWorkoutTemplate(
             title: "Unit PT Endurance 2",
             mode: .unitPT,
             focus: .endurance,
             equipment: [.running],
-            objective: "Interval running with formation accountability.",
+            objective: "Interval running with group accountability.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "400 m Run", sets: 6, duration: "moderate-hard"),
@@ -1329,20 +1329,20 @@ enum ArmyTemplateLibrary {
             objective: "Progressive run building from easy to hard effort.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
-                ArmyExercise(name: "Easy Formation Run", sets: 1, duration: "5 min"),
+                ArmyExercise(name: "Easy Group Run", sets: 1, duration: "5 min"),
                 ArmyExercise(name: "Moderate Pace Run", sets: 1, duration: "5 min"),
                 ArmyExercise(name: "Hard Effort Run", sets: 1, duration: "5 min"),
                 ArmyExercise(name: "Cool-Down Jog", sets: 1, duration: "5 min")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
-            leaderNotes: "Build progressively. No sprinting. Control the formation."
+            leaderNotes: "Build progressively. No sprinting. Control the pace."
         ),
         ArmyWorkoutTemplate(
             title: "Unit PT Conditioning 3",
             mode: .unitPT,
             focus: .tactical,
             equipment: [.field, .bodyweight],
-            objective: "AMRAP-style conditioning in formation with simple movements.",
+            objective: "AMRAP-style conditioning in a group with simple movements.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Push-Up", sets: 1, reps: "10 per round"),
@@ -1367,10 +1367,10 @@ enum ArmyTemplateLibrary {
                 ArmyExercise(name: "Flutter Kick", sets: 8, duration: "20 sec on / 10 sec off")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
-            leaderNotes: "Use a timer. Keep the formation tight and loud."
+            leaderNotes: "Use a timer. Keep the group tight and focused."
         ),
         ArmyWorkoutTemplate(
-            title: "Unit PT Military Movement 2",
+            title: "Group Agility Movement 2",
             mode: .unitPT,
             focus: .tactical,
             equipment: [.field],
@@ -1434,7 +1434,7 @@ enum ArmyTemplateLibrary {
                 ArmyExercise(name: "Calf Raise", sets: 3, reps: "20")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
-            leaderNotes: "No equipment needed. Execute in extended rectangular formation."
+            leaderNotes: "No equipment needed. Execute in a group spread."
         ),
         ArmyWorkoutTemplate(
             title: "Unit PT Sprint Relay Day",
@@ -1476,16 +1476,16 @@ enum ArmyTemplateLibrary {
             objective: "Run-core-run sandwich for trunk endurance under cardiovascular load.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
-                ArmyExercise(name: "Formation Run", sets: 1, duration: "8 min easy"),
+                ArmyExercise(name: "Group Run", sets: 1, duration: "8 min easy"),
                 ArmyExercise(name: "Four for the Core", sets: 1, duration: "through sequence"),
-                ArmyExercise(name: "Formation Run", sets: 1, duration: "8 min moderate"),
+                ArmyExercise(name: "Group Run", sets: 1, duration: "8 min moderate"),
                 ArmyExercise(name: "Plank", sets: 2, duration: "60 sec")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
             leaderNotes: "Transition quickly between run and ground work."
         ),
         ArmyWorkoutTemplate(
-            title: "Unit PT Recovery Formation 2",
+            title: "Group Recovery Session 2",
             mode: .unitPT,
             focus: .recovery,
             equipment: [.bodyweight],
@@ -1505,14 +1505,14 @@ enum ArmyTemplateLibrary {
             mode: .unitPT,
             focus: .endurance,
             equipment: [.running],
-            objective: "Formation interval run for aerobic power.",
+            objective: "Group interval run for aerobic power.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "800 m Run", sets: 4, duration: "moderate-hard"),
                 ArmyExercise(name: "Walk Recovery", sets: 4, duration: "2 min")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
-            leaderNotes: "Call target pace. Keep formation together on recovery."
+            leaderNotes: "Call target pace. Keep group together on recovery."
         ),
         ArmyWorkoutTemplate(
             title: "Unit PT Buddy Workout 1",
@@ -1582,7 +1582,7 @@ enum ArmyTemplateLibrary {
             leaderNotes: "Alternate between static holds and loaded carries for recovery."
         ),
         ArmyWorkoutTemplate(
-            title: "Unit PT Full Formation Circuit",
+            title: "Group Full Circuit",
             mode: .unitPT,
             focus: .aftPrep,
             equipment: [.field, .bodyweight],
@@ -1597,7 +1597,7 @@ enum ArmyTemplateLibrary {
                 ArmyExercise(name: "Mountain Climber", sets: 3, duration: "30 sec")
             ],
             cooldown: ArmyDrillLibrary.recoveryDrill,
-            leaderNotes: "Works for large formations. Keep it simple, loud, and disciplined."
+            leaderNotes: "Works for large groups. Keep it simple, loud, and disciplined."
         ),
     ]
 
@@ -1644,7 +1644,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "WOD Tactical Circuit 1",
+            title: "WOD Conditioning Circuit 1",
             mode: .workoutOfDay,
             focus: .tactical,
             equipment: [.field, .bodyweight],
@@ -1782,7 +1782,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "WOD Tactical Circuit 2",
+            title: "WOD Conditioning Circuit 2",
             mode: .workoutOfDay,
             focus: .tactical,
             equipment: [.field, .bodyweight],
@@ -1797,7 +1797,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "WOD Tactical Circuit 3",
+            title: "WOD Conditioning Circuit 3",
             mode: .workoutOfDay,
             focus: .tactical,
             equipment: [.bodyweight],
@@ -1887,7 +1887,7 @@ enum ArmyTemplateLibrary {
             mode: .workoutOfDay,
             focus: .tactical,
             equipment: [.bodyweight, .field],
-            objective: "Army conditioning drills as the main effort.",
+            objective: "Conditioning drills as the main effort.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
                 ArmyExercise(name: "Conditioning Drill 1", sets: 1, duration: "through sequence"),
@@ -1932,7 +1932,7 @@ enum ArmyTemplateLibrary {
             objective: "Focus on clean movement patterns at moderate intensity.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
-                ArmyExercise(name: "Military Movement Drill 1", sets: 1, duration: "through sequence"),
+                ArmyExercise(name: "Agility Movement Drill 1", sets: 1, duration: "through sequence"),
                 ArmyExercise(name: "High Knee Run", sets: 4, duration: "25 m"),
                 ArmyExercise(name: "Lateral Shuffle", sets: 4, duration: "25 m each"),
                 ArmyExercise(name: "Sprint", sets: 4, duration: "40 m")
@@ -2043,14 +2043,14 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "Random Session Tactical 2",
+            title: "Random Session Conditioning 2",
             mode: .randomSession,
             focus: .tactical,
             equipment: [.field],
-            objective: "Field-friendly random tactical day.",
+            objective: "Field-friendly random conditioning day.",
             warmup: ArmyDrillLibrary.prepDrill,
             mainEffort: [
-                ArmyExercise(name: "Military Movement Drill 1", sets: 1, duration: "through sequence"),
+                ArmyExercise(name: "Agility Movement Drill 1", sets: 1, duration: "through sequence"),
                 ArmyExercise(name: "Conditioning Drill 1", sets: 1, duration: "through sequence"),
                 ArmyExercise(name: "Shuttle Run", sets: 5, duration: "20 sec")
             ],
@@ -2160,7 +2160,7 @@ enum ArmyTemplateLibrary {
             cooldown: ArmyDrillLibrary.recoveryDrill
         ),
         ArmyWorkoutTemplate(
-            title: "Random Session Tactical 3",
+            title: "Random Session Conditioning 3",
             mode: .randomSession,
             focus: .tactical,
             equipment: [.field, .bodyweight],

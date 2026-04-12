@@ -3,7 +3,7 @@ import Foundation
 enum AFTCalculatorService {
 
     static func calculate(
-        soldierName: String,
+        athleteName: String,
         age: Int,
         sex: SoldierSex,
         standard: AFTStandard,
@@ -36,7 +36,7 @@ enum AFTCalculatorService {
         let passed = allEventsPassed && total >= minTotal
 
         return AFTCalculatorResult(
-            soldierName: soldierName,
+            athleteName: athleteName,
             age: age,
             sex: sex,
             standard: standard,

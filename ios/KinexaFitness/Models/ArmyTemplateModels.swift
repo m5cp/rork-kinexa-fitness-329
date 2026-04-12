@@ -9,13 +9,13 @@ nonisolated enum ArmyWorkoutMode: String, Codable, CaseIterable, Sendable {
 }
 
 nonisolated enum ArmyFocus: String, Codable, CaseIterable, Sendable {
-    case aftPrep = "AFT Prep"
+    case aftPrep = "Fitness Test Prep"
     case lowerStrength = "Lower Strength"
     case upperEndurance = "Upper Endurance"
     case workCapacity = "Work Capacity"
     case coreRun = "Core + Run"
     case endurance = "Endurance"
-    case tactical = "Tactical Conditioning"
+    case tactical = "Functional Conditioning"
     case recovery = "Recovery"
 }
 

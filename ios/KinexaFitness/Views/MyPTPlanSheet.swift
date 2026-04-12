@@ -398,7 +398,7 @@ struct MyPTPlanSheet: View {
                     .font(.title3.weight(.bold))
                     .foregroundStyle(KinexaTheme.primaryText)
 
-                Text("Your plan will be tailored to your goal using Army PRT principles and AFT event standards.")
+                Text("Your plan will be tailored to your goal using proven fitness principles and performance standards.")
                     .font(.caption)
                     .foregroundStyle(KinexaTheme.secondaryText)
                     .multilineTextAlignment(.center)
@@ -539,7 +539,7 @@ struct MyPTPlanSheet: View {
                     .foregroundStyle(KinexaTheme.tertiaryText)
             }
 
-            let focuses = selectedGoal.armyFocuses
+            let focuses = selectedGoal.workoutFocuses
             let uniqueFocuses = Array(Set(focuses))
 
             LazyVGrid(columns: [

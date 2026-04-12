@@ -5,7 +5,7 @@ struct AFTGoalModeView: View {
     let age: Int
     let sex: SoldierSex
     let standard: AFTStandard
-    let soldierName: String
+    let athleteName: String
 
     @State private var targetScore: Double = 400
     @State private var showShareSheet: Bool = false
@@ -261,7 +261,7 @@ struct AFTGoalModeView: View {
                     runSeconds: runNeeded,
                     passed: passed,
                     standard: standard,
-                    soldierName: soldierName
+                    athleteName: athleteName
                 )
                 showShareSheet = true
             } label: {
@@ -359,7 +359,7 @@ struct AFTGoalShareSheet: View {
 
                         Button {
                             if let image {
-                                let text = "Kinexa Fitness — AFT Goal: \(totalScore)/500\n#KinexaFitness #Fitness"
+                                let text = "Kinexa Fitness — Fitness Goal: \(totalScore)/500\n#KinexaFitness #Fitness"
                                 let activityVC = UIActivityViewController(activityItems: [image, text], applicationActivities: nil)
                                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                                       let rootVC = windowScene.windows.first?.rootViewController else { return }
@@ -440,7 +440,7 @@ enum AFTGoalCardRenderer {
         runSeconds: Int,
         passed: Bool,
         standard: AFTStandard,
-        soldierName: String
+        athleteName: String
     ) -> UIImage? {
         let width: CGFloat = 1080
         let height: CGFloat = 1350
@@ -530,12 +530,12 @@ enum AFTGoalCardRenderer {
             let maxSize = maxStr.size()
             maxStr.draw(at: CGPoint(x: (width - maxSize.width) / 2, y: 380))
 
-            if !soldierName.isEmpty {
+            if !athleteName.isEmpty {
                 let nameAttrs: [NSAttributedString.Key: Any] = [
                     .font: UIFont.systemFont(ofSize: 22, weight: .medium),
                     .foregroundColor: UIColor.white.withAlphaComponent(0.4)
                 ]
-                let nameStr = NSAttributedString(string: soldierName.uppercased(), attributes: nameAttrs)
+                let nameStr = NSAttributedString(string: athleteName.uppercased(), attributes: nameAttrs)
                 let nameSize = nameStr.size()
                 nameStr.draw(at: CGPoint(x: (width - nameSize.width) / 2, y: 430))
             }

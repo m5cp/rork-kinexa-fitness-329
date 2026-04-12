@@ -4,7 +4,7 @@ struct ExerciseAutocompleteField: View {
     let title: String
     @Binding var text: String
     var accentColor: Color = KinexaTheme.accent
-    var armyOnly: Bool = false
+    var ptOnly: Bool = false
     var onChanged: (() -> Void)? = nil
 
     @State private var isEditing: Bool = false
@@ -31,14 +31,14 @@ struct ExerciseAutocompleteField: View {
                 .focused($isFocused)
                 .onChange(of: text) { _, newValue in
                     if isFocused {
-                        suggestions = (armyOnly ? ArmyPTExerciseLibrary.search(newValue) : ExerciseLibrary.search(newValue)).prefix(6).map { $0 }
+                        suggestions = (ptOnly ? ArmyPTExerciseLibrary.search(newValue) : ExerciseLibrary.search(newValue)).prefix(6).map { $0 }
                     }
                     onChanged?()
                 }
                 .onChange(of: isFocused) { _, focused in
                     if focused {
                         isEditing = true
-                        suggestions = (armyOnly ? ArmyPTExerciseLibrary.search(text) : ExerciseLibrary.search(text)).prefix(6).map { $0 }
+                        suggestions = (ptOnly ? ArmyPTExerciseLibrary.search(text) : ExerciseLibrary.search(text)).prefix(6).map { $0 }
                     } else {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                             isEditing = false

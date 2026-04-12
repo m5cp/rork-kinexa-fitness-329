@@ -1,8 +1,10 @@
 import Foundation
 
-nonisolated enum BiologicalSex: String, Codable, CaseIterable, Sendable {
+nonisolated enum BiologicalSex: String, Codable, CaseIterable, Identifiable, Sendable {
     case male = "Male"
     case female = "Female"
+
+    var id: String { rawValue }
 
     var icon: String {
         switch self {

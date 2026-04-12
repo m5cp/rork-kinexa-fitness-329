@@ -1118,7 +1118,7 @@ struct StickerPickerSheet: View {
 
     private let categories: [(String, [String])] = [
         ("Fitness", ["\u{1F4AA}", "\u{1F3CB}\u{FE0F}", "\u{1F3C3}", "\u{1F9D8}", "\u{26BD}", "\u{1F3C0}", "\u{1F3C8}", "\u{1F6B4}", "\u{1F3CA}", "\u{1F94A}", "\u{1F93C}", "\u{1F938}"]),
-        ("Military", ["\u{1F396}", "\u{1F3C5}", "\u{1F6E1}", "\u{2694}\u{FE0F}", "\u{1F1FA}\u{1F1F8}", "\u{1FA96}", "\u{1F9ED}", "\u{2B50}", "\u{1F31F}", "\u{2728}", "\u{1F4AB}", "\u{1F3AF}"]),
+        ("Achievement", ["\u{1F396}", "\u{1F3C5}", "\u{1F6E1}", "\u{2694}\u{FE0F}", "\u{1F1FA}\u{1F1F8}", "\u{1FA96}", "\u{1F9ED}", "\u{2B50}", "\u{1F31F}", "\u{2728}", "\u{1F4AB}", "\u{1F3AF}"]),
         ("Celebration", ["\u{1F525}", "\u{1F4AF}", "\u{1F947}", "\u{1F3C6}", "\u{26A1}", "\u{1F389}", "\u{1F38A}", "\u{1F386}", "\u{1F60E}", "\u{1F929}", "\u{1F4A5}", "\u{2705}"]),
         ("Motivation", ["\u{2764}\u{FE0F}", "\u{1F49A}", "\u{1F499}", "\u{1F4A8}", "\u{1F680}", "\u{1F3F3}\u{FE0F}", "\u{1F4AA}", "\u{1F9BE}", "\u{1FAE1}", "\u{270C}\u{FE0F}", "\u{1F44A}", "\u{1F91C}"])
     ]

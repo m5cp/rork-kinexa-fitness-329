@@ -22,7 +22,7 @@ struct DAForm705ExportView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 18) {
                         headerCard
-                        soldierInfoSection
+                        athleteInfoSection
                         testInfoSection
                         scoresSummary
                         exportButton
@@ -54,16 +54,16 @@ struct DAForm705ExportView: View {
             HStack(spacing: 8) {
                 Image(systemName: "doc.richtext.fill")
                     .foregroundStyle(KinexaTheme.accent)
-                Text("Export AFT Score Report")
+                Text("Export Score Report")
                     .font(.headline)
                     .foregroundStyle(KinexaTheme.primaryText)
             }
 
-            Text("Generates an unofficial score report with your AFT data filled in. Review and add optional details before exporting.")
+            Text("Generates a score report with your fitness test data filled in. Review and add optional details before exporting.")
                 .font(.subheadline)
                 .foregroundStyle(KinexaTheme.secondaryText)
 
-            Text("This is not an official military document. For personal reference only.")
+            Text("For personal reference only.")
                 .font(.caption2)
                 .foregroundStyle(KinexaTheme.warning)
                 .padding(.top, 2)
@@ -72,11 +72,11 @@ struct DAForm705ExportView: View {
         .premiumCard()
     }
 
-    private var soldierInfoSection: some View {
+    private var athleteInfoSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionLabel("SOLDIER INFORMATION")
+            sectionLabel("ATHLETE INFORMATION")
 
-            fieldRow(label: "Name", text: $exportData.soldierName, placeholder: "Last, First MI")
+            fieldRow(label: "Name", text: $exportData.athleteName, placeholder: "Last, First MI")
 
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
@@ -290,7 +290,7 @@ struct DAForm705ExportView: View {
         isGenerating = true
         Task {
             guard let pdfData = DAForm705PDFService.generatePDF(from: exportData),
-                  let url = DAForm705PDFService.savePDFToTemp(data: pdfData, soldierName: exportData.soldierName) else {
+                  let url = DAForm705PDFService.savePDFToTemp(data: pdfData, athleteName: exportData.athleteName) else {
                 isGenerating = false
                 return
             }
