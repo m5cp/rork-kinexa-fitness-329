@@ -6,10 +6,28 @@ import RevenueCat
 @MainActor
 class StoreViewModel {
     var offerings: Offerings?
-    var isPremium = false
+    private var _rcPremium = false
     var isLoading = false
     var isPurchasing = false
     var error: String?
+
+    var testBypassEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "kinexa_test_bypass") }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "kinexa_test_bypass")
+            if let group = UserDefaults(suiteName: "group.com.kinexafitness.shared") {
+                group.set(newValue, forKey: "kinexa_test_bypass")
+            }
+        }
+    }
+
+    var isPremium: Bool {
+        #if DEBUG
+        return testBypassEnabled || _rcPremium
+        #else
+        return _rcPremium
+        #endif
+    }
 
     init() {
         Task { await listenForUpdates() }
@@ -18,7 +36,7 @@ class StoreViewModel {
 
     private func listenForUpdates() async {
         for await info in Purchases.shared.customerInfoStream {
-            self.isPremium = info.entitlements["premium"]?.isActive == true
+            self._rcPremium = info.entitlements["premium"]?.isActive == true
         }
     }
 
@@ -37,7 +55,7 @@ class StoreViewModel {
         do {
             let result = try await Purchases.shared.purchase(package: package)
             if !result.userCancelled {
-                isPremium = result.customerInfo.entitlements["premium"]?.isActive == true
+                _rcPremium = result.customerInfo.entitlements["premium"]?.isActive == true
             }
         } catch ErrorCode.purchaseCancelledError {
         } catch ErrorCode.paymentPendingError {
@@ -50,7 +68,7 @@ class StoreViewModel {
     func restore() async {
         do {
             let info = try await Purchases.shared.restorePurchases()
-            isPremium = info.entitlements["premium"]?.isActive == true
+            _rcPremium = info.entitlements["premium"]?.isActive == true
         } catch {
             self.error = error.localizedDescription
         }
@@ -59,7 +77,7 @@ class StoreViewModel {
     func checkStatus() async {
         do {
             let info = try await Purchases.shared.customerInfo()
-            isPremium = info.entitlements["premium"]?.isActive == true
+            _rcPremium = info.entitlements["premium"]?.isActive == true
         } catch {
             self.error = error.localizedDescription
         }

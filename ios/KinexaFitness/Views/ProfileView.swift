@@ -23,6 +23,9 @@ struct ProfileView: View {
     @State private var restoreTrigger = false
     @State private var imageManager = ProfileImageManager()
     @State private var isEditingName: Bool = false
+    @State private var devTapCount: Int = 0
+    @State private var showDevMenu: Bool = false
+    @State private var bypassToggleTrigger: Bool = false
     @FocusState private var nameFieldFocused: Bool
 
     var body: some View {
@@ -635,11 +638,124 @@ struct ProfileView: View {
             Text("Version 5.0")
                 .font(.caption2)
                 .foregroundStyle(KinexaTheme.tertiaryText.opacity(0.4))
+                .onTapGesture {
+                    devTapCount += 1
+                    if devTapCount >= 5 {
+                        devTapCount = 0
+                        showDevMenu = true
+                    }
+                }
 
-
+            #if DEBUG
+            if store.testBypassEnabled {
+                HStack(spacing: 4) {
+                    Image(systemName: "hammer.fill")
+                        .font(.system(size: 8))
+                    Text("TEST BYPASS ACTIVE")
+                        .font(.system(size: 9, weight: .heavy))
+                        .tracking(0.5)
+                }
+                .foregroundStyle(KinexaTheme.warning)
+                .padding(.top, 4)
+            }
+            #endif
         }
         .padding(.top, 8)
+        .sheet(isPresented: $showDevMenu) {
+            devMenuSheet
+        }
     }
+
+    #if DEBUG
+    private var devMenuSheet: some View {
+        NavigationStack {
+            ZStack {
+                KinexaTheme.background.ignoresSafeArea()
+
+                VStack(spacing: 24) {
+                    VStack(spacing: 8) {
+                        Image(systemName: "hammer.circle.fill")
+                            .font(.system(size: 44))
+                            .foregroundStyle(KinexaTheme.warning)
+                        Text("Developer Menu")
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Text("These options are only available in debug builds.")
+                            .font(.caption)
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.top, 8)
+
+                    VStack(spacing: 0) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "crown.fill")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(KinexaTheme.heroAmber)
+                                .frame(width: 24)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Bypass Paywall")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(KinexaTheme.primaryText)
+                                Text("Unlock all Pro features for testing")
+                                    .font(.caption2)
+                                    .foregroundStyle(KinexaTheme.tertiaryText)
+                            }
+                            Spacer()
+                            Toggle("", isOn: Binding(
+                                get: { store.testBypassEnabled },
+                                set: { store.testBypassEnabled = $0 }
+                            ))
+                            .labelsHidden()
+                            .tint(KinexaTheme.heroAmber)
+                        }
+                        .frame(minHeight: 56)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(KinexaTheme.card)
+                    .clipShape(.rect(cornerRadius: 16))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(KinexaTheme.border)
+                    }
+
+                    VStack(spacing: 8) {
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(store.isPremium ? KinexaTheme.success : KinexaTheme.danger)
+                                .frame(width: 8, height: 8)
+                            Text(store.isPremium ? "Premium Active" : "Free Tier")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(KinexaTheme.secondaryText)
+                        }
+                        Text("RevenueCat entitlement: \(store.testBypassEnabled ? "bypassed" : "checking server")")
+                            .font(.caption2)
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showDevMenu = false }
+                        .foregroundStyle(KinexaTheme.primaryText)
+                }
+            }
+            .toolbarBackground(KinexaTheme.background, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+    }
+    #else
+    private var devMenuSheet: some View {
+        EmptyView()
+    }
+    #endif
 
     // MARK: - Reusable Components
 
