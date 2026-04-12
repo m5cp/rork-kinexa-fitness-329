@@ -199,9 +199,9 @@ struct SplashView: View {
 
                 Image("AppLogo")
                     .resizable()
+                    .renderingMode(.original)
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 110, height: 110)
-                    .clipShape(RoundedRectangle(cornerRadius: 26))
+                    .frame(width: 130, height: 130)
                     .shadow(color: KinexaTheme.accent.opacity(iconGlowPulse), radius: 40, y: 0)
                     .shadow(color: KinexaTheme.brandGreen.opacity(iconGlowPulse * 0.6), radius: 70, y: 10)
                     .shadow(color: KinexaTheme.accent.opacity(iconGlowPulse * 0.3), radius: 100, y: 0)
