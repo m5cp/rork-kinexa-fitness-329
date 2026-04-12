@@ -17,7 +17,7 @@ nonisolated enum AppearanceMode: String, CaseIterable, Identifiable, Sendable {
 
     var colorScheme: ColorScheme? {
         switch self {
-        case .system: return nil
+        case .system: return .dark
         case .light: return .light
         case .dark: return .dark
         }

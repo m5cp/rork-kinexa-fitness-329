@@ -481,22 +481,18 @@ struct ProfileView: View {
             }
             .sensoryFeedback(.warning, trigger: resetAllTrigger)
 
-            sectionDivider
-
-            NavigationLink {
-                ResourcesView()
-            } label: {
-                settingsRow(icon: "tablecells", title: "Scoring Reference", color: KinexaTheme.accent, showChevron: true)
-            }
-
         }
     }
 
     // MARK: - Support & Partners
 
+    @State private var showNutritionPartner: Bool = false
+
     private var supportSection: some View {
         settingsSection(title: "SUPPORT & PARTNERS", icon: "person.2") {
-            VStack(alignment: .leading, spacing: 10) {
+            Button {
+                showNutritionPartner = true
+            } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "leaf.fill")
                         .font(.title3.weight(.bold))
@@ -515,44 +511,21 @@ struct ProfileView: View {
                         Text("Nutrition Partner")
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(KinexaTheme.primaryText)
-                        Text("Personalized consultations available")
+                        Text("Personalized nutrition consultations")
                             .font(.caption2.weight(.medium))
                             .foregroundStyle(KinexaTheme.tertiaryText)
                     }
-                }
 
-                Text("For personalized nutrition plans, dietary guidance, and one-on-one consultations, connect with our certified nutrition partner.")
-                    .font(.caption)
-                    .foregroundStyle(KinexaTheme.secondaryText)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .lineSpacing(3)
+                    Spacer(minLength: 0)
 
-                Button {
-                    if let url = URL(string: "mailto:nutrition@kinexafit.com") {
-                        UIApplication.shared.open(url)
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "envelope.fill")
-                            .font(.caption.weight(.bold))
-                        Text("Contact for Consultation")
-                            .font(.caption.weight(.bold))
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 40)
-                    .background(
-                        LinearGradient(
-                            colors: [Color(hex: "#059669"), Color(hex: "#10B981")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .clipShape(.rect(cornerRadius: 12))
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
                 }
-                .buttonStyle(PressScaleButtonStyle())
+                .frame(minHeight: 48)
+                .contentShape(Rectangle())
             }
-            .padding(.vertical, 8)
+            .buttonStyle(.plain)
 
             sectionDivider
 
@@ -563,6 +536,9 @@ struct ProfileView: View {
             } label: {
                 settingsRow(icon: "questionmark.circle", title: "Contact Support", color: KinexaTheme.accent, showChevron: true)
             }
+        }
+        .sheet(isPresented: $showNutritionPartner) {
+            NutritionPartnerView()
         }
     }
 
