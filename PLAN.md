@@ -60,7 +60,7 @@
 
 **Monetization (RevenueCat)**
 - Free tier: basic workout generation, plan access, step tracking, quick start, basic progress
-- Premium tier: unlimited plan generation, AI insights, advanced analytics, all routines, premium export/share
+- Premium tier: full plan generation, AI insights, advanced analytics, all routines, premium export/share
 - Beautiful paywall triggered after value moments (3, 5, 8, 12 workouts)
 - Annual plan highlighted with trial option
 - Before vs. after comparison framing

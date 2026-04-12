@@ -11,9 +11,9 @@ struct UpgradeView: View {
     @State private var purchaseTrigger: Bool = false
 
     private let proFeatures: [(icon: String, title: String, desc: String)] = [
-        ("bolt.shield.fill", "Advanced PT Plans", "Unlimited plan generation & customization"),
+        ("bolt.shield.fill", "Advanced PT Plans", "Full plan generation & customization"),
         ("chart.line.uptrend.xyaxis", "AI Insights", "On-device intelligence for smarter training"),
-        ("fork.knife", "Full Nutrition Suite", "Unlimited recipes, meal plans & macro tracking"),
+        ("fork.knife", "Full Nutrition Suite", "Complete recipes, meal plans & macro tracking"),
         ("person.3.fill", "Unit PT Builder", "Build & share group workouts"),
         ("doc.text.fill", "PDF & Calendar Export", "Export plans, scores & schedules"),
         ("square.and.arrow.up.fill", "Share Cards & QR", "Share progress & import workouts")
