@@ -453,6 +453,14 @@ struct ProfileView: View {
 
     private var appControlsSection: some View {
         settingsSection(title: "APP", icon: "gearshape") {
+            NavigationLink {
+                StyleEditorView()
+            } label: {
+                settingsRow(icon: "paintpalette.fill", title: "Style Editor", color: KinexaTheme.accent, showChevron: true)
+            }
+
+            sectionDivider
+
             Button {
                 showResetPlanAlert = true
             } label: {

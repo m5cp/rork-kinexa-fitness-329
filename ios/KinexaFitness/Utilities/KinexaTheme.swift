@@ -1,70 +1,82 @@
 import SwiftUI
 
 enum KinexaTheme {
-    static let background = Color(hex: "#0C0F0E")
-    static let card = Color(hex: "#141917")
-    static let cardSoft = Color(hex: "#1A201E")
-    static let border = Color.white.opacity(0.08)
-    static let accent = Color(hex: "#2E7D52")
-    static let accent2 = Color(hex: "#4A7C6B")
-    static let success = Color(hex: "#22C55E")
-    static let warning = Color(hex: "#D4915E")
-    static let danger = Color(hex: "#EF4444")
-    static let primaryText = Color.white
-    static let secondaryText = Color(hex: "#9CA3AF")
-    static let tertiaryText = Color(hex: "#6B7280")
+    private static var colors: PaletteColors { ThemeManager.shared.colors }
 
-    static let brandGreen = Color(hex: "#1B5E3B")
-    static let brandGreenLight = Color(hex: "#2E7D52")
-    static let brandGreenDark = Color(hex: "#14442B")
-    static let slateAccent = Color(hex: "#5B7A8A")
-    static let heroAmber = Color(hex: "#C4833B")
+    static var background: Color { colors.background }
+    static var card: Color { colors.card }
+    static var cardSoft: Color { colors.cardSoft }
+    static var border: Color { Color.white.opacity(0.08) }
+    static var accent: Color { colors.accent }
+    static var accent2: Color { colors.accent2 }
+    static var success: Color { colors.success }
+    static var warning: Color { colors.warning }
+    static var danger: Color { colors.danger }
+    static var primaryText: Color { Color.white }
+    static var secondaryText: Color { Color(hex: "#9CA3AF") }
+    static var tertiaryText: Color { Color(hex: "#6B7280") }
 
-    static let heroGradient = LinearGradient(
-        colors: [
-            Color(hex: "#1B5E3B").opacity(0.95),
-            Color(hex: "#2E7D52").opacity(0.90)
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
+    static var brandGreen: Color { colors.brandPrimary }
+    static var brandGreenLight: Color { colors.brandPrimaryLight }
+    static var brandGreenDark: Color { colors.brandPrimaryDark }
+    static var slateAccent: Color { colors.slateAccent }
+    static var heroAmber: Color { colors.heroAmber }
 
-    static let subtleGradient = LinearGradient(
-        colors: [
-            Color.white.opacity(0.08),
-            Color.clear
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
+    static var heroGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                colors.brandPrimary.opacity(0.95),
+                colors.brandPrimaryLight.opacity(0.90)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
 
-    static let aftGradient = LinearGradient(
-        colors: [
-            Color(hex: "#1B5E3B"),
-            Color(hex: "#14442B"),
-            Color(hex: "#0F3320")
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
+    static var subtleGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color.white.opacity(0.08),
+                Color.clear
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
 
-    static let ptGradient = LinearGradient(
-        colors: [
-            Color(hex: "#2E5A7C"),
-            Color(hex: "#1E3F5A")
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
+    static var aftGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                colors.brandPrimary,
+                colors.brandPrimaryDark,
+                colors.brandPrimaryDark.opacity(0.8)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
 
-    static let functionalGradient = LinearGradient(
-        colors: [
-            Color(hex: "#8B5E34"),
-            Color(hex: "#6B4423")
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
+    static var ptGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                colors.accent.opacity(0.8),
+                colors.accent.opacity(0.5)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    static var functionalGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                colors.heroAmber.opacity(0.8),
+                colors.heroAmber.opacity(0.5)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
 }
 
 extension Color {
