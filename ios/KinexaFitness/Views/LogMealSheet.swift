@@ -17,6 +17,7 @@ struct LogMealSheet: View {
     @State private var capturedPhotoData: Data?
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var inputMode: MealInputMode = .text
+    @State private var showManualEntry: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -31,6 +32,10 @@ struct LogMealSheet: View {
                         photoInputSection
                     case .barcode:
                         barcodeInputSection
+                    case .manual:
+                        manualInputSection
+                    case .favorites:
+                        favoritesSection
                     }
                     if isEstimating { estimatingView }
                     if hasEstimated && !estimatedFoods.isEmpty { estimatedFoodsSection }
@@ -68,6 +73,12 @@ struct LogMealSheet: View {
         .fullScreenCover(isPresented: $showBarcode) {
             BarcodeScannerView { code in
                 Task { await lookupBarcode(code) }
+            }
+        }
+        .sheet(isPresented: $showManualEntry) {
+            ManualFoodEntrySheet { food in
+                estimatedFoods.append(food)
+                hasEstimated = true
             }
         }
         .onChange(of: selectedPhoto) { _, newValue in
@@ -109,11 +120,16 @@ struct LogMealSheet: View {
     }
 
     private var inputModeSelector: some View {
-        HStack(spacing: 8) {
-            inputModeButton(mode: .text, icon: "text.cursor", label: "Type It")
-            inputModeButton(mode: .photo, icon: "camera.fill", label: "Photo")
-            inputModeButton(mode: .barcode, icon: "barcode.viewfinder", label: "Barcode")
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                inputModeButton(mode: .text, icon: "sparkles", label: "AI Text")
+                inputModeButton(mode: .photo, icon: "camera.fill", label: "Photo")
+                inputModeButton(mode: .barcode, icon: "barcode.viewfinder", label: "Barcode")
+                inputModeButton(mode: .manual, icon: "pencil.line", label: "Manual")
+                inputModeButton(mode: .favorites, icon: "star.fill", label: "Favorites")
+            }
         }
+        .contentMargins(.horizontal, 0)
     }
 
     private func inputModeButton(mode: MealInputMode, icon: String, label: String) -> some View {
@@ -126,13 +142,13 @@ struct LogMealSheet: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 13, weight: .bold))
-                Text(label)
                     .font(.system(size: 12, weight: .bold))
+                Text(label)
+                    .font(.system(size: 11, weight: .bold))
             }
             .foregroundStyle(isSelected ? .white : KinexaTheme.secondaryText)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
             .background(isSelected ? KinexaTheme.accent : KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 12))
             .overlay {
@@ -205,10 +221,14 @@ struct LogMealSheet: View {
     private var photoInputSection: some View {
         VStack(spacing: 16) {
             if let data = capturedPhotoData, let uiImage = UIImage(data: data) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
+                Color(.secondarySystemBackground)
                     .frame(height: 200)
+                    .overlay {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .allowsHitTesting(false)
+                    }
                     .clipShape(.rect(cornerRadius: 16))
                     .overlay(alignment: .topTrailing) {
                         Button {
@@ -333,6 +353,172 @@ struct LogMealSheet: View {
         }
     }
 
+    private var manualInputSection: some View {
+        VStack(spacing: 16) {
+            if !estimatedFoods.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Added Items")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                    ForEach(estimatedFoods) { food in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(food.name)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(KinexaTheme.primaryText)
+                                Text("\(food.quantity) · \(food.nutrition.calories) cal")
+                                    .font(.caption)
+                                    .foregroundStyle(KinexaTheme.tertiaryText)
+                            }
+                            Spacer()
+                            Button {
+                                estimatedFoods.removeAll { $0.id == food.id }
+                                if estimatedFoods.isEmpty { hasEstimated = false }
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.subheadline)
+                                    .foregroundStyle(KinexaTheme.tertiaryText)
+                            }
+                        }
+                        .padding(12)
+                        .background(KinexaTheme.cardSoft)
+                        .clipShape(.rect(cornerRadius: 12))
+                    }
+                }
+            }
+
+            Button {
+                showManualEntry = true
+            } label: {
+                VStack(spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(Color(hex: "#F59E0B").opacity(0.12))
+                            .frame(width: 64, height: 64)
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundStyle(Color(hex: "#F59E0B"))
+                    }
+
+                    Text("Add Food Manually")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+
+                    Text("Enter food name, serving size, and nutrition info by hand")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(2)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 28)
+                .background(KinexaTheme.card)
+                .clipShape(.rect(cornerRadius: 18))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color(hex: "#F59E0B").opacity(0.2), lineWidth: 1.5)
+                }
+            }
+            .buttonStyle(PressScaleButtonStyle())
+        }
+    }
+
+    private var favoritesSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if nutritionVM.favorites.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "star.circle")
+                        .font(.system(size: 40))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                    Text("No favorites yet")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                    Text("Foods you log will automatically appear here for quick re-logging")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+            } else {
+                if !nutritionVM.recentFoods.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "clock.fill")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Color(hex: "#3B82F6"))
+                            Text("Recent")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(KinexaTheme.secondaryText)
+                        }
+
+                        ForEach(nutritionVM.recentFoods) { fav in
+                            favoriteRow(fav)
+                        }
+                    }
+                }
+
+                let topFavs = nutritionVM.topFavorites.filter { fav in
+                    fav.usageCount > 1
+                }
+                if !topFavs.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "star.fill")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Color(hex: "#F59E0B"))
+                            Text("Most Used")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(KinexaTheme.secondaryText)
+                        }
+
+                        ForEach(topFavs) { fav in
+                            favoriteRow(fav)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func favoriteRow(_ fav: FavoriteFoodItem) -> some View {
+        Button {
+            let food = fav.toFoodItem()
+            estimatedFoods.append(food)
+            hasEstimated = true
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(fav.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    HStack(spacing: 6) {
+                        Text(fav.quantity)
+                            .font(.caption)
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                        Text("·")
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                        Text("\(fav.nutrition.calories) cal")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.secondaryText)
+                    }
+                }
+                Spacer()
+                Image(systemName: "plus.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(KinexaTheme.accent)
+            }
+            .padding(14)
+            .background(KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 14))
+            .overlay {
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(KinexaTheme.border)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
     private var estimatingView: some View {
         HStack(spacing: 12) {
             ProgressView()
@@ -375,9 +561,19 @@ struct LogMealSheet: View {
                                 .foregroundStyle(KinexaTheme.tertiaryText)
                         }
                         Spacer()
-                        Text("\(food.nutrition.calories) cal")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(KinexaTheme.primaryText)
+                        HStack(spacing: 8) {
+                            Text("\(food.nutrition.calories) cal")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(KinexaTheme.primaryText)
+                            Button {
+                                estimatedFoods.removeAll { $0.id == food.id }
+                                if estimatedFoods.isEmpty { hasEstimated = false }
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(KinexaTheme.tertiaryText)
+                            }
+                        }
                     }
 
                     HStack(spacing: 12) {
@@ -396,6 +592,19 @@ struct LogMealSheet: View {
                 .overlay {
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(KinexaTheme.border)
+                }
+            }
+
+            if inputMode != .manual {
+                Button {
+                    showManualEntry = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus.circle.fill")
+                        Text("Add another item")
+                    }
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.accent)
                 }
             }
         }
@@ -455,6 +664,8 @@ struct LogMealSheet: View {
         case .text: return "sparkles"
         case .photo: return "camera.fill"
         case .barcode: return "barcode"
+        case .manual: return "pencil.line"
+        case .favorites: return "star.fill"
         }
     }
 
@@ -463,6 +674,8 @@ struct LogMealSheet: View {
         case .text: return Color(hex: "#6366F1")
         case .photo: return Color(hex: "#22C55E")
         case .barcode: return KinexaTheme.accent
+        case .manual: return Color(hex: "#F59E0B")
+        case .favorites: return Color(hex: "#F59E0B")
         }
     }
 
@@ -544,4 +757,6 @@ nonisolated enum MealInputMode: Sendable {
     case text
     case photo
     case barcode
+    case manual
+    case favorites
 }

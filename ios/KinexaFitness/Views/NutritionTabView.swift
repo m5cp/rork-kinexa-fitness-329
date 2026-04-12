@@ -4,27 +4,39 @@ struct NutritionTabView: View {
     @State private var nutritionVM = NutritionViewModel()
     @State private var showLogMeal: Bool = false
     @State private var showGoalSheet: Bool = false
+    @State private var showProfileSheet: Bool = false
     @State private var showDailyInsight: Bool = false
+    @State private var showHistoryView: Bool = false
     @State private var selectedMeal: MealEntry?
     @State private var animateRings: Bool = false
     @State private var showExportSheet: Bool = false
     @State private var exportedPDFURL: URL?
+    @State private var mealSuggestion: String?
+    @State private var isLoadingSuggestion: Bool = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 0) {
                 VStack(spacing: 24) {
                     headerSection
+                    if !nutritionVM.isProfileConfigured {
+                        profileSetupBanner
+                    }
                     dateSelector
                     calorieRingCard
                     macroProgressRow
                     if nutritionVM.todayNutrition.alcohol > 0 {
                         alcoholBadge
                     }
+                    WaterTrackerCard(nutritionVM: nutritionVM)
                     mealsSection
+                    if nutritionVM.isGeminiConfigured && !nutritionVM.mealsForSelectedDate.isEmpty {
+                        smartSuggestionCard
+                    }
                     if nutritionVM.isGeminiConfigured && !nutritionVM.mealsForSelectedDate.isEmpty {
                         aiInsightButton
                     }
+                    weeklyPreviewCard
                     if !nutritionVM.mealsForSelectedDate.isEmpty {
                         exportButton
                     }
@@ -54,9 +66,9 @@ struct NutritionTabView: View {
                             .foregroundStyle(KinexaTheme.secondaryText)
                     }
                     Button {
-                        showGoalSheet = true
+                        showProfileSheet = true
                     } label: {
-                        Image(systemName: "target")
+                        Image(systemName: "person.crop.circle")
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(KinexaTheme.accent)
                     }
@@ -68,6 +80,9 @@ struct NutritionTabView: View {
         }
         .sheet(isPresented: $showGoalSheet) {
             NutritionGoalSheet(nutritionVM: nutritionVM)
+        }
+        .sheet(isPresented: $showProfileSheet) {
+            NutritionProfileSheet(nutritionVM: nutritionVM)
         }
         .sheet(item: $selectedMeal) { meal in
             MealDetailSheet(meal: meal, nutritionVM: nutritionVM)
@@ -81,6 +96,9 @@ struct NutritionTabView: View {
                     .presentationDetents([.medium])
             }
         }
+        .navigationDestination(isPresented: $showHistoryView) {
+            NutritionHistoryView(nutritionVM: nutritionVM)
+        }
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.3)) {
                 animateRings = true
@@ -88,15 +106,28 @@ struct NutritionTabView: View {
         }
     }
 
+    // MARK: - Header
+
     private var headerSection: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Nutrition")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(KinexaTheme.primaryText)
-                Text(nutritionVM.mealsForSelectedDate.isEmpty ? "Log your first meal" : "\(nutritionVM.mealsForSelectedDate.count) meal\(nutritionVM.mealsForSelectedDate.count == 1 ? "" : "s") logged")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(KinexaTheme.secondaryText)
+                HStack(spacing: 8) {
+                    Text(nutritionVM.mealsForSelectedDate.isEmpty ? "Log your first meal" : "\(nutritionVM.mealsForSelectedDate.count) meal\(nutritionVM.mealsForSelectedDate.count == 1 ? "" : "s") logged")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                    if nutritionVM.loggingStreak > 0 {
+                        HStack(spacing: 3) {
+                            Image(systemName: "flame.fill")
+                                .font(.system(size: 10))
+                            Text("\(nutritionVM.loggingStreak)")
+                                .font(.system(size: 11, weight: .bold))
+                        }
+                        .foregroundStyle(Color(hex: "#F59E0B"))
+                    }
+                }
             }
             Spacer()
             Button {
@@ -119,6 +150,62 @@ struct NutritionTabView: View {
             .buttonStyle(PressScaleButtonStyle())
         }
     }
+
+    // MARK: - Profile Setup Banner
+
+    private var profileSetupBanner: some View {
+        Button {
+            showProfileSheet = true
+        } label: {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(KinexaTheme.accent.opacity(0.15))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: "person.text.rectangle.fill")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(KinexaTheme.accent)
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Set Up Your Profile")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("Auto-calculate calorie & macro targets based on your body stats and goals")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .lineLimit(2)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.accent)
+            }
+            .padding(14)
+            .background {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(KinexaTheme.card)
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(
+                            LinearGradient(
+                                colors: [KinexaTheme.accent.opacity(0.06), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(KinexaTheme.accent.opacity(0.2))
+                }
+            }
+            .clipShape(.rect(cornerRadius: 16))
+        }
+        .buttonStyle(PressScaleButtonStyle())
+    }
+
+    // MARK: - Date Selector
 
     private var dateSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -171,6 +258,8 @@ struct NutritionTabView: View {
         .contentMargins(.horizontal, 0)
     }
 
+    // MARK: - Calorie Ring
+
     private var calorieRingCard: some View {
         VStack(spacing: 20) {
             ZStack {
@@ -209,6 +298,19 @@ struct NutritionTabView: View {
             Text("\(remaining) cal remaining")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(remaining > 0 ? KinexaTheme.success : KinexaTheme.warning)
+
+            if nutritionVM.isProfileConfigured {
+                HStack(spacing: 6) {
+                    Image(systemName: nutritionVM.profile.goalType.icon)
+                        .font(.system(size: 10, weight: .bold))
+                    Text(nutritionVM.profile.goalType.rawValue)
+                        .font(.system(size: 10, weight: .bold))
+                    Text("·")
+                    Text("TDEE \(Int(nutritionVM.profile.tdee))")
+                        .font(.system(size: 10, weight: .medium))
+                }
+                .foregroundStyle(KinexaTheme.tertiaryText)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 24)
@@ -219,6 +321,8 @@ struct NutritionTabView: View {
         }
         .clipShape(.rect(cornerRadius: 24))
     }
+
+    // MARK: - Macro Progress
 
     private var macroProgressRow: some View {
         HStack(spacing: 12) {
@@ -281,6 +385,45 @@ struct NutritionTabView: View {
         .clipShape(.rect(cornerRadius: 18))
     }
 
+    // MARK: - Alcohol Badge
+
+    private var alcoholBadge: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "wineglass.fill")
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Color(hex: "#A855F7"))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Alcohol")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.secondaryText)
+                Text("\(String(format: "%.1f", nutritionVM.todayNutrition.alcohol))g today")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+
+            Spacer()
+
+            Text("\(Int(nutritionVM.todayNutrition.alcohol * 7)) cal")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color(hex: "#A855F7"))
+        }
+        .padding(14)
+        .background {
+            ZStack {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(KinexaTheme.card)
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(hex: "#A855F7").opacity(0.05))
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(Color(hex: "#A855F7").opacity(0.15))
+            }
+        }
+        .clipShape(.rect(cornerRadius: 14))
+    }
+
+    // MARK: - Meals Section
+
     private var mealsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
@@ -326,7 +469,7 @@ struct NutritionTabView: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(KinexaTheme.secondaryText)
 
-            Text("Tap + to log your first meal.\nGemini AI will estimate nutrition for you.")
+            Text("Tap + to log your first meal.\nUse AI, camera, barcode, or manual entry.")
                 .font(.caption)
                 .foregroundStyle(KinexaTheme.tertiaryText)
                 .multilineTextAlignment(.center)
@@ -409,6 +552,92 @@ struct NutritionTabView: View {
         .clipShape(.rect(cornerRadius: 16))
     }
 
+    // MARK: - Smart Suggestion
+
+    private var smartSuggestionCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if let suggestion = mealSuggestion {
+                HStack(spacing: 8) {
+                    Image(systemName: "lightbulb.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color(hex: "#F59E0B"))
+                    Text("Smart Suggestion")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                    Spacer()
+                    Button {
+                        mealSuggestion = nil
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+                }
+
+                Text(suggestion)
+                    .font(.subheadline)
+                    .foregroundStyle(KinexaTheme.primaryText)
+                    .lineSpacing(3)
+            } else {
+                Button {
+                    isLoadingSuggestion = true
+                    Task {
+                        mealSuggestion = await nutritionVM.generateMealSuggestion()
+                        isLoadingSuggestion = false
+                    }
+                } label: {
+                    HStack(spacing: 10) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color(hex: "#F59E0B").opacity(0.15))
+                                .frame(width: 32, height: 32)
+                            if isLoadingSuggestion {
+                                ProgressView()
+                                    .tint(Color(hex: "#F59E0B"))
+                                    .scaleEffect(0.7)
+                            } else {
+                                Image(systemName: "lightbulb.fill")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(Color(hex: "#F59E0B"))
+                            }
+                        }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("What should I eat next?")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(KinexaTheme.primaryText)
+                            Text("AI suggests based on remaining macros")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(KinexaTheme.tertiaryText)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "sparkles")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Color(hex: "#F59E0B"))
+                    }
+                }
+                .buttonStyle(.plain)
+                .disabled(isLoadingSuggestion)
+            }
+        }
+        .padding(14)
+        .background {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(KinexaTheme.card)
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(hex: "#F59E0B").opacity(0.04))
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color(hex: "#F59E0B").opacity(0.12))
+            }
+        }
+        .clipShape(.rect(cornerRadius: 16))
+    }
+
+    // MARK: - AI Insight Button
+
     private var aiInsightButton: some View {
         Button {
             showDailyInsight = true
@@ -462,40 +691,61 @@ struct NutritionTabView: View {
         .buttonStyle(PressScaleButtonStyle())
     }
 
-    private var alcoholBadge: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "wineglass.fill")
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(Color(hex: "#A855F7"))
+    // MARK: - Weekly Preview
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Alcohol")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(KinexaTheme.secondaryText)
-                Text("\(String(format: "%.1f", nutritionVM.todayNutrition.alcohol))g today")
-                    .font(.caption2.weight(.medium))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
+    private var weeklyPreviewCard: some View {
+        Button {
+            showHistoryView = true
+        } label: {
+            VStack(spacing: 14) {
+                HStack(spacing: 8) {
+                    Image(systemName: "chart.bar.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color(hex: "#3B82F6"))
+                    Text("Weekly Overview")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+
+                let weekData = nutritionVM.weeklyCalories()
+                let maxCal = max(Double(weekData.map(\.calories).max() ?? 1), 1)
+
+                HStack(alignment: .bottom, spacing: 6) {
+                    ForEach(Array(weekData.enumerated()), id: \.offset) { _, item in
+                        VStack(spacing: 4) {
+                            let height = maxCal > 0 ? CGFloat(Double(item.calories) / maxCal) * 40 : 0
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(
+                                    item.calories > nutritionVM.dailyGoal.calories
+                                    ? KinexaTheme.warning.opacity(0.7)
+                                    : KinexaTheme.success.opacity(0.7)
+                                )
+                                .frame(height: max(2, height))
+
+                            Text(miniDayLabel(item.date))
+                                .font(.system(size: 7, weight: .bold))
+                                .foregroundStyle(Calendar.current.isDateInToday(item.date) ? KinexaTheme.success : KinexaTheme.tertiaryText)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+                .frame(height: 56)
             }
-
-            Spacer()
-
-            Text("\(Int(nutritionVM.todayNutrition.alcohol * 7)) cal")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(Color(hex: "#A855F7"))
-        }
-        .padding(14)
-        .background {
-            ZStack {
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(KinexaTheme.card)
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(hex: "#A855F7").opacity(0.05))
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(Color(hex: "#A855F7").opacity(0.15))
+            .padding(16)
+            .background(KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 18))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border)
             }
         }
-        .clipShape(.rect(cornerRadius: 14))
+        .buttonStyle(.plain)
     }
+
+    // MARK: - Export
 
     private var exportButton: some View {
         Button {
@@ -537,6 +787,8 @@ struct NutritionTabView: View {
         .buttonStyle(PressScaleButtonStyle())
     }
 
+    // MARK: - Helpers
+
     private func exportWeekPDF() {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: .now)
@@ -576,5 +828,11 @@ struct NutritionTabView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE"
         return formatter.string(from: date).uppercased()
+    }
+
+    private func miniDayLabel(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "E"
+        return String(formatter.string(from: date).prefix(1)).uppercased()
     }
 }

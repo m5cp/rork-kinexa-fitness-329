@@ -9,14 +9,21 @@ final class NutritionViewModel {
     var isAnalyzing: Bool = false
     var dailyInsight: GeminiDailyInsight?
     var mealInsights: [UUID: GeminiMealInsight] = [:]
+    var profile: NutritionProfile = .default
+    var waterEntries: [WaterEntry] = []
+    var waterGoal: WaterGoal = .default
+    var favorites: [FavoriteFoodItem] = []
+    var loggingStreak: Int = 0
 
     private let gemini = GeminiService()
     private let barcodeService = BarcodeLookupService()
 
     var isGeminiConfigured: Bool { gemini.isConfigured }
+    var isProfileConfigured: Bool { profile.isConfigured }
 
     init() {
         loadData()
+        calculateStreak()
     }
 
     var mealsForSelectedDate: [MealEntry] {
@@ -58,6 +65,85 @@ final class NutritionViewModel {
         return min(todayNutrition.fat / dailyGoal.fat, 1.0)
     }
 
+    // MARK: - Water Tracking
+
+    var waterForSelectedDate: [WaterEntry] {
+        let calendar = Calendar.current
+        return waterEntries.filter { calendar.isDate($0.date, inSameDayAs: selectedDate) }
+    }
+
+    var todayWaterOunces: Double {
+        waterForSelectedDate.map(\.amount).reduce(0, +)
+    }
+
+    var waterProgress: Double {
+        guard waterGoal.dailyOunces > 0 else { return 0 }
+        return min(todayWaterOunces / waterGoal.dailyOunces, 1.0)
+    }
+
+    func addWater(_ ounces: Double) {
+        let entry = WaterEntry(amount: ounces, date: selectedDate == Calendar.current.startOfDay(for: .now) ? .now : selectedDate)
+        waterEntries.append(entry)
+        persistData()
+    }
+
+    func removeLastWater() {
+        guard let lastIndex = waterForSelectedDate.indices.last else { return }
+        let lastEntry = waterForSelectedDate[lastIndex]
+        waterEntries.removeAll { $0.id == lastEntry.id }
+        persistData()
+    }
+
+    func updateWaterGoal(_ goal: WaterGoal) {
+        waterGoal = goal
+        persistData()
+    }
+
+    // MARK: - Favorites
+
+    var recentFoods: [FavoriteFoodItem] {
+        Array(favorites.sorted { $0.lastUsed > $1.lastUsed }.prefix(10))
+    }
+
+    var topFavorites: [FavoriteFoodItem] {
+        Array(favorites.sorted { $0.usageCount > $1.usageCount }.prefix(10))
+    }
+
+    func addToFavorites(_ food: FoodItem) {
+        if let idx = favorites.firstIndex(where: { $0.name.lowercased() == food.name.lowercased() }) {
+            favorites[idx].usageCount += 1
+            favorites[idx].lastUsed = .now
+        } else {
+            let fav = FavoriteFoodItem(
+                name: food.name,
+                quantity: food.quantity,
+                nutrition: food.nutrition
+            )
+            favorites.append(fav)
+        }
+        persistData()
+    }
+
+    func removeFavorite(id: UUID) {
+        favorites.removeAll { $0.id == id }
+        persistData()
+    }
+
+    func addFoodsToFavorites(_ foods: [FoodItem]) {
+        for food in foods {
+            addToFavorites(food)
+        }
+    }
+
+    // MARK: - Profile
+
+    func updateProfile(_ newProfile: NutritionProfile) {
+        profile = newProfile
+        persistData()
+    }
+
+    // MARK: - Meals
+
     func mealsForDate(_ date: Date) -> [MealEntry] {
         let calendar = Calendar.current
         return meals.filter { calendar.isDate($0.date, inSameDayAs: date) }
@@ -77,21 +163,71 @@ final class NutritionViewModel {
         )
     }
 
+    func waterForDate(_ date: Date) -> Double {
+        let calendar = Calendar.current
+        return waterEntries.filter { calendar.isDate($0.date, inSameDayAs: date) }
+            .map(\.amount).reduce(0, +)
+    }
+
     func addMeal(_ meal: MealEntry) {
         meals.insert(meal, at: 0)
+        addFoodsToFavorites(meal.foods)
         persistData()
+        calculateStreak()
     }
 
     func deleteMeal(id: UUID) {
         meals.removeAll { $0.id == id }
         mealInsights.removeValue(forKey: id)
         persistData()
+        calculateStreak()
     }
 
     func updateGoal(_ goal: DailyNutritionGoal) {
         dailyGoal = goal
         persistData()
     }
+
+    // MARK: - Streak
+
+    private func calculateStreak() {
+        let calendar = Calendar.current
+        var streak = 0
+        var checkDate = calendar.startOfDay(for: .now)
+
+        while true {
+            let dayMeals = meals.filter { calendar.isDate($0.date, inSameDayAs: checkDate) }
+            if dayMeals.isEmpty { break }
+            streak += 1
+            guard let prev = calendar.date(byAdding: .day, value: -1, to: checkDate) else { break }
+            checkDate = prev
+        }
+        loggingStreak = streak
+    }
+
+    // MARK: - Weekly Stats
+
+    func weeklyCalories() -> [(date: Date, calories: Int)] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+        return (0..<7).reversed().compactMap { offset in
+            guard let date = calendar.date(byAdding: .day, value: -offset, to: today) else { return nil }
+            let nutrition = nutritionForDate(date)
+            return (date: date, calories: nutrition.calories)
+        }
+    }
+
+    func weeklyMacros() -> [(date: Date, protein: Double, carbs: Double, fat: Double)] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+        return (0..<7).reversed().compactMap { offset in
+            guard let date = calendar.date(byAdding: .day, value: -offset, to: today) else { return nil }
+            let n = nutritionForDate(date)
+            return (date: date, protein: n.protein, carbs: n.carbs, fat: n.fat)
+        }
+    }
+
+    // MARK: - AI
 
     func estimateFoodFromText(_ description: String) async throws -> [FoodItem] {
         let prompt = """
@@ -233,13 +369,49 @@ final class NutritionViewModel {
         } catch {}
     }
 
+    func generateMealSuggestion() async -> String? {
+        guard isGeminiConfigured else { return nil }
+        let remaining = dailyGoal.calories - todayNutrition.calories
+        let remainingP = dailyGoal.protein - todayNutrition.protein
+        let remainingC = dailyGoal.carbs - todayNutrition.carbs
+        let remainingF = dailyGoal.fat - todayNutrition.fat
+
+        guard remaining > 100 else { return nil }
+
+        let prompt = """
+        Suggest a single meal or snack to help hit remaining macros. Keep it simple and practical. Return just the suggestion as plain text (2-3 sentences max).
+
+        Remaining targets:
+        - Calories: \(remaining) cal
+        - Protein: \(String(format: "%.0f", remainingP))g
+        - Carbs: \(String(format: "%.0f", remainingC))g
+        - Fat: \(String(format: "%.0f", remainingF))g
+
+        Already eaten today: \(mealsForSelectedDate.flatMap(\.foods).map(\.name).joined(separator: ", "))
+        """
+
+        let systemPrompt = "You are a practical sports nutrition advisor. Suggest real, easily available foods. Be specific with portions. Keep it brief."
+
+        return try? await gemini.generateText(prompt: prompt, systemPrompt: systemPrompt, maxTokens: 256)
+    }
+
+    // MARK: - Persistence
+
     private func persistData() {
         LocalStore.save(meals, forKey: "nutritionMeals")
         LocalStore.save(dailyGoal, forKey: "nutritionGoal")
+        LocalStore.save(profile, forKey: "nutritionProfile")
+        LocalStore.save(waterEntries, forKey: "nutritionWater")
+        LocalStore.save(waterGoal, forKey: "nutritionWaterGoal")
+        LocalStore.save(favorites, forKey: "nutritionFavorites")
     }
 
     private func loadData() {
         meals = LocalStore.load([MealEntry].self, forKey: "nutritionMeals", fallback: [])
         dailyGoal = LocalStore.load(DailyNutritionGoal.self, forKey: "nutritionGoal", fallback: .default)
+        profile = LocalStore.load(NutritionProfile.self, forKey: "nutritionProfile", fallback: .default)
+        waterEntries = LocalStore.load([WaterEntry].self, forKey: "nutritionWater", fallback: [])
+        waterGoal = LocalStore.load(WaterGoal.self, forKey: "nutritionWaterGoal", fallback: .default)
+        favorites = LocalStore.load([FavoriteFoodItem].self, forKey: "nutritionFavorites", fallback: [])
     }
 }
