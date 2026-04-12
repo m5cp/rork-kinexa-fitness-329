@@ -134,49 +134,7 @@ struct WorkoutsTabView: View {
             }
             .buttonStyle(PressScaleButtonStyle())
 
-            Button {
-                toolTapTrigger.toggle()
-                pendingExercises = []
-                showManualBuilder = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "square.and.pencil")
-                        .font(.body.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 42, height: 42)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: "#8B5CF6"), Color(hex: "#6D28D9")],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .clipShape(.rect(cornerRadius: 11))
 
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("Manual Build")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(KinexaTheme.primaryText)
-                        Text("Pick exercises, arrange by day")
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(KinexaTheme.tertiaryText)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(KinexaTheme.tertiaryText)
-                }
-                .padding(16)
-                .background(KinexaTheme.card)
-                .clipShape(.rect(cornerRadius: 16))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color(hex: "#8B5CF6").opacity(0.2))
-                }
-            }
-            .buttonStyle(PressScaleButtonStyle())
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
@@ -196,7 +154,7 @@ struct WorkoutsTabView: View {
                 pendingExerciseBanner
             }
 
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            HStack(spacing: 10) {
                 plannerBlock(
                     title: "Functional Fitness",
                     icon: "bolt.heart.fill",
