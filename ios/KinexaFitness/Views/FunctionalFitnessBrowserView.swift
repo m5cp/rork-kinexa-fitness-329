@@ -8,16 +8,30 @@ struct FunctionalFitnessBrowserView: View {
     @State private var expandedID: UUID?
     @State private var searchText: String = ""
     @State private var addedTrigger: Bool = false
-    @State private var showAddMovementSheet: Bool = false
-    @State private var editingWorkoutIndex: Int?
-    @State private var localWorkouts: [WODTemplate]
     @State private var showSearchExerciseSheet: Bool = false
     @State private var searchExerciseWorkoutIndex: Int?
     @State private var setAsTodayTrigger: Bool = false
+    @State private var localWorkouts: [WODTemplate]
 
     init(onAddExercise: @escaping (ManualRoutineExercise) -> Void) {
         self.onAddExercise = onAddExercise
         _localWorkouts = State(initialValue: FunctionalFitnessLibrary.functionalFitnessWorkouts)
+    }
+
+    private var moderateWorkouts: [WODTemplate] {
+        localWorkouts.filter { $0.intensityGrade == .moderate }
+    }
+
+    private var highWorkouts: [WODTemplate] {
+        localWorkouts.filter { $0.intensityGrade == .high }
+    }
+
+    private var extremeWorkouts: [WODTemplate] {
+        localWorkouts.filter { $0.intensityGrade == .extreme }
+    }
+
+    private var lowWorkouts: [WODTemplate] {
+        localWorkouts.filter { $0.intensityGrade == .low }
     }
 
     var body: some View {
@@ -26,23 +40,11 @@ struct FunctionalFitnessBrowserView: View {
                 KinexaTheme.background.ignoresSafeArea()
 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 12) {
-                        actionButtons
-
-                        ForEach(Array(filteredWorkouts.enumerated()), id: \.element.id) { idx, workout in
-                            workoutCard(workout, index: localWorkouts.firstIndex(where: { $0.id == workout.id }) ?? idx)
-                        }
-
-                        if filteredWorkouts.isEmpty {
-                            VStack(spacing: 12) {
-                                Image(systemName: "magnifyingglass")
-                                    .font(.title)
-                                    .foregroundStyle(KinexaTheme.tertiaryText)
-                                Text("No workouts found")
-                                    .font(.subheadline)
-                                    .foregroundStyle(KinexaTheme.secondaryText)
-                            }
-                            .padding(.top, 40)
+                    VStack(spacing: 14) {
+                        if !searchText.isEmpty {
+                            searchResults
+                        } else {
+                            intensityHeroCards
                         }
                     }
                     .padding(.horizontal, 20)
@@ -73,48 +75,100 @@ struct FunctionalFitnessBrowserView: View {
         }
     }
 
-    private var filteredWorkouts: [WODTemplate] {
-        guard !searchText.isEmpty else { return localWorkouts }
-        return localWorkouts.filter {
-            $0.title.localizedStandardContains(searchText) ||
-            $0.workoutDescription.localizedStandardContains(searchText)
-        }
-    }
-
-    // MARK: - Action Buttons
-
-    private var actionButtons: some View {
-        HStack(spacing: 10) {
-            Button {
-                setAsTodayTrigger.toggle()
-                pickRandomWorkoutAsToday()
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "shuffle")
-                        .font(.caption.weight(.bold))
-                    Text("Random")
-                        .font(.caption.weight(.bold))
-                }
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 40)
-                .background(
-                    LinearGradient(
-                        colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
+    private var intensityHeroCards: some View {
+        VStack(spacing: 14) {
+            if !lowWorkouts.isEmpty {
+                intensityHeroCard(
+                    grade: .low,
+                    gradient: [Color(hex: "#22C55E"), Color(hex: "#16A34A")],
+                    workouts: lowWorkouts
                 )
-                .clipShape(.rect(cornerRadius: 12))
             }
-            .buttonStyle(PressScaleButtonStyle())
+
+            if !moderateWorkouts.isEmpty {
+                intensityHeroCard(
+                    grade: .moderate,
+                    gradient: [Color(hex: "#F59E0B"), Color(hex: "#D97706")],
+                    workouts: moderateWorkouts
+                )
+            }
+
+            if !highWorkouts.isEmpty {
+                intensityHeroCard(
+                    grade: .high,
+                    gradient: [Color(hex: "#EA580C"), Color(hex: "#C2410C")],
+                    workouts: highWorkouts
+                )
+            }
+
+            if !extremeWorkouts.isEmpty {
+                intensityHeroCard(
+                    grade: .extreme,
+                    gradient: [Color(hex: "#EF4444"), Color(hex: "#DC2626")],
+                    workouts: extremeWorkouts
+                )
+            }
         }
     }
 
-    // MARK: - Workout Card
+    private func intensityHeroCard(grade: IntensityGrade, gradient: [Color], workouts: [WODTemplate]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 12) {
+                Circle()
+                    .fill(gradient.first ?? .orange)
+                    .frame(width: 12, height: 12)
 
-    private func workoutCard(_ workout: WODTemplate, index: Int) -> some View {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(grade.rawValue)
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(.white)
+
+                    Text("\(workouts.count) workouts")
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+
+                Spacer(minLength: 0)
+
+                Text("See All")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.white.opacity(0.9))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.white.opacity(0.15))
+                    .clipShape(Capsule())
+            }
+            .padding(16)
+            .background(
+                LinearGradient(
+                    colors: gradient,
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(.rect(topLeadingRadius: 18, topTrailingRadius: 18))
+
+            VStack(spacing: 0) {
+                ForEach(Array(workouts.prefix(3).enumerated()), id: \.element.id) { idx, workout in
+                    if idx > 0 {
+                        Divider().overlay(KinexaTheme.border)
+                    }
+                    workoutPreviewRow(workout, gradient: gradient)
+                }
+            }
+            .background(KinexaTheme.card)
+            .clipShape(.rect(bottomLeadingRadius: 18, bottomTrailingRadius: 18))
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(gradient.first?.opacity(0.2) ?? Color.clear)
+        }
+        .shadow(color: (gradient.first ?? .clear).opacity(0.12), radius: 12, y: 6)
+    }
+
+    private func workoutPreviewRow(_ workout: WODTemplate, gradient: [Color]) -> some View {
         let isExpanded = expandedID == workout.id
+        let workoutIndex = localWorkouts.firstIndex(where: { $0.id == workout.id })
 
         return VStack(spacing: 0) {
             Button {
@@ -122,34 +176,31 @@ struct FunctionalFitnessBrowserView: View {
                     expandedID = isExpanded ? nil : workout.id
                 }
             } label: {
-                HStack(spacing: 14) {
-                    VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(workout.title)
-                            .font(.subheadline.weight(.semibold))
+                            .font(.subheadline.weight(.medium))
                             .foregroundStyle(KinexaTheme.primaryText)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
+                            .lineLimit(1)
 
-                        HStack(spacing: 8) {
+                        HStack(spacing: 6) {
                             Text("~\(workout.durationMinutes) min")
-                                .font(.caption2.weight(.medium))
-                                .foregroundStyle(KinexaTheme.tertiaryText)
-                            Text(workout.intensityGrade.rawValue)
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(intensityColor(workout.intensityGrade))
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(gradient.first ?? .orange)
                             Text("\(workout.movements.count) movements")
-                                .font(.caption2.weight(.medium))
+                                .font(.system(size: 10, weight: .medium))
                                 .foregroundStyle(KinexaTheme.tertiaryText)
                         }
                     }
 
                     Spacer(minLength: 0)
 
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.caption.weight(.bold))
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.right")
+                        .font(.caption2.weight(.bold))
                         .foregroundStyle(KinexaTheme.tertiaryText)
                 }
-                .padding(14)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
             .buttonStyle(.plain)
 
@@ -166,7 +217,7 @@ struct FunctionalFitnessBrowserView: View {
                         ForEach(Array(workout.movements.enumerated()), id: \.element.id) { mIdx, movement in
                             HStack(spacing: 10) {
                                 Circle()
-                                    .fill(Color(hex: "#F59E0B").opacity(0.5))
+                                    .fill((gradient.first ?? .orange).opacity(0.5))
                                     .frame(width: 6, height: 6)
 
                                 Text(movement.name)
@@ -194,13 +245,13 @@ struct FunctionalFitnessBrowserView: View {
                                 } label: {
                                     Image(systemName: "plus.circle.fill")
                                         .font(.body)
-                                        .foregroundStyle(Color(hex: "#F59E0B"))
+                                        .foregroundStyle(gradient.first ?? .orange)
                                 }
 
                                 Button {
                                     withAnimation(.spring(response: 0.3)) {
-                                        if index < localWorkouts.count {
-                                            localWorkouts[index].movements.remove(at: mIdx)
+                                        if let idx = workoutIndex, idx < localWorkouts.count {
+                                            localWorkouts[idx].movements.remove(at: mIdx)
                                         }
                                     }
                                 } label: {
@@ -214,8 +265,10 @@ struct FunctionalFitnessBrowserView: View {
 
                     HStack(spacing: 8) {
                         Button {
-                            searchExerciseWorkoutIndex = index
-                            showSearchExerciseSheet = true
+                            if let idx = workoutIndex {
+                                searchExerciseWorkoutIndex = idx
+                                showSearchExerciseSheet = true
+                            }
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "magnifyingglass")
@@ -223,10 +276,10 @@ struct FunctionalFitnessBrowserView: View {
                                 Text("Add Movement")
                                     .font(.caption.weight(.semibold))
                             }
-                            .foregroundStyle(Color(hex: "#F59E0B"))
+                            .foregroundStyle(gradient.first ?? .orange)
                             .frame(maxWidth: .infinity)
                             .frame(height: 36)
-                            .background(Color(hex: "#F59E0B").opacity(0.1))
+                            .background((gradient.first ?? .orange).opacity(0.1))
                             .clipShape(.rect(cornerRadius: 10))
                         }
                         .buttonStyle(PressScaleButtonStyle())
@@ -246,7 +299,7 @@ struct FunctionalFitnessBrowserView: View {
                             .frame(height: 36)
                             .background(
                                 LinearGradient(
-                                    colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")],
+                                    colors: gradient,
                                     startPoint: .leading,
                                     endPoint: .trailing
                                 )
@@ -256,41 +309,95 @@ struct FunctionalFitnessBrowserView: View {
                         .buttonStyle(PressScaleButtonStyle())
                     }
                 }
-                .padding(.horizontal, 14)
+                .padding(.horizontal, 16)
                 .padding(.bottom, 14)
             }
         }
-        .background(KinexaTheme.card)
-        .clipShape(.rect(cornerRadius: 14))
-        .overlay {
-            RoundedRectangle(cornerRadius: 14).stroke(
-                isExpanded ? Color(hex: "#F59E0B").opacity(0.3) : KinexaTheme.border
-            )
+    }
+
+    private var searchResults: some View {
+        let filtered = localWorkouts.filter {
+            $0.title.localizedStandardContains(searchText) ||
+            $0.workoutDescription.localizedStandardContains(searchText)
+        }
+
+        return VStack(spacing: 10) {
+            if filtered.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.title)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                    Text("No workouts found")
+                        .font(.subheadline)
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                }
+                .padding(.top, 40)
+            } else {
+                ForEach(filtered) { workout in
+                    searchWorkoutCard(workout)
+                }
+            }
         }
     }
 
-    // MARK: - Actions
+    private func searchWorkoutCard(_ workout: WODTemplate) -> some View {
+        let gradient = intensityGradient(workout.intensityGrade)
+
+        return Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                expandedID = expandedID == workout.id ? nil : workout.id
+            }
+        } label: {
+            HStack(spacing: 14) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(workout.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+
+                    HStack(spacing: 8) {
+                        Text("~\(workout.durationMinutes) min")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                        Text(workout.intensityGrade.rawValue)
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(gradient.first ?? .orange)
+                        Text("\(workout.movements.count) movements")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+            .padding(14)
+            .background(KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 14))
+            .overlay {
+                RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
+            }
+        }
+        .buttonStyle(PressScaleButtonStyle())
+    }
+
+    private func intensityGradient(_ grade: IntensityGrade) -> [Color] {
+        switch grade {
+        case .low: return [Color(hex: "#22C55E"), Color(hex: "#16A34A")]
+        case .moderate: return [Color(hex: "#F59E0B"), Color(hex: "#D97706")]
+        case .high: return [Color(hex: "#EA580C"), Color(hex: "#C2410C")]
+        case .extreme: return [Color(hex: "#EF4444"), Color(hex: "#DC2626")]
+        }
+    }
 
     private func setWorkoutAsToday(_ workout: WODTemplate) {
         vm.setFunctionalFitnessAsToday(workout)
     }
-
-    private func pickRandomWorkoutAsToday() {
-        guard let randomWorkout = localWorkouts.randomElement() else { return }
-        vm.setFunctionalFitnessAsToday(randomWorkout)
-    }
-
-    private func intensityColor(_ grade: IntensityGrade) -> Color {
-        switch grade {
-        case .low: return .green
-        case .moderate: return Color(hex: "#F59E0B")
-        case .high: return .orange
-        case .extreme: return .red
-        }
-    }
 }
-
-// MARK: - Exercise Search Sheet
 
 struct ExerciseSearchSheet: View {
     @Environment(\.dismiss) private var dismiss

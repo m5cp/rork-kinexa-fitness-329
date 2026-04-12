@@ -5,10 +5,11 @@ struct PreMadeRoutinesView: View {
     let onAddExercise: (ManualRoutineExercise) -> Void
 
     @State private var searchText: String = ""
-    @State private var selectedRoutine: PreMadeRoutine?
     @State private var showMode: RoutineBrowseMode = .levels
+    @State private var selectedRoutine: PreMadeRoutine?
+    @State private var addedTrigger: Bool = false
 
-    private enum RoutineBrowseMode {
+    private enum RoutineBrowseMode: Equatable {
         case levels
         case levelDetail(RoutineLevel)
     }
@@ -66,8 +67,9 @@ struct PreMadeRoutinesView: View {
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .sensoryFeedback(.impact(weight: .light), trigger: addedTrigger)
             .sheet(item: $selectedRoutine) { routine in
-                PreMadeRoutineDetailView(routine: routine, onAddExercise: onAddExercise)
+                PreMadeRoutineDetailSheet(routine: routine, onAddExercise: onAddExercise)
             }
         }
     }
@@ -98,8 +100,6 @@ struct PreMadeRoutinesView: View {
         }
     }
 
-    // MARK: - Level Hero Cards
-
     private var levelHeroCards: some View {
         VStack(spacing: 14) {
             levelHeroCard(
@@ -119,7 +119,7 @@ struct PreMadeRoutinesView: View {
             levelHeroCard(
                 level: .advanced,
                 gradient: [Color(hex: "#EF4444"), Color(hex: "#DC2626")],
-                icon: "figure.highintensity.intervaltraining",
+                icon: "figure.strengthtraining.functional",
                 routines: PreMadeRoutineLibrary.advancedRoutines
             )
         }
@@ -173,7 +173,7 @@ struct PreMadeRoutinesView: View {
             .buttonStyle(.plain)
 
             VStack(spacing: 0) {
-                ForEach(Array(routines.prefix(3).enumerated()), id: \.element.id) { idx, routine in
+                ForEach(Array(routines.enumerated()), id: \.element.id) { idx, routine in
                     if idx > 0 {
                         Divider().overlay(KinexaTheme.border)
                     }
@@ -190,7 +190,7 @@ struct PreMadeRoutinesView: View {
                                 HStack(spacing: 6) {
                                     Text("\(routine.daysPerWeek) days/wk")
                                         .font(.system(size: 10, weight: .bold))
-                                        .foregroundStyle(gradient.first ?? .blue)
+                                        .foregroundStyle(gradient.first ?? .green)
                                     Text(routine.splitType.rawValue)
                                         .font(.system(size: 10, weight: .medium))
                                         .foregroundStyle(KinexaTheme.tertiaryText)
@@ -219,8 +219,6 @@ struct PreMadeRoutinesView: View {
         .shadow(color: (gradient.first ?? .clear).opacity(0.12), radius: 12, y: 6)
     }
 
-    // MARK: - Level Detail
-
     private func levelRoutineList(_ level: RoutineLevel) -> some View {
         let routines = PreMadeRoutineLibrary.routines(for: level)
         return LazyVStack(spacing: 12) {
@@ -230,13 +228,19 @@ struct PreMadeRoutinesView: View {
         }
     }
 
-    // MARK: - Search
-
     private var searchResults: some View {
         let filtered = PreMadeRoutineLibrary.search(searchText)
         return VStack(spacing: 12) {
             if filtered.isEmpty {
-                emptyState
+                VStack(spacing: 12) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.title)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                    Text("No routines found")
+                        .font(.subheadline)
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                }
+                .padding(.top, 40)
             } else {
                 ForEach(filtered) { routine in
                     routineCard(routine)
@@ -257,7 +261,7 @@ struct PreMadeRoutinesView: View {
                         .frame(width: 44, height: 44)
                         .background(
                             LinearGradient(
-                                colors: [Color(hex: "#6366F1"), Color(hex: "#4338CA")],
+                                colors: levelGradient(routine.level),
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -321,15 +325,136 @@ struct PreMadeRoutinesView: View {
         }
     }
 
-    private var emptyState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "magnifyingglass")
-                .font(.title)
-                .foregroundStyle(KinexaTheme.tertiaryText)
-            Text("No routines found")
+    private func levelGradient(_ level: RoutineLevel) -> [Color] {
+        switch level {
+        case .beginner: return [Color(hex: "#22C55E"), Color(hex: "#16A34A")]
+        case .intermediate: return [Color(hex: "#F59E0B"), Color(hex: "#D97706")]
+        case .advanced: return [Color(hex: "#EF4444"), Color(hex: "#DC2626")]
+        case .allLevels: return [Color(hex: "#6366F1"), Color(hex: "#4338CA")]
+        }
+    }
+}
+
+struct PreMadeRoutineDetailSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let routine: PreMadeRoutine
+    let onAddExercise: (ManualRoutineExercise) -> Void
+
+    @State private var addedTrigger: Bool = false
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                KinexaTheme.background.ignoresSafeArea()
+
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        routineHeader
+
+                        ForEach(routine.days) { day in
+                            dayCard(day)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 12)
+                    .padding(.bottom, 48)
+                }
+            }
+            .navigationTitle(routine.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .foregroundStyle(KinexaTheme.primaryText)
+                }
+            }
+            .toolbarBackground(KinexaTheme.background, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .sensoryFeedback(.impact(weight: .light), trigger: addedTrigger)
+        }
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(KinexaTheme.background)
+    }
+
+    private var routineHeader: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(routine.routineDescription)
                 .font(.subheadline)
                 .foregroundStyle(KinexaTheme.secondaryText)
+
+            HStack(spacing: 8) {
+                infoPill(text: "\(routine.daysPerWeek) days/wk", color: Color(hex: "#6366F1"))
+                infoPill(text: "\(routine.durationWeeks) weeks", color: Color(hex: "#8B5CF6"))
+                infoPill(text: routine.splitType.rawValue, color: Color(hex: "#0EA5E9"))
+            }
         }
-        .padding(.top, 40)
+    }
+
+    private func infoPill(text: String, color: Color) -> some View {
+        Text(text)
+            .font(.system(size: 11, weight: .bold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(color.opacity(0.12))
+            .clipShape(Capsule())
+    }
+
+    private func dayCard(_ day: PreMadeRoutineDay) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(day.dayName)
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+                Text("—")
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+                Text(day.focus)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color(hex: "#6366F1"))
+            }
+
+            VStack(spacing: 6) {
+                ForEach(day.exercises) { exercise in
+                    HStack(spacing: 10) {
+                        Circle()
+                            .fill(Color(hex: "#6366F1").opacity(0.5))
+                            .frame(width: 6, height: 6)
+
+                        Text(exercise.name)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(KinexaTheme.primaryText)
+
+                        Spacer(minLength: 0)
+
+                        Text("\(exercise.sets)x\(exercise.reps)")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+
+                        Button {
+                            addedTrigger.toggle()
+                            let routineExercise = ManualRoutineExercise(
+                                name: exercise.name,
+                                category: day.focus,
+                                sets: exercise.sets,
+                                reps: exercise.reps,
+                                sourceType: .weightTraining
+                            )
+                            onAddExercise(routineExercise)
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.body)
+                                .foregroundStyle(Color(hex: "#6366F1"))
+                        }
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .background(KinexaTheme.card)
+        .clipShape(.rect(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
+        }
     }
 }

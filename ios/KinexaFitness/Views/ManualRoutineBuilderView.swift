@@ -387,25 +387,9 @@ struct CardioBrowserForRoutineView: View {
     let onAddExercise: (ManualRoutineExercise) -> Void
 
     @State private var searchText: String = ""
-    @State private var selectedCategory: CardioCategory?
     @State private var addedTrigger: Bool = false
-
-    private var filteredWorkouts: [CardioWorkoutDefinition] {
-        var results: [CardioWorkoutDefinition]
-        if let cat = selectedCategory {
-            results = CardioLibrary.workouts(for: cat)
-        } else {
-            results = CardioLibrary.allWorkouts
-        }
-        if !searchText.isEmpty {
-            let lower = searchText.lowercased()
-            results = results.filter {
-                $0.name.lowercased().contains(lower) ||
-                $0.description.lowercased().contains(lower)
-            }
-        }
-        return results
-    }
+    @State private var showCardioByType: Bool = false
+    @State private var showCardioPrograms: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -413,32 +397,22 @@ struct CardioBrowserForRoutineView: View {
                 KinexaTheme.background.ignoresSafeArea()
 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 14) {
-                        categoryFilterStrip
+                    VStack(spacing: 16) {
+                        cardioDisclaimerBanner
 
-                        ForEach(filteredWorkouts, id: \.id) { workout in
-                            cardioRow(workout)
-                        }
-
-                        if filteredWorkouts.isEmpty {
-                            VStack(spacing: 12) {
-                                Image(systemName: "magnifyingglass")
-                                    .font(.title)
-                                    .foregroundStyle(KinexaTheme.tertiaryText)
-                                Text("No workouts found")
-                                    .font(.subheadline)
-                                    .foregroundStyle(KinexaTheme.secondaryText)
-                            }
-                            .padding(.top, 40)
+                        if !searchText.isEmpty {
+                            cardioSearchResults
+                        } else {
+                            cardioLandingCards
                         }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 12)
+                    .padding(.top, 8)
                     .padding(.bottom, 48)
                 }
             }
             .navigationTitle("Cardio")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .searchable(text: $searchText, prompt: "Search cardio")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -449,95 +423,207 @@ struct CardioBrowserForRoutineView: View {
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .sensoryFeedback(.impact(weight: .light), trigger: addedTrigger)
+            .sheet(isPresented: $showCardioByType) {
+                CardioByTypeView(onAddExercise: onAddExercise)
+            }
+            .sheet(isPresented: $showCardioPrograms) {
+                PreMadeCardioProgramsView()
+            }
         }
     }
 
-    private var categoryFilterStrip: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                categoryChip(title: "All", category: nil)
-                ForEach(CardioCategory.allCases) { category in
-                    categoryChip(title: category.rawValue, category: category)
-                }
-            }
+    private var cardioDisclaimerBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "info.circle.fill")
+                .font(.caption)
+                .foregroundStyle(Color(hex: "#EC4899").opacity(0.7))
+
+            Text("These are open source cardio exercises blended together by traditional training methods. They are not a recommendation or guide. For tracking and accountability only.")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(KinexaTheme.tertiaryText)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .contentMargins(.horizontal, 0)
+        .padding(12)
+        .background(Color(hex: "#EC4899").opacity(0.06))
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12).stroke(Color(hex: "#EC4899").opacity(0.1))
+        }
     }
 
-    private func categoryChip(title: String, category: CardioCategory?) -> some View {
-        let isSelected = selectedCategory == category
-        return Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                selectedCategory = category
-            }
-        } label: {
-            HStack(spacing: 6) {
-                if let cat = category {
-                    Image(systemName: cat.icon)
-                        .font(.caption2.weight(.bold))
-                }
-                Text(title)
-                    .font(.caption.weight(.semibold))
-            }
-            .foregroundStyle(isSelected ? .white : KinexaTheme.secondaryText)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
-            .background(isSelected ? Color(hex: "#EC4899") : KinexaTheme.card)
-            .clipShape(Capsule())
-            .overlay {
-                Capsule().stroke(isSelected ? Color(hex: "#EC4899") : KinexaTheme.border)
-            }
-        }
-        .buttonStyle(.plain)
-    }
+    private var cardioLandingCards: some View {
+        VStack(spacing: 14) {
+            Button {
+                showCardioByType = true
+            } label: {
+                HStack(spacing: 14) {
+                    Image(systemName: "heart.fill")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 48, height: 48)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "#EC4899"), Color(hex: "#BE185D")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(.rect(cornerRadius: 14))
 
-    private func cardioRow(_ workout: CardioWorkoutDefinition) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: workout.icon)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(Color(hex: "#EC4899"))
-                .frame(width: 36, height: 36)
-                .background(Color(hex: "#EC4899").opacity(0.12))
-                .clipShape(.rect(cornerRadius: 10))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Cardio by Type")
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(workout.name)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(KinexaTheme.primaryText)
+                        Text("Browse workouts by category")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
 
-                HStack(spacing: 8) {
-                    Text(workout.category.rawValue)
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(Color(hex: "#EC4899"))
-                    Text(workout.difficultyLevel)
-                        .font(.caption2.weight(.medium))
+                        Text("\(CardioLibrary.allWorkouts.count) workouts")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(Color(hex: "#EC4899"))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Color(hex: "#EC4899").opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(KinexaTheme.tertiaryText)
                 }
+                .padding(16)
+                .background(KinexaTheme.card)
+                .clipShape(.rect(cornerRadius: 18))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border)
+                }
             }
-
-            Spacer(minLength: 0)
+            .buttonStyle(PressScaleButtonStyle())
 
             Button {
-                addedTrigger.toggle()
-                let exercise = ManualRoutineExercise(
-                    name: workout.name,
-                    category: workout.category.rawValue,
-                    sets: 1,
-                    reps: "30 min",
-                    sourceType: .cardio
-                )
-                onAddExercise(exercise)
+                showCardioPrograms = true
             } label: {
-                Image(systemName: "plus.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(Color(hex: "#EC4899"))
+                HStack(spacing: 14) {
+                    Image(systemName: "doc.text.fill")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 48, height: 48)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(.rect(cornerRadius: 14))
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Pre-made Programs")
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+
+                        Text("Complete cardio programs ready to go")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                            .lineLimit(2)
+
+                        Text("\(PreMadeCardioLibrary.allPrograms.count) programs")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(Color(hex: "#F59E0B"))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Color(hex: "#F59E0B").opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                .padding(16)
+                .background(KinexaTheme.card)
+                .clipShape(.rect(cornerRadius: 18))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border)
+                }
             }
+            .buttonStyle(PressScaleButtonStyle())
         }
-        .padding(14)
-        .background(KinexaTheme.card)
-        .clipShape(.rect(cornerRadius: 14))
-        .overlay {
-            RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
+    }
+
+    private var cardioSearchResults: some View {
+        let filtered = CardioLibrary.allWorkouts.filter {
+            $0.name.localizedStandardContains(searchText) ||
+            $0.description.localizedStandardContains(searchText)
+        }
+
+        return VStack(spacing: 10) {
+            if filtered.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.title)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                    Text("No workouts found")
+                        .font(.subheadline)
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                }
+                .padding(.top, 40)
+            } else {
+                ForEach(filtered) { workout in
+                    HStack(spacing: 14) {
+                        Image(systemName: workout.icon)
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(Color(hex: "#EC4899"))
+                            .frame(width: 36, height: 36)
+                            .background(Color(hex: "#EC4899").opacity(0.12))
+                            .clipShape(.rect(cornerRadius: 10))
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(workout.name)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(KinexaTheme.primaryText)
+
+                            HStack(spacing: 8) {
+                                Text(workout.category.rawValue)
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(Color(hex: "#EC4899"))
+                                Text(workout.difficultyLevel)
+                                    .font(.caption2.weight(.medium))
+                                    .foregroundStyle(KinexaTheme.tertiaryText)
+                            }
+                        }
+
+                        Spacer(minLength: 0)
+
+                        Button {
+                            addedTrigger.toggle()
+                            let exercise = ManualRoutineExercise(
+                                name: workout.name,
+                                category: workout.category.rawValue,
+                                sets: 1,
+                                reps: "30 min",
+                                sourceType: .cardio
+                            )
+                            onAddExercise(exercise)
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
+                                .foregroundStyle(Color(hex: "#EC4899"))
+                        }
+                    }
+                    .padding(14)
+                    .background(KinexaTheme.card)
+                    .clipShape(.rect(cornerRadius: 14))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
+                    }
+                }
+            }
         }
     }
 }
