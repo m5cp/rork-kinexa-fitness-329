@@ -187,7 +187,7 @@ enum AFTCardRenderer {
             .foregroundColor: UIColor.white.withAlphaComponent(0.7),
             .kern: 3.0
         ]
-        let titleStr = NSAttributedString(string: "KINEXA FITNESS", attributes: titleAttrs)
+        let titleStr = NSAttributedString(string: "KINEXA FIT", attributes: titleAttrs)
         titleStr.draw(at: CGPoint(x: 100, y: 54))
 
         let dateFormatter = DateFormatter()

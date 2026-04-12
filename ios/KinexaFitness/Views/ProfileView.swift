@@ -557,7 +557,7 @@ struct ProfileView: View {
 
     private var footer: some View {
         VStack(spacing: 6) {
-            Text("KINEXA FITNESS")
+            Text("KINEXA FIT")
                 .font(.caption.weight(.heavy))
                 .tracking(2.0)
                 .foregroundStyle(KinexaTheme.tertiaryText)

@@ -477,7 +477,7 @@ enum AFTGoalCardRenderer {
                 .foregroundColor: UIColor.white.withAlphaComponent(0.7),
                 .kern: 3.0
             ]
-            let headerStr = NSAttributedString(string: "KINEXA FITNESS", attributes: headerAttrs)
+            let headerStr = NSAttributedString(string: "KINEXA FIT", attributes: headerAttrs)
             headerStr.draw(at: CGPoint(x: 60, y: 50))
 
             let dateFormatter = DateFormatter()

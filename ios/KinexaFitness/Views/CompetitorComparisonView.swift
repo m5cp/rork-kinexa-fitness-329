@@ -538,7 +538,7 @@ struct CompetitorComparisonView: View {
                         Image(systemName: "shield.fill")
                             .font(.headline.weight(.bold))
                             .foregroundStyle(.white)
-                        Text("KINEXA FITNESS")
+                        Text("KINEXA FIT")
                             .font(.caption.weight(.heavy))
                             .tracking(1.5)
                             .foregroundStyle(.white.opacity(0.9))

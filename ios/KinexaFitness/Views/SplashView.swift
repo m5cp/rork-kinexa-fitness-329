@@ -33,7 +33,7 @@ struct SplashView: View {
     @State private var verticalBeamOpacity: Double = 0
     @State private var verticalBeamOffset: Double = 200
 
-    private let titleText = "KINEXA FITNESS"
+    private let titleText = "KINEXA FIT"
 
     nonisolated private enum SplashPhase {
         case dark, reveal, hold, exit

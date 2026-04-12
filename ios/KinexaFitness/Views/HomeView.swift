@@ -83,7 +83,7 @@ struct HomeView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("KINEXA FITNESS")
+                Text("KINEXA FIT")
                     .font(.caption.weight(.heavy))
                     .tracking(2.4)
                     .foregroundStyle(KinexaTheme.secondaryText)

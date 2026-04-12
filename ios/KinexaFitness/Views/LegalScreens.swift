@@ -133,7 +133,7 @@ struct LegalDetailView: View {
             Image(systemName: "checkmark.shield.fill")
                 .font(.caption.weight(.bold))
                 .foregroundStyle(KinexaTheme.accent)
-            Text("KINEXA FITNESS")
+            Text("KINEXA FIT")
                 .font(.caption2.weight(.heavy))
                 .tracking(1.5)
                 .foregroundStyle(KinexaTheme.tertiaryText)
