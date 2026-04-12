@@ -7,6 +7,7 @@ struct NutritionTabView: View {
     @State private var showProfileSheet: Bool = false
     @State private var showDailyInsight: Bool = false
     @State private var showHistoryView: Bool = false
+    @State private var showRecipesView: Bool = false
     @State private var selectedMeal: MealEntry?
     @State private var animateRings: Bool = false
     @State private var showExportSheet: Bool = false
@@ -30,6 +31,7 @@ struct NutritionTabView: View {
                     }
                     WaterTrackerCard(nutritionVM: nutritionVM)
                     mealsSection
+                    recipesCard
                     if nutritionVM.isGeminiConfigured && !nutritionVM.mealsForSelectedDate.isEmpty {
                         smartSuggestionCard
                     }
@@ -98,6 +100,9 @@ struct NutritionTabView: View {
         }
         .navigationDestination(isPresented: $showHistoryView) {
             NutritionHistoryView(nutritionVM: nutritionVM)
+        }
+        .navigationDestination(isPresented: $showRecipesView) {
+            RecipesView(nutritionVM: nutritionVM)
         }
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.3)) {
@@ -550,6 +555,66 @@ struct NutritionTabView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(.rect(cornerRadius: 16))
+    }
+
+    // MARK: - Recipes Card
+
+    private var recipesCard: some View {
+        Button {
+            showRecipesView = true
+        } label: {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color(hex: "#F59E0B").opacity(0.2), Color(hex: "#F59E0B").opacity(0.08)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 44, height: 44)
+                    Image(systemName: "frying.pan.fill")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(Color(hex: "#F59E0B"))
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("AI Recipes")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("Groq-powered meals matched to your macros")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color(hex: "#F59E0B"))
+            }
+            .padding(16)
+            .background {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(KinexaTheme.card)
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color(hex: "#F59E0B").opacity(0.05), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color(hex: "#F59E0B").opacity(0.12))
+                }
+            }
+            .clipShape(.rect(cornerRadius: 18))
+        }
+        .buttonStyle(PressScaleButtonStyle())
     }
 
     // MARK: - Smart Suggestion
