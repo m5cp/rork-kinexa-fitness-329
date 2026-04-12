@@ -8,21 +8,15 @@ struct UpgradeView: View {
     @State private var selectedPackageID: String?
     @State private var animateIn: Bool = false
     @State private var pulseGlow: Bool = false
+    @State private var purchaseTrigger: Bool = false
 
-    private let proFeatures: [(icon: String, title: String)] = [
-        ("bolt.shield.fill", "Advanced PT Plans"),
-        ("chart.line.uptrend.xyaxis", "AI Insights & Analytics"),
-        ("person.3.fill", "Unit PT Builder"),
-        ("doc.text.fill", "PDF & Calendar Export"),
-        ("square.and.arrow.up.fill", "Share Cards & QR"),
-        ("star.fill", "Priority Support")
-    ]
-
-    private let freeFeatures: [(icon: String, title: String)] = [
-        ("figure.run", "AFT Score Calculator"),
-        ("bolt.fill", "Quick Start Activities"),
-        ("dumbbell.fill", "Basic Workouts"),
-        ("chart.bar.fill", "Step Tracking")
+    private let proFeatures: [(icon: String, title: String, desc: String)] = [
+        ("bolt.shield.fill", "Advanced PT Plans", "Unlimited plan generation & customization"),
+        ("chart.line.uptrend.xyaxis", "AI Insights", "On-device intelligence for smarter training"),
+        ("fork.knife", "Full Nutrition Suite", "Unlimited recipes, meal plans & macro tracking"),
+        ("person.3.fill", "Unit PT Builder", "Build & share group workouts"),
+        ("doc.text.fill", "PDF & Calendar Export", "Export plans, scores & schedules"),
+        ("square.and.arrow.up.fill", "Share Cards & QR", "Share progress & import workouts")
     ]
 
     var body: some View {
@@ -31,11 +25,10 @@ struct UpgradeView: View {
                 KinexaTheme.background.ignoresSafeArea()
 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 28) {
+                    VStack(spacing: 24) {
                         headerSection
-                        freeTierSection
-                        subscriptionTiersSection
-                        lifetimeDealSection
+                        featuresGrid
+                        plansSection
                         ctaButton
                         legalSection
                     }
@@ -76,15 +69,29 @@ struct UpgradeView: View {
                 withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true).delay(0.6)) {
                     pulseGlow = true
                 }
+                if selectedPackageID == nil, let current = store.offerings?.current {
+                    let lifetime = current.availablePackages.first { $0.packageType == .lifetime }
+                    let annual = current.availablePackages.first { $0.packageType == .annual }
+                    selectedPackageID = (lifetime ?? annual)?.identifier
+                }
             }
         }
     }
 
-    // MARK: - Header
-
     private var headerSection: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [KinexaTheme.accent.opacity(0.3), .clear],
+                            center: .center,
+                            startRadius: 20,
+                            endRadius: 60
+                        )
+                    )
+                    .frame(width: 100, height: 100)
+
                 Circle()
                     .fill(
                         LinearGradient(
@@ -93,84 +100,75 @@ struct UpgradeView: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 68, height: 68)
-                    .shadow(color: KinexaTheme.accent.opacity(0.35), radius: 16, y: 6)
+                    .frame(width: 72, height: 72)
+                    .shadow(color: KinexaTheme.accent.opacity(0.4), radius: 20, y: 8)
 
                 Image(systemName: "crown.fill")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.system(size: 30, weight: .bold))
                     .foregroundStyle(.white)
             }
-            .scaleEffect(animateIn ? 1 : 0.6)
+            .scaleEffect(animateIn ? 1 : 0.5)
             .opacity(animateIn ? 1 : 0)
 
             VStack(spacing: 6) {
                 Text("Unlock Kinexa Pro")
-                    .font(.title2.weight(.bold))
+                    .font(.title.weight(.bold))
                     .foregroundStyle(KinexaTheme.primaryText)
 
-                Text("Train smarter. Perform better.")
+                Text("Train smarter. Eat better. Perform at your best.")
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(KinexaTheme.secondaryText)
+                    .multilineTextAlignment(.center)
             }
             .opacity(animateIn ? 1 : 0)
             .offset(y: animateIn ? 0 : 10)
         }
+        .padding(.top, 8)
     }
 
-    // MARK: - Free Tier
+    private var featuresGrid: some View {
+        LazyVGrid(columns: [
+            GridItem(.flexible(), spacing: 10),
+            GridItem(.flexible(), spacing: 10)
+        ], spacing: 10) {
+            ForEach(Array(proFeatures.enumerated()), id: \.element.title) { index, feature in
+                VStack(alignment: .leading, spacing: 8) {
+                    Image(systemName: feature.icon)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.accent)
+                        .frame(width: 32, height: 32)
+                        .background(KinexaTheme.accent.opacity(0.12))
+                        .clipShape(.rect(cornerRadius: 8))
 
-    private var freeTierSection: some View {
-        VStack(spacing: 0) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Free")
-                        .font(.headline.weight(.bold))
+                    Text(feature.title)
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(KinexaTheme.primaryText)
-                    Text("Basic features included")
-                        .font(.caption.weight(.medium))
+
+                    Text(feature.desc)
+                        .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(KinexaTheme.tertiaryText)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-
-                Spacer(minLength: 0)
-
-                Text("$0")
-                    .font(.title2.weight(.heavy))
-                    .foregroundStyle(KinexaTheme.secondaryText)
-            }
-            .padding(16)
-
-            Divider().overlay(KinexaTheme.border)
-
-            VStack(spacing: 8) {
-                ForEach(freeFeatures, id: \.title) { feature in
-                    HStack(spacing: 10) {
-                        Image(systemName: "checkmark")
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(KinexaTheme.tertiaryText)
-                            .frame(width: 18)
-                        Text(feature.title)
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(KinexaTheme.secondaryText)
-                        Spacer(minLength: 0)
-                    }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(KinexaTheme.card)
+                .clipShape(.rect(cornerRadius: 14))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(KinexaTheme.border)
                 }
+                .opacity(animateIn ? 1 : 0)
+                .offset(y: animateIn ? 0 : 8)
+                .animation(
+                    .spring(response: 0.5, dampingFraction: 0.8).delay(Double(index) * 0.04 + 0.15),
+                    value: animateIn
+                )
             }
-            .padding(16)
         }
-        .background(KinexaTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .overlay {
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(KinexaTheme.border)
-        }
-        .opacity(animateIn ? 1 : 0)
-        .offset(y: animateIn ? 0 : 8)
-        .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.15), value: animateIn)
     }
 
-    // MARK: - Subscription Tiers
-
-    private var subscriptionTiersSection: some View {
+    private var plansSection: some View {
         VStack(spacing: 10) {
             if store.isLoading {
                 VStack(spacing: 12) {
@@ -180,12 +178,12 @@ struct UpgradeView: View {
                         .font(.caption)
                         .foregroundStyle(KinexaTheme.tertiaryText)
                 }
-                .frame(height: 120)
+                .frame(height: 180)
             } else if let current = store.offerings?.current {
-                ForEach(sortedPackages(from: current), id: \.identifier) { package in
-                    if package.packageType != .lifetime {
-                        subscriptionCard(package)
-                    }
+                let packages = sortedPackages(from: current)
+
+                ForEach(packages, id: \.identifier) { package in
+                    planCard(package, packages: packages)
                 }
             } else {
                 VStack(spacing: 12) {
@@ -201,266 +199,205 @@ struct UpgradeView: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(KinexaTheme.accent)
                 }
-                .frame(height: 120)
+                .frame(height: 180)
             }
         }
         .opacity(animateIn ? 1 : 0)
-        .offset(y: animateIn ? 0 : 10)
-        .animation(.spring(response: 0.6, dampingFraction: 0.82).delay(0.25), value: animateIn)
+        .offset(y: animateIn ? 0 : 12)
+        .animation(.spring(response: 0.6, dampingFraction: 0.82).delay(0.3), value: animateIn)
     }
 
-    private func subscriptionCard(_ package: Package) -> some View {
+    private func planCard(_ package: Package, packages: [Package]) -> some View {
         let isSelected = selectedPackageID == package.identifier
+        let isLifetime = package.packageType == .lifetime
         let isAnnual = package.packageType == .annual
 
         return Button {
-            selectedPackageID = package.identifier
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                selectedPackageID = package.identifier
+            }
         } label: {
-            HStack(spacing: 14) {
-                ZStack {
-                    Circle()
-                        .stroke(isSelected ? KinexaTheme.accent : KinexaTheme.tertiaryText.opacity(0.4), lineWidth: 2)
-                        .frame(width: 22, height: 22)
-                    if isSelected {
-                        Circle()
-                            .fill(KinexaTheme.accent)
-                            .frame(width: 14, height: 14)
+            VStack(spacing: 0) {
+                if isLifetime {
+                    HStack(spacing: 6) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 10, weight: .bold))
+                        Text("BEST VALUE")
+                            .font(.system(size: 10, weight: .heavy))
+                            .tracking(1.0)
                     }
+                    .foregroundStyle(Color(hex: "#0C0F0E"))
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity)
+                    .background(KinexaTheme.heroAmber)
+                } else if isAnnual {
+                    HStack(spacing: 6) {
+                        Image(systemName: "flame.fill")
+                            .font(.system(size: 10, weight: .bold))
+                        Text("MOST POPULAR")
+                            .font(.system(size: 10, weight: .heavy))
+                            .tracking(1.0)
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity)
+                    .background(KinexaTheme.accent)
                 }
 
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 8) {
-                        Text(package.storeProduct.localizedTitle)
+                HStack(spacing: 14) {
+                    ZStack {
+                        Circle()
+                            .stroke(isSelected ? (isLifetime ? KinexaTheme.heroAmber : KinexaTheme.accent) : KinexaTheme.tertiaryText.opacity(0.4), lineWidth: 2)
+                            .frame(width: 24, height: 24)
+                        if isSelected {
+                            Circle()
+                                .fill(isLifetime ? KinexaTheme.heroAmber : KinexaTheme.accent)
+                                .frame(width: 14, height: 14)
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(planTitle(package))
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(KinexaTheme.primaryText)
 
-                        if isAnnual {
-                            Text("POPULAR")
-                                .font(.system(size: 9, weight: .heavy))
-                                .tracking(0.5)
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 7)
-                                .padding(.vertical, 2)
-                                .background(KinexaTheme.accent)
-                                .clipShape(Capsule())
-                        }
-                    }
-
-                    if let intro = package.storeProduct.introductoryDiscount {
-                        HStack(spacing: 4) {
-                            Image(systemName: "gift.fill")
-                                .font(.system(size: 9))
-                            Text("\(intro.subscriptionPeriod.value) \(intro.subscriptionPeriod.unit == .day ? "day" : intro.subscriptionPeriod.unit == .week ? "week" : "month") free trial")
-                                .font(.caption2.weight(.semibold))
-                        }
-                        .foregroundStyle(KinexaTheme.success)
-                    } else if isAnnual {
-                        Text("Save 58% vs monthly")
+                        Text(planSubtitle(package, packages: packages))
                             .font(.caption2.weight(.medium))
-                            .foregroundStyle(KinexaTheme.success)
+                            .foregroundStyle(isLifetime ? KinexaTheme.heroAmber : KinexaTheme.success)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(package.storeProduct.localizedPriceString)
+                            .font(.title3.weight(.heavy))
+                            .foregroundStyle(isSelected ? (isLifetime ? KinexaTheme.heroAmber : KinexaTheme.accent) : KinexaTheme.primaryText)
+
+                        Text(planPeriod(package))
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
                     }
                 }
-
-                Spacer(minLength: 0)
-
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text(package.storeProduct.localizedPriceString)
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(isSelected ? KinexaTheme.accent : KinexaTheme.primaryText)
-
-                    Text(package.packageType == .annual ? "per year" : "per month")
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(KinexaTheme.tertiaryText)
-                }
+                .padding(16)
             }
-            .padding(16)
-            .background(isSelected ? KinexaTheme.accent.opacity(0.06) : KinexaTheme.card)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .background(
+                isLifetime && isSelected ?
+                LinearGradient(
+                    colors: [Color(hex: "#1A1A2E"), Color(hex: "#16213E")],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ) :
+                LinearGradient(
+                    colors: [isSelected ? KinexaTheme.accent.opacity(0.06) : KinexaTheme.card, isSelected ? KinexaTheme.accent.opacity(0.03) : KinexaTheme.card],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(.rect(cornerRadius: 18))
             .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(isSelected ? KinexaTheme.accent.opacity(0.5) : KinexaTheme.border, lineWidth: isSelected ? 1.5 : 1)
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(
+                        isSelected ?
+                        (isLifetime ? KinexaTheme.heroAmber.opacity(pulseGlow ? 0.7 : 0.4) : KinexaTheme.accent.opacity(0.5)) :
+                        KinexaTheme.border,
+                        lineWidth: isSelected ? 1.5 : 1
+                    )
             }
+            .shadow(
+                color: isLifetime && isSelected ? KinexaTheme.heroAmber.opacity(pulseGlow ? 0.15 : 0.05) : .clear,
+                radius: 16, y: 8
+            )
         }
         .buttonStyle(.plain)
+        .sensoryFeedback(.selection, trigger: selectedPackageID)
     }
 
-    // MARK: - Lifetime Deal
+    private func planTitle(_ package: Package) -> String {
+        switch package.packageType {
+        case .monthly: return "Monthly"
+        case .annual: return "Annual"
+        case .lifetime: return "Lifetime Access"
+        default: return package.storeProduct.localizedTitle
+        }
+    }
 
-    private var lifetimeDealSection: some View {
-        Group {
-            if let current = store.offerings?.current,
-               let lifetimePackage = current.availablePackages.first(where: { $0.packageType == .lifetime }) {
-                let isSelected = selectedPackageID == lifetimePackage.identifier || (selectedPackageID == nil)
-
-                Button {
-                    selectedPackageID = lifetimePackage.identifier
-                } label: {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "star.fill")
-                                .font(.caption2.weight(.bold))
-                            Text("LIMITED TIME LAUNCH OFFER")
-                                .font(.caption2.weight(.heavy))
-                                .tracking(1.2)
-                        }
-                        .foregroundStyle(Color(hex: "#0C0F0E"))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 9)
-                        .frame(maxWidth: .infinity)
-                        .background(KinexaTheme.heroAmber)
-
-                        VStack(spacing: 16) {
-                            VStack(spacing: 5) {
-                                Text("Founding Member")
-                                    .font(.caption.weight(.bold))
-                                    .tracking(1.0)
-                                    .foregroundStyle(KinexaTheme.heroAmber)
-
-                                Text("Lifetime Access")
-                                    .font(.title2.weight(.heavy))
-                                    .foregroundStyle(.white)
-                            }
-
-                            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                                Text(lifetimePackage.storeProduct.localizedPriceString)
-                                    .font(.system(size: 48, weight: .heavy, design: .rounded))
-                                    .foregroundStyle(.white)
-                            }
-
-                            VStack(spacing: 6) {
-                                HStack(spacing: 6) {
-                                    Text("$99.99")
-                                        .font(.subheadline.weight(.bold))
-                                        .strikethrough(color: .white.opacity(0.5))
-                                        .foregroundStyle(.white.opacity(0.4))
-
-                                    Text("50% OFF")
-                                        .font(.caption2.weight(.heavy))
-                                        .tracking(0.5)
-                                        .foregroundStyle(Color(hex: "#0C0F0E"))
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
-                                        .background(KinexaTheme.heroAmber)
-                                        .clipShape(Capsule())
-                                }
-
-                                Text("One payment. Yours forever.")
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(.white.opacity(0.5))
-                            }
-
-                            Divider().overlay(.white.opacity(0.1))
-                                .padding(.horizontal, 8)
-
-                            VStack(spacing: 9) {
-                                lifetimePerk(icon: "infinity", text: "Every feature, every update — forever")
-                                lifetimePerk(icon: "lock.open.fill", text: "No recurring charges, no surprises")
-                                lifetimePerk(icon: "chart.line.uptrend.xyaxis", text: "Pays for itself in under 13 months vs annual")
-                                lifetimePerk(icon: "shield.checkered", text: "Lock in before price goes to $99.99")
-                            }
-
-                            VStack(spacing: 4) {
-                                Text("Half the cost of one year at the leading fitness tracker")
-                                    .font(.caption2.weight(.semibold))
-                                    .foregroundStyle(KinexaTheme.success)
-
-                                    Text("Dedicated users save hundreds over the long run")
-                                    .font(.caption2.weight(.medium))
-                                    .foregroundStyle(.white.opacity(0.4))
-                            }
-                            .multilineTextAlignment(.center)
-                        }
-                        .padding(20)
-                        .background {
-                            ZStack {
-                                LinearGradient(
-                                    colors: [
-                                        Color(hex: "#1A1A2E"),
-                                        Color(hex: "#16213E"),
-                                        Color(hex: "#0F3460").opacity(0.8)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                                KinexaTheme.subtleGradient
-                            }
-                        }
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        KinexaTheme.heroAmber.opacity(isSelected ? 0.8 : (pulseGlow ? 0.6 : 0.3)),
-                                        KinexaTheme.heroAmber.opacity(isSelected ? 0.5 : (pulseGlow ? 0.3 : 0.1)),
-                                        KinexaTheme.heroAmber.opacity(isSelected ? 0.8 : (pulseGlow ? 0.6 : 0.3))
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: isSelected ? 2 : 1.5
-                            )
-                    }
-                    .shadow(color: KinexaTheme.heroAmber.opacity(pulseGlow ? 0.2 : 0.08), radius: 24, y: 12)
-                }
-                .buttonStyle(.plain)
+    private func planSubtitle(_ package: Package, packages: [Package]) -> String {
+        switch package.packageType {
+        case .monthly:
+            return "Cancel anytime"
+        case .annual:
+            if let intro = package.storeProduct.introductoryDiscount {
+                return "\(intro.subscriptionPeriod.value)-\(intro.subscriptionPeriod.unit == .day ? "day" : intro.subscriptionPeriod.unit == .week ? "week" : "month") free trial"
             }
-        }
-        .opacity(animateIn ? 1 : 0)
-        .offset(y: animateIn ? 0 : 16)
-        .animation(.spring(response: 0.7, dampingFraction: 0.78).delay(0.35), value: animateIn)
-    }
-
-    private func lifetimePerk(icon: String, text: String) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon)
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(KinexaTheme.heroAmber)
-                .frame(width: 20)
-
-            Text(text)
-                .font(.caption.weight(.medium))
-                .foregroundStyle(.white.opacity(0.75))
-
-            Spacer(minLength: 0)
+            return "Save 58% vs monthly"
+        case .lifetime:
+            return "One payment. Yours forever."
+        default:
+            return ""
         }
     }
 
-    // MARK: - CTA
+    private func planPeriod(_ package: Package) -> String {
+        switch package.packageType {
+        case .monthly: return "per month"
+        case .annual: return "per year"
+        case .lifetime: return "one time"
+        default: return ""
+        }
+    }
 
     private var ctaButton: some View {
         Group {
             if let current = store.offerings?.current, let selected = selectedPackage(from: current) {
                 Button {
+                    purchaseTrigger.toggle()
                     Task { await store.purchase(package: selected) }
                 } label: {
                     HStack(spacing: 10) {
                         if store.isPurchasing {
                             ProgressView().tint(.white)
                         } else {
-                            Image(systemName: "lock.open.fill")
+                            Image(systemName: selected.packageType == .lifetime ? "crown.fill" : "lock.open.fill")
                                 .font(.subheadline.weight(.bold))
                         }
-                        Text(selected.packageType == .lifetime ? "Get Lifetime Access" : "Continue")
+                        Text(ctaText(selected))
                             .font(.headline.weight(.bold))
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(KinexaTheme.heroGradient)
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
-                    .shadow(color: KinexaTheme.accent.opacity(0.3), radius: 16, y: 8)
+                    .background(
+                        selected.packageType == .lifetime ?
+                        LinearGradient(colors: [KinexaTheme.heroAmber, KinexaTheme.heroAmber.opacity(0.85)], startPoint: .leading, endPoint: .trailing) :
+                        KinexaTheme.heroGradient
+                    )
+                    .clipShape(.rect(cornerRadius: 18))
+                    .shadow(
+                        color: (selected.packageType == .lifetime ? KinexaTheme.heroAmber : KinexaTheme.accent).opacity(0.3),
+                        radius: 16, y: 8
+                    )
                 }
                 .disabled(store.isPurchasing)
                 .buttonStyle(PressScaleButtonStyle())
+                .sensoryFeedback(.impact(weight: .medium), trigger: purchaseTrigger)
             }
         }
         .opacity(animateIn ? 1 : 0)
-        .animation(.spring(response: 0.6, dampingFraction: 0.82).delay(0.45), value: animateIn)
+        .animation(.spring(response: 0.6, dampingFraction: 0.82).delay(0.4), value: animateIn)
     }
 
-    // MARK: - Helpers
+    private func ctaText(_ package: Package) -> String {
+        switch package.packageType {
+        case .lifetime: return "Get Lifetime Access"
+        case .annual:
+            if package.storeProduct.introductoryDiscount != nil {
+                return "Start Free Trial"
+            }
+            return "Subscribe Annually"
+        case .monthly: return "Subscribe Monthly"
+        default: return "Continue"
+        }
+    }
 
     private func sortedPackages(from offering: Offering) -> [Package] {
         let order: [PackageType] = [.monthly, .annual, .lifetime]
@@ -477,8 +414,6 @@ struct UpgradeView: View {
         }
         return offering.availablePackages.first { $0.packageType == .lifetime } ?? offering.availablePackages.first
     }
-
-    // MARK: - Legal
 
     private var legalSection: some View {
         VStack(spacing: 10) {

@@ -36,6 +36,7 @@ struct ProfileView: View {
                     currentGoalSection
                     notificationsSection
                     appControlsSection
+                    supportSection
                     legalSection
                     footer
                 }
@@ -485,12 +486,79 @@ struct ProfileView: View {
                 settingsRow(icon: "tablecells", title: "Scoring Reference", color: KinexaTheme.accent, showChevron: true)
             }
 
+        }
+    }
+
+    // MARK: - Support & Partners
+
+    private var supportSection: some View {
+        settingsSection(title: "SUPPORT & PARTNERS", icon: "person.2") {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 12) {
+                    Image(systemName: "leaf.fill")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 40, height: 40)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "#059669"), Color(hex: "#10B981")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(.rect(cornerRadius: 10))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Nutrition Partner")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Text("Personalized consultations available")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+                }
+
+                Text("For personalized nutrition plans, dietary guidance, and one-on-one consultations, connect with our certified nutrition partner.")
+                    .font(.caption)
+                    .foregroundStyle(KinexaTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .lineSpacing(3)
+
+                Button {
+                    if let url = URL(string: "mailto:nutrition@kinexafit.com") {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "envelope.fill")
+                            .font(.caption.weight(.bold))
+                        Text("Contact for Consultation")
+                            .font(.caption.weight(.bold))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 40)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#059669"), Color(hex: "#10B981")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(.rect(cornerRadius: 12))
+                }
+                .buttonStyle(PressScaleButtonStyle())
+            }
+            .padding(.vertical, 8)
+
             sectionDivider
 
-            NavigationLink {
-                CompetitorComparisonView()
+            Button {
+                if let url = URL(string: "mailto:support@kinexafit.com") {
+                    UIApplication.shared.open(url)
+                }
             } label: {
-                settingsRow(icon: "medal.fill", title: "Why Kinexa?", color: KinexaTheme.heroAmber, showChevron: true)
+                settingsRow(icon: "questionmark.circle", title: "Contact Support", color: KinexaTheme.accent, showChevron: true)
             }
         }
     }
@@ -522,7 +590,7 @@ struct ProfileView: View {
             } label: {
                 settingsRow(icon: "exclamationmark.triangle", title: "Disclaimer", color: KinexaTheme.warning, showChevron: true)
             }
-            .accessibilityHint("View the fitness disclaimer")
+            .accessibilityHint("View the fitness and nutrition disclaimer")
 
             sectionDivider
 
