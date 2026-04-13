@@ -16,6 +16,7 @@ struct NutritionTabView: View {
     @State private var mealSuggestion: String?
     @State private var isLoadingSuggestion: Bool = false
     @State private var showUpgrade: Bool = false
+    @State private var showTokenStore: Bool = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -63,6 +64,28 @@ struct NutritionTabView: View {
         .navigationTitle("Nutrition")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    showTokenStore = true
+                } label: {
+                    let tracker = AIUsageTracker.shared
+                    HStack(spacing: 5) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 11, weight: .bold))
+                        Text("\(tracker.totalRemaining)")
+                            .font(.caption2.weight(.heavy))
+                            .contentTransition(.numericText())
+                    }
+                    .foregroundStyle(Color(hex: "#8B5CF6"))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color(hex: "#8B5CF6").opacity(0.12))
+                    .clipShape(Capsule())
+                    .overlay {
+                        Capsule().stroke(Color(hex: "#8B5CF6").opacity(0.25))
+                    }
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 12) {
                     Button {
@@ -81,6 +104,9 @@ struct NutritionTabView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showTokenStore) {
+            TokenStoreView()
         }
         .sheet(isPresented: $showLogMeal) {
             LogMealSheet(nutritionVM: nutritionVM)

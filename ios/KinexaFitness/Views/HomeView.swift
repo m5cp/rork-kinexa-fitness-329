@@ -5,6 +5,7 @@ struct HomeView: View {
     @Environment(StoreViewModel.self) private var store
 
     @State private var showUpgrade: Bool = false
+    @State private var showTokenStore: Bool = false
 
     @State private var animateHero: Bool = false
     @State private var animateMetrics: Bool = false
@@ -83,6 +84,9 @@ struct HomeView: View {
                     .font(.caption.weight(.heavy))
                     .tracking(2.4)
                     .foregroundStyle(KinexaTheme.secondaryText)
+            }
+            ToolbarItem(placement: .topBarLeading) {
+                tokenBalancePill
             }
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 12) {
@@ -204,6 +208,9 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showUpgrade) {
             UpgradeView()
+        }
+        .sheet(isPresented: $showTokenStore) {
+            TokenStoreView()
         }
         .sheet(isPresented: $showWODSheet) {
             WODDetailView()
@@ -335,6 +342,29 @@ struct HomeView: View {
             }
             withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.2)) {
                 animateMetrics = true
+            }
+        }
+    }
+
+    private var tokenBalancePill: some View {
+        Button {
+            showTokenStore = true
+        } label: {
+            let tracker = AIUsageTracker.shared
+            HStack(spacing: 5) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 11, weight: .bold))
+                Text("\(tracker.totalRemaining)")
+                    .font(.caption2.weight(.heavy))
+                    .contentTransition(.numericText())
+            }
+            .foregroundStyle(Color(hex: "#8B5CF6"))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(Color(hex: "#8B5CF6").opacity(0.12))
+            .clipShape(Capsule())
+            .overlay {
+                Capsule().stroke(Color(hex: "#8B5CF6").opacity(0.25))
             }
         }
     }

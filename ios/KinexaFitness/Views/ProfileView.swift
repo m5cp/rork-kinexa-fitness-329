@@ -253,38 +253,45 @@ struct ProfileView: View {
                         .clipShape(Capsule())
                 }
                 .frame(minHeight: 48)
-
-                sectionDivider
-
-                Button {
-                    showTokenStore = true
-                } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "sparkles")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color(hex: "#8B5CF6"))
-                            .frame(width: 24)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("AI Tokens")
-                                .font(.subheadline.weight(.medium))
-                                .foregroundStyle(KinexaTheme.primaryText)
-                            Text("\(AIUsageTracker.shared.bonusTokens) tokens available")
-                                .font(.caption2)
-                                .foregroundStyle(KinexaTheme.tertiaryText)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(KinexaTheme.tertiaryText)
-                    }
-                    .frame(minHeight: 48)
-                }
             } else {
                 Button {
                     showUpgrade = true
                 } label: {
                     settingsRow(icon: "crown.fill", title: "Upgrade to Pro", color: KinexaTheme.heroAmber, showChevron: true)
                 }
+            }
+
+            sectionDivider
+
+            Button {
+                showTokenStore = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "sparkles")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color(hex: "#8B5CF6"))
+                        .frame(width: 24)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("AI Tokens")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        let tracker = AIUsageTracker.shared
+                        Text("\(tracker.totalRemaining) scan\(tracker.totalRemaining == 1 ? "" : "s") remaining · \(tracker.bonusTokens) bonus token\(tracker.bonusTokens == 1 ? "" : "s")")
+                            .font(.caption2)
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+                    Spacer()
+                    HStack(spacing: 4) {
+                        Text("\(AIUsageTracker.shared.totalRemaining)")
+                            .font(.caption.weight(.heavy))
+                            .foregroundStyle(Color(hex: "#8B5CF6"))
+                            .contentTransition(.numericText())
+                        Image(systemName: "chevron.right")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+                }
+                .frame(minHeight: 48)
             }
 
             sectionDivider
