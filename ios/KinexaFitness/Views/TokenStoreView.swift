@@ -6,6 +6,7 @@ struct TokenStoreView: View {
     @Environment(StoreViewModel.self) private var store
     @State private var purchasedTokenCount: Int = 0
     @State private var showSuccess: Bool = false
+    @State private var showUpgrade: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -131,9 +132,10 @@ struct TokenStoreView: View {
                         .font(.title3.weight(.bold))
                         .foregroundStyle(KinexaTheme.success)
                 } else {
-                    Text(tracker.hasFreeTrialRemaining ? "1 left" : "0 left")
+                    let freeLeft = tracker.remainingToday
+                    Text("\(freeLeft) left")
                         .font(.title3.weight(.bold))
-                        .foregroundStyle(tracker.hasFreeTrialRemaining ? KinexaTheme.success : KinexaTheme.warning)
+                        .foregroundStyle(freeLeft > 0 ? KinexaTheme.success : KinexaTheme.warning)
                 }
             }
         }
@@ -306,32 +308,43 @@ struct TokenStoreView: View {
     private var subscriptionUpsell: some View {
         Group {
             if !store.isPremium {
-                VStack(spacing: 10) {
-                    HStack(spacing: 10) {
-                        Image(systemName: "crown.fill")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(KinexaTheme.heroAmber)
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("Subscribe for the best value")
+                Button {
+                    showUpgrade = true
+                } label: {
+                    VStack(spacing: 10) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "crown.fill")
                                 .font(.subheadline.weight(.bold))
-                                .foregroundStyle(KinexaTheme.primaryText)
-                            Text("Get 15 AI scans per day — up to 450/month for $19.99")
-                                .font(.caption2)
-                                .foregroundStyle(KinexaTheme.secondaryText)
+                                .foregroundStyle(KinexaTheme.heroAmber)
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("Subscribe for the best value")
+                                    .font(.subheadline.weight(.bold))
+                                    .foregroundStyle(KinexaTheme.primaryText)
+                                Text("Get 15 AI scans per day — up to 450/month")
+                                    .font(.caption2)
+                                    .foregroundStyle(KinexaTheme.secondaryText)
+                            }
+                            Spacer(minLength: 0)
+                            Image(systemName: "chevron.right")
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(KinexaTheme.heroAmber)
                         }
-                        Spacer(minLength: 0)
-                    }
 
-                    Text("That's ~$0.04/scan vs $0.20–$0.30/token")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(KinexaTheme.accent)
+                        Text("That's ~$0.04/scan vs $0.20–$0.30/token")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.accent)
+                    }
+                    .padding(14)
+                    .background(KinexaTheme.heroAmber.opacity(0.08))
+                    .clipShape(.rect(cornerRadius: 14))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(KinexaTheme.heroAmber.opacity(0.2))
+                    }
                 }
-                .padding(14)
-                .background(KinexaTheme.heroAmber.opacity(0.08))
-                .clipShape(.rect(cornerRadius: 14))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(KinexaTheme.heroAmber.opacity(0.2))
+                .buttonStyle(PressScaleButtonStyle())
+                .sheet(isPresented: $showUpgrade) {
+                    UpgradeView()
                 }
             }
         }
