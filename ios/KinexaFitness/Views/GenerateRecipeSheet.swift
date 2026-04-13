@@ -147,6 +147,7 @@ struct GenerateRecipeSheet: View {
         Button {
             isGenerating = true
             Task {
+                AIUsageTracker.shared.recordUsage()
                 await recipeVM.generateRecipes(
                     profile: nutritionVM.profile,
                     currentNutrition: nutritionVM.todayNutrition,

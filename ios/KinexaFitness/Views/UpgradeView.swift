@@ -13,7 +13,7 @@ struct UpgradeView: View {
     private let proFeatures: [(icon: String, title: String, desc: String)] = [
         ("bolt.shield.fill", "Advanced PT Plans", "Full plan generation & customization"),
         ("chart.line.uptrend.xyaxis", "AI Insights", "On-device intelligence for smarter training"),
-        ("fork.knife", "Full Nutrition Suite", "Complete recipes, meal plans & macro tracking"),
+        ("fork.knife", "Full Nutrition Suite", "AI food scanning, recipes & macro insights"),
         ("person.3.fill", "Unit PT Builder", "Build & share group workouts"),
         ("doc.text.fill", "PDF & Calendar Export", "Export plans, scores & schedules"),
         ("square.and.arrow.up.fill", "Share Cards & QR", "Share progress & import workouts")
@@ -329,7 +329,7 @@ struct UpgradeView: View {
             if let intro = package.storeProduct.introductoryDiscount {
                 return "\(intro.subscriptionPeriod.value)-\(intro.subscriptionPeriod.unit == .day ? "day" : intro.subscriptionPeriod.unit == .week ? "week" : "month") free trial"
             }
-            return "Save 58% vs monthly"
+            return "Save 50% vs monthly"
         case .lifetime:
             return "One payment. Yours forever."
         default:

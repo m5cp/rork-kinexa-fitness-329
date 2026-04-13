@@ -1,11 +1,13 @@
 import SwiftUI
 
 struct RecipesView: View {
+    @Environment(StoreViewModel.self) private var store
     @State private var recipeVM = RecipeViewModel()
     var nutritionVM: NutritionViewModel
     @State private var showGenerateSheet: Bool = false
     @State private var selectedRecipe: Recipe?
     @State private var showFavoritesOnly: Bool = false
+    @State private var showUpgrade: Bool = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -56,6 +58,9 @@ struct RecipesView: View {
         .sheet(isPresented: $showGenerateSheet) {
             GenerateRecipeSheet(recipeVM: recipeVM, nutritionVM: nutritionVM)
         }
+        .sheet(isPresented: $showUpgrade) {
+            UpgradeView()
+        }
         .sheet(item: $selectedRecipe) { recipe in
             RecipeDetailSheet(recipe: recipe, recipeVM: recipeVM, nutritionVM: nutritionVM)
         }
@@ -98,7 +103,11 @@ struct RecipesView: View {
 
     private var generateCard: some View {
         Button {
-            showGenerateSheet = true
+            if store.isPremium {
+                showGenerateSheet = true
+            } else {
+                showUpgrade = true
+            }
         } label: {
             HStack(spacing: 14) {
                 ZStack {

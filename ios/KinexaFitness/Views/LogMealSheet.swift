@@ -3,6 +3,7 @@ import PhotosUI
 
 struct LogMealSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(StoreViewModel.self) private var store
     let nutritionVM: NutritionViewModel
 
     @State private var selectedMealType: MealType = .lunch
@@ -16,8 +17,9 @@ struct LogMealSheet: View {
     @State private var showBarcode: Bool = false
     @State private var capturedPhotoData: Data?
     @State private var selectedPhoto: PhotosPickerItem?
-    @State private var inputMode: MealInputMode = .text
+    @State private var inputMode: MealInputMode = .manual
     @State private var showManualEntry: Bool = false
+    @State private var showUpgrade: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -85,6 +87,47 @@ struct LogMealSheet: View {
             guard let newValue else { return }
             Task { await loadAndAnalyzePhoto(newValue) }
         }
+        .sheet(isPresented: $showUpgrade) {
+            UpgradeView()
+        }
+    }
+
+    private var aiUsageBadge: some View {
+        let remaining = AIUsageTracker.shared.remainingToday
+        return HStack(spacing: 4) {
+            Image(systemName: "sparkle")
+                .font(.system(size: 8, weight: .bold))
+            Text("\(remaining)/15 today")
+                .font(.system(size: 9, weight: .bold))
+        }
+        .foregroundStyle(remaining <= 3 ? KinexaTheme.warning : KinexaTheme.tertiaryText)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(remaining <= 3 ? KinexaTheme.warning.opacity(0.1) : KinexaTheme.cardSoft)
+        .clipShape(Capsule())
+    }
+
+    private var dailyLimitReachedBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "exclamationmark.circle.fill")
+                .foregroundStyle(KinexaTheme.warning)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Daily AI limit reached")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.primaryText)
+                Text("You've used all 15 AI scans for today. Use manual entry or barcode instead.")
+                    .font(.system(size: 10))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(KinexaTheme.warning.opacity(0.08))
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(KinexaTheme.warning.opacity(0.2))
+        }
     }
 
     private var mealTypeSelector: some View {
@@ -122,39 +165,49 @@ struct LogMealSheet: View {
     private var inputModeSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                inputModeButton(mode: .text, icon: "sparkles", label: "AI Text")
-                inputModeButton(mode: .photo, icon: "camera.fill", label: "Photo")
-                inputModeButton(mode: .barcode, icon: "barcode.viewfinder", label: "Barcode")
                 inputModeButton(mode: .manual, icon: "pencil.line", label: "Manual")
+                inputModeButton(mode: .barcode, icon: "barcode.viewfinder", label: "Barcode")
                 inputModeButton(mode: .favorites, icon: "star.fill", label: "Favorites")
+                inputModeButton(mode: .text, icon: "sparkles", label: "AI Text", isPremiumFeature: true)
+                inputModeButton(mode: .photo, icon: "camera.fill", label: "Photo", isPremiumFeature: true)
             }
         }
         .contentMargins(.horizontal, 0)
     }
 
-    private func inputModeButton(mode: MealInputMode, icon: String, label: String) -> some View {
+    private func inputModeButton(mode: MealInputMode, icon: String, label: String, isPremiumFeature: Bool = false) -> some View {
         let isSelected = inputMode == mode
+        let isLocked = isPremiumFeature && !store.isPremium
         return Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                inputMode = mode
-                errorMessage = nil
+            if isLocked {
+                showUpgrade = true
+            } else {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    inputMode = mode
+                    errorMessage = nil
+                }
             }
         } label: {
             HStack(spacing: 6) {
-                Image(systemName: icon)
+                Image(systemName: isLocked ? "lock.fill" : icon)
                     .font(.system(size: 12, weight: .bold))
                 Text(label)
                     .font(.system(size: 11, weight: .bold))
+                if isPremiumFeature && !isLocked {
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 8))
+                        .foregroundStyle(Color(hex: "#F59E0B"))
+                }
             }
-            .foregroundStyle(isSelected ? .white : KinexaTheme.secondaryText)
+            .foregroundStyle(isLocked ? KinexaTheme.tertiaryText : (isSelected ? .white : KinexaTheme.secondaryText))
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
-            .background(isSelected ? KinexaTheme.accent : KinexaTheme.card)
+            .background(isLocked ? KinexaTheme.cardSoft : (isSelected ? KinexaTheme.accent : KinexaTheme.card))
             .clipShape(.rect(cornerRadius: 12))
             .overlay {
-                if !isSelected {
+                if !isSelected || isLocked {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(KinexaTheme.border)
+                        .stroke(isLocked ? KinexaTheme.border.opacity(0.5) : KinexaTheme.border)
                 }
             }
         }
@@ -170,6 +223,8 @@ struct LogMealSheet: View {
                 Text("Describe your meal")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(KinexaTheme.secondaryText)
+                Spacer()
+                aiUsageBadge
             }
 
             VStack(spacing: 12) {
@@ -205,15 +260,19 @@ struct LogMealSheet: View {
                         )
                     )
                     .clipShape(.rect(cornerRadius: 14))
-                    .opacity(foodDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1)
+                    .opacity(foodDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || AIUsageTracker.shared.hasReachedLimit ? 0.5 : 1)
                 }
                 .buttonStyle(PressScaleButtonStyle())
-                .disabled(foodDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isEstimating)
+                .disabled(foodDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isEstimating || AIUsageTracker.shared.hasReachedLimit)
 
-                Text("Gemini AI will estimate calories and macros from your description")
-                    .font(.system(size: 10))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-                    .multilineTextAlignment(.center)
+                if AIUsageTracker.shared.hasReachedLimit {
+                    dailyLimitReachedBanner
+                } else {
+                    Text("Gemini AI will estimate calories and macros from your description")
+                        .font(.system(size: 10))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .multilineTextAlignment(.center)
+                }
             }
         }
     }
@@ -245,63 +304,72 @@ struct LogMealSheet: View {
                     }
             }
 
-            HStack(spacing: 12) {
-                Button {
-                    showCamera = true
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "camera.fill")
-                            .font(.subheadline.weight(.bold))
-                        Text("Take Photo")
-                            .font(.subheadline.weight(.bold))
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 48)
-                    .background(
-                        LinearGradient(
-                            colors: [Color(hex: "#22C55E"), Color(hex: "#16A34A")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .clipShape(.rect(cornerRadius: 14))
-                }
-                .buttonStyle(PressScaleButtonStyle())
-
-                PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "photo.on.rectangle")
-                            .font(.subheadline.weight(.bold))
-                        Text("Gallery")
-                            .font(.subheadline.weight(.bold))
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 48)
-                    .background(
-                        LinearGradient(
-                            colors: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .clipShape(.rect(cornerRadius: 14))
-                }
-                .buttonStyle(PressScaleButtonStyle())
+            HStack(alignment: .center) {
+                Spacer()
+                aiUsageBadge
             }
 
-            VStack(spacing: 6) {
-                Image(systemName: "sparkles")
-                    .font(.title3)
-                    .foregroundStyle(Color(hex: "#6366F1"))
-                Text("Snap a photo of your food and AI will identify every item and estimate nutrition automatically")
-                    .font(.caption)
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(2)
+            if AIUsageTracker.shared.hasReachedLimit {
+                dailyLimitReachedBanner
+            } else {
+                HStack(spacing: 12) {
+                    Button {
+                        showCamera = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "camera.fill")
+                                .font(.subheadline.weight(.bold))
+                            Text("Take Photo")
+                                .font(.subheadline.weight(.bold))
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "#22C55E"), Color(hex: "#16A34A")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(.rect(cornerRadius: 14))
+                    }
+                    .buttonStyle(PressScaleButtonStyle())
+
+                    PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "photo.on.rectangle")
+                                .font(.subheadline.weight(.bold))
+                            Text("Gallery")
+                                .font(.subheadline.weight(.bold))
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(.rect(cornerRadius: 14))
+                    }
+                    .buttonStyle(PressScaleButtonStyle())
+                }
+
+                VStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.title3)
+                        .foregroundStyle(Color(hex: "#6366F1"))
+                    Text("Snap a photo of your food and AI will identify every item and estimate nutrition automatically")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(2)
+                }
+                .padding(.top, 4)
             }
-            .padding(.top, 4)
         }
     }
 
@@ -682,6 +750,10 @@ struct LogMealSheet: View {
     private func estimateFromText() async {
         let description = foodDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !description.isEmpty else { return }
+        guard !AIUsageTracker.shared.hasReachedLimit else {
+            errorMessage = "Daily AI limit reached (15/day). Use manual entry or barcode."
+            return
+        }
 
         isEstimating = true
         errorMessage = nil
@@ -689,6 +761,7 @@ struct LogMealSheet: View {
         do {
             estimatedFoods = try await nutritionVM.estimateFoodFromText(description)
             hasEstimated = true
+            AIUsageTracker.shared.recordUsage()
         } catch {
             errorMessage = "Could not estimate nutrition. Please try again or check your connection."
         }
@@ -697,12 +770,18 @@ struct LogMealSheet: View {
     }
 
     private func analyzePhoto(_ data: Data) async {
+        guard !AIUsageTracker.shared.hasReachedLimit else {
+            errorMessage = "Daily AI limit reached (15/day). Use manual entry or barcode."
+            return
+        }
+
         isEstimating = true
         errorMessage = nil
 
         do {
             estimatedFoods = try await nutritionVM.estimateFoodFromImage(data)
             hasEstimated = true
+            AIUsageTracker.shared.recordUsage()
         } catch {
             errorMessage = "Could not analyze photo. Please try again or use text description."
         }

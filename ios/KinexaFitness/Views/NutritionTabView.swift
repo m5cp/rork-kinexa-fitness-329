@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct NutritionTabView: View {
+    @Environment(StoreViewModel.self) private var store
     @State private var nutritionVM = NutritionViewModel()
     @State private var showLogMeal: Bool = false
     @State private var showGoalSheet: Bool = false
@@ -14,6 +15,7 @@ struct NutritionTabView: View {
     @State private var exportedPDFURL: URL?
     @State private var mealSuggestion: String?
     @State private var isLoadingSuggestion: Bool = false
+    @State private var showUpgrade: Bool = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -32,11 +34,14 @@ struct NutritionTabView: View {
                     WaterTrackerCard(nutritionVM: nutritionVM)
                     mealsSection
                     recipesCard
-                    if nutritionVM.isGeminiConfigured && !nutritionVM.mealsForSelectedDate.isEmpty {
+                    if store.isPremium && nutritionVM.isGeminiConfigured && !nutritionVM.mealsForSelectedDate.isEmpty {
                         smartSuggestionCard
                     }
-                    if nutritionVM.isGeminiConfigured && !nutritionVM.mealsForSelectedDate.isEmpty {
+                    if store.isPremium && nutritionVM.isGeminiConfigured && !nutritionVM.mealsForSelectedDate.isEmpty {
                         aiInsightButton
+                    }
+                    if !store.isPremium {
+                        premiumNutritionUpsell
                     }
                     weeklyPreviewCard
                     if !nutritionVM.mealsForSelectedDate.isEmpty {
@@ -103,6 +108,9 @@ struct NutritionTabView: View {
         }
         .navigationDestination(isPresented: $showRecipesView) {
             RecipesView(nutritionVM: nutritionVM)
+        }
+        .sheet(isPresented: $showUpgrade) {
+            UpgradeView()
         }
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.3)) {
@@ -562,7 +570,11 @@ struct NutritionTabView: View {
 
     private var recipesCard: some View {
         Button {
-            showRecipesView = true
+            if store.isPremium {
+                showRecipesView = true
+            } else {
+                showUpgrade = true
+            }
         } label: {
             HStack(spacing: 14) {
                 ZStack {
@@ -592,9 +604,15 @@ struct NutritionTabView: View {
 
                 Spacer()
 
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color(hex: "#F59E0B"))
+                if !store.isPremium {
+                    Image(systemName: "lock.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color(hex: "#F59E0B"))
+                }
             }
             .padding(16)
             .background {
@@ -851,6 +869,80 @@ struct NutritionTabView: View {
             }
         }
         .buttonStyle(PressScaleButtonStyle())
+    }
+
+    // MARK: - Premium Upsell
+
+    private var premiumNutritionUpsell: some View {
+        Button {
+            showUpgrade = true
+        } label: {
+            VStack(spacing: 14) {
+                HStack(spacing: 10) {
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(Color(hex: "#F59E0B"))
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Unlock AI Nutrition")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Text("Photo scanning, AI recipes, meal insights & more")
+                            .font(.caption)
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                            .lineLimit(1)
+                    }
+
+                    Spacer()
+
+                    Text("PRO")
+                        .font(.system(size: 10, weight: .black))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color(hex: "#F59E0B"))
+                        .clipShape(Capsule())
+                }
+
+                HStack(spacing: 16) {
+                    upsellFeature(icon: "camera.fill", text: "Photo Scan")
+                    upsellFeature(icon: "sparkles", text: "AI Text")
+                    upsellFeature(icon: "frying.pan.fill", text: "Recipes")
+                    upsellFeature(icon: "chart.line.uptrend.xyaxis", text: "Insights")
+                }
+            }
+            .padding(16)
+            .background {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(KinexaTheme.card)
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color(hex: "#F59E0B").opacity(0.08), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color(hex: "#F59E0B").opacity(0.2))
+                }
+            }
+            .clipShape(.rect(cornerRadius: 18))
+        }
+        .buttonStyle(PressScaleButtonStyle())
+    }
+
+    private func upsellFeature(icon: String, text: String) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(Color(hex: "#F59E0B"))
+            Text(text)
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(KinexaTheme.tertiaryText)
+        }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Helpers

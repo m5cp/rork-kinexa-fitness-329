@@ -5,9 +5,11 @@ struct MealDetailSheet: View {
     let nutritionVM: NutritionViewModel
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(StoreViewModel.self) private var store
     @State private var insight: GeminiMealInsight?
     @State private var isAnalyzing: Bool = false
     @State private var showDeleteConfirm: Bool = false
+    @State private var showUpgrade: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -19,7 +21,7 @@ struct MealDetailSheet: View {
                     }
                     nutritionSummaryCard
                     foodItemsList
-                    if nutritionVM.isGeminiConfigured { aiAnalysisSection }
+                    if store.isPremium && nutritionVM.isGeminiConfigured { aiAnalysisSection }
                     if !meal.notes.isEmpty { notesCard }
                     deleteButton
                 }
@@ -35,6 +37,9 @@ struct MealDetailSheet: View {
                     Button("Done") { dismiss() }
                         .foregroundStyle(KinexaTheme.accent)
                 }
+            }
+            .sheet(isPresented: $showUpgrade) {
+                UpgradeView()
             }
             .alert("Delete Meal", isPresented: $showDeleteConfirm) {
                 Button("Delete", role: .destructive) {
