@@ -70,9 +70,8 @@ struct UpgradeView: View {
                     pulseGlow = true
                 }
                 if selectedPackageID == nil, let current = store.offerings?.current {
-                    let lifetime = current.availablePackages.first { $0.packageType == .lifetime }
                     let annual = current.availablePackages.first { $0.packageType == .annual }
-                    selectedPackageID = (lifetime ?? annual)?.identifier
+                    selectedPackageID = annual?.identifier ?? current.availablePackages.first?.identifier
                 }
             }
         }
@@ -209,7 +208,6 @@ struct UpgradeView: View {
 
     private func planCard(_ package: Package, packages: [Package]) -> some View {
         let isSelected = selectedPackageID == package.identifier
-        let isLifetime = package.packageType == .lifetime
         let isAnnual = package.packageType == .annual
 
         return Button {
@@ -218,23 +216,11 @@ struct UpgradeView: View {
             }
         } label: {
             VStack(spacing: 0) {
-                if isLifetime {
-                    HStack(spacing: 6) {
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 10, weight: .bold))
-                        Text("BEST VALUE")
-                            .font(.system(size: 10, weight: .heavy))
-                            .tracking(1.0)
-                    }
-                    .foregroundStyle(Color(hex: "#0C0F0E"))
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity)
-                    .background(KinexaTheme.heroAmber)
-                } else if isAnnual {
+                if isAnnual {
                     HStack(spacing: 6) {
                         Image(systemName: "flame.fill")
                             .font(.system(size: 10, weight: .bold))
-                        Text("MOST POPULAR")
+                        Text("BEST VALUE")
                             .font(.system(size: 10, weight: .heavy))
                             .tracking(1.0)
                     }
@@ -247,11 +233,11 @@ struct UpgradeView: View {
                 HStack(spacing: 14) {
                     ZStack {
                         Circle()
-                            .stroke(isSelected ? (isLifetime ? KinexaTheme.heroAmber : KinexaTheme.accent) : KinexaTheme.tertiaryText.opacity(0.4), lineWidth: 2)
+                            .stroke(isSelected ? KinexaTheme.accent : KinexaTheme.tertiaryText.opacity(0.4), lineWidth: 2)
                             .frame(width: 24, height: 24)
                         if isSelected {
                             Circle()
-                                .fill(isLifetime ? KinexaTheme.heroAmber : KinexaTheme.accent)
+                                .fill(KinexaTheme.accent)
                                 .frame(width: 14, height: 14)
                         }
                     }
@@ -263,7 +249,7 @@ struct UpgradeView: View {
 
                         Text(planSubtitle(package, packages: packages))
                             .font(.caption2.weight(.medium))
-                            .foregroundStyle(isLifetime ? KinexaTheme.heroAmber : KinexaTheme.success)
+                            .foregroundStyle(KinexaTheme.success)
                     }
 
                     Spacer(minLength: 0)
@@ -271,7 +257,7 @@ struct UpgradeView: View {
                     VStack(alignment: .trailing, spacing: 2) {
                         Text(package.storeProduct.localizedPriceString)
                             .font(.title3.weight(.heavy))
-                            .foregroundStyle(isSelected ? (isLifetime ? KinexaTheme.heroAmber : KinexaTheme.accent) : KinexaTheme.primaryText)
+                            .foregroundStyle(isSelected ? KinexaTheme.accent : KinexaTheme.primaryText)
 
                         Text(planPeriod(package))
                             .font(.caption2.weight(.medium))
@@ -281,12 +267,6 @@ struct UpgradeView: View {
                 .padding(16)
             }
             .background(
-                isLifetime && isSelected ?
-                LinearGradient(
-                    colors: [Color(hex: "#1A1A2E"), Color(hex: "#16213E")],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ) :
                 LinearGradient(
                     colors: [isSelected ? KinexaTheme.accent.opacity(0.06) : KinexaTheme.card, isSelected ? KinexaTheme.accent.opacity(0.03) : KinexaTheme.card],
                     startPoint: .topLeading,
@@ -297,16 +277,10 @@ struct UpgradeView: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(
-                        isSelected ?
-                        (isLifetime ? KinexaTheme.heroAmber.opacity(pulseGlow ? 0.7 : 0.4) : KinexaTheme.accent.opacity(0.5)) :
-                        KinexaTheme.border,
+                        isSelected ? KinexaTheme.accent.opacity(0.5) : KinexaTheme.border,
                         lineWidth: isSelected ? 1.5 : 1
                     )
             }
-            .shadow(
-                color: isLifetime && isSelected ? KinexaTheme.heroAmber.opacity(pulseGlow ? 0.15 : 0.05) : .clear,
-                radius: 16, y: 8
-            )
         }
         .buttonStyle(.plain)
         .sensoryFeedback(.selection, trigger: selectedPackageID)
@@ -316,7 +290,6 @@ struct UpgradeView: View {
         switch package.packageType {
         case .monthly: return "Monthly"
         case .annual: return "Annual"
-        case .lifetime: return "Lifetime Access"
         default: return package.storeProduct.localizedTitle
         }
     }
@@ -330,8 +303,6 @@ struct UpgradeView: View {
                 return "\(intro.subscriptionPeriod.value)-\(intro.subscriptionPeriod.unit == .day ? "day" : intro.subscriptionPeriod.unit == .week ? "week" : "month") free trial"
             }
             return "Save 50% vs monthly"
-        case .lifetime:
-            return "One payment. Yours forever."
         default:
             return ""
         }
@@ -341,7 +312,6 @@ struct UpgradeView: View {
         switch package.packageType {
         case .monthly: return "per month"
         case .annual: return "per year"
-        case .lifetime: return "one time"
         default: return ""
         }
     }
@@ -357,7 +327,7 @@ struct UpgradeView: View {
                         if store.isPurchasing {
                             ProgressView().tint(.white)
                         } else {
-                            Image(systemName: selected.packageType == .lifetime ? "crown.fill" : "lock.open.fill")
+                            Image(systemName: "lock.open.fill")
                                 .font(.subheadline.weight(.bold))
                         }
                         Text(ctaText(selected))
@@ -366,14 +336,10 @@ struct UpgradeView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(
-                        selected.packageType == .lifetime ?
-                        LinearGradient(colors: [KinexaTheme.heroAmber, KinexaTheme.heroAmber.opacity(0.85)], startPoint: .leading, endPoint: .trailing) :
-                        KinexaTheme.heroGradient
-                    )
+                    .background(KinexaTheme.heroGradient)
                     .clipShape(.rect(cornerRadius: 18))
                     .shadow(
-                        color: (selected.packageType == .lifetime ? KinexaTheme.heroAmber : KinexaTheme.accent).opacity(0.3),
+                        color: KinexaTheme.accent.opacity(0.3),
                         radius: 16, y: 8
                     )
                 }
@@ -388,7 +354,6 @@ struct UpgradeView: View {
 
     private func ctaText(_ package: Package) -> String {
         switch package.packageType {
-        case .lifetime: return "Get Lifetime Access"
         case .annual:
             if package.storeProduct.introductoryDiscount != nil {
                 return "Start Free Trial"
@@ -400,19 +365,22 @@ struct UpgradeView: View {
     }
 
     private func sortedPackages(from offering: Offering) -> [Package] {
-        let order: [PackageType] = [.monthly, .annual, .lifetime]
-        return offering.availablePackages.sorted { a, b in
-            let aIdx = order.firstIndex(of: a.packageType) ?? 99
-            let bIdx = order.firstIndex(of: b.packageType) ?? 99
-            return aIdx < bIdx
-        }
+        let order: [PackageType] = [.monthly, .annual]
+        return offering.availablePackages
+            .filter { $0.packageType != .lifetime }
+            .sorted { a, b in
+                let aIdx = order.firstIndex(of: a.packageType) ?? 99
+                let bIdx = order.firstIndex(of: b.packageType) ?? 99
+                return aIdx < bIdx
+            }
     }
 
     private func selectedPackage(from offering: Offering) -> Package? {
+        let filtered = offering.availablePackages.filter { $0.packageType != .lifetime }
         if let id = selectedPackageID {
-            return offering.availablePackages.first { $0.identifier == id }
+            return filtered.first { $0.identifier == id }
         }
-        return offering.availablePackages.first { $0.packageType == .lifetime } ?? offering.availablePackages.first
+        return filtered.first { $0.packageType == .annual } ?? filtered.first
     }
 
     private var legalSection: some View {

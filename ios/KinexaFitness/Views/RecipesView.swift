@@ -8,6 +8,7 @@ struct RecipesView: View {
     @State private var selectedRecipe: Recipe?
     @State private var showFavoritesOnly: Bool = false
     @State private var showUpgrade: Bool = false
+    @State private var showTokenStore: Bool = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -61,6 +62,9 @@ struct RecipesView: View {
         .sheet(isPresented: $showUpgrade) {
             UpgradeView()
         }
+        .sheet(isPresented: $showTokenStore) {
+            TokenStoreView()
+        }
         .sheet(item: $selectedRecipe) { recipe in
             RecipeDetailSheet(recipe: recipe, recipeVM: recipeVM, nutritionVM: nutritionVM)
         }
@@ -103,10 +107,13 @@ struct RecipesView: View {
 
     private var generateCard: some View {
         Button {
-            if store.isPremium {
-                showGenerateSheet = true
-            } else {
+            let tracker = AIUsageTracker.shared
+            if tracker.hasReachedLimit && !store.isPremium {
                 showUpgrade = true
+            } else if tracker.hasReachedLimit {
+                showTokenStore = true
+            } else {
+                showGenerateSheet = true
             }
         } label: {
             HStack(spacing: 14) {

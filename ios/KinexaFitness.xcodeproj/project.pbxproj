@@ -415,7 +415,7 @@
 				CODE_SIGN_ENTITLEMENTS = KinexaFitness/KinexaFitness.entitlements;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kinexa Fitness";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSCalendarsUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Take photos of food to log nutrition, scan barcodes for product lookup, and scan QR codes to import workout plans.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Track distance and pace during outdoor activities like running, biking, and hiking.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Track your daily steps and activity.";
@@ -455,7 +455,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kinexa Fitness";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSCalendarsUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Take photos of food to log nutrition, scan barcodes for product lookup, and scan QR codes to import workout plans.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Track distance and pace during outdoor activities like running, biking, and hiking.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Track your daily steps and activity.";
