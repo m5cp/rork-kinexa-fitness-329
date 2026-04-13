@@ -197,11 +197,17 @@ struct SplashView: View {
                     .frame(width: 110, height: 110)
                     .opacity(iconOpacity)
 
-                Image("AppLogo")
+                Image(systemName: "figure.run")
                     .resizable()
-                    .renderingMode(.original)
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 130, height: 130)
+                    .frame(width: 100, height: 100)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [KinexaTheme.accent, KinexaTheme.accent2],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     .shadow(color: KinexaTheme.accent.opacity(iconGlowPulse), radius: 40, y: 0)
                     .shadow(color: KinexaTheme.brandGreen.opacity(iconGlowPulse * 0.6), radius: 70, y: 10)
                     .shadow(color: KinexaTheme.accent.opacity(iconGlowPulse * 0.3), radius: 100, y: 0)
