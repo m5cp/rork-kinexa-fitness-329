@@ -6,7 +6,7 @@ final class AIUsageTracker {
     static let shared = AIUsageTracker()
 
     private let subscriberDailyLimit = 15
-    private let freeLifetimeLimit = 1
+    private let freeLifetimeLimit = 3
     private let storageKey = "ai_usage_tracker"
     private let tokenStorageKey = "ai_bonus_tokens"
     private let lifetimeUsageKey = "ai_lifetime_usage"
