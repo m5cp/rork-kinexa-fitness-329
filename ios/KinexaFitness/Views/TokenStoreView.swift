@@ -16,6 +16,7 @@ struct TokenStoreView: View {
                     VStack(spacing: 24) {
                         headerSection
                         balanceCard
+                        subscriptionUpsell
                         packagesSection
                         infoSection
                     }
@@ -99,19 +100,20 @@ struct TokenStoreView: View {
     }
 
     private var balanceCard: some View {
-        HStack(spacing: 16) {
+        let tracker = AIUsageTracker.shared
+        return HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Current Balance")
+                Text("Token Balance")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(KinexaTheme.tertiaryText)
 
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("\(AIUsageTracker.shared.bonusTokens)")
+                    Text("\(tracker.bonusTokens)")
                         .font(.system(size: 34, weight: .heavy, design: .rounded))
                         .foregroundStyle(Color(hex: "#8B5CF6"))
                         .contentTransition(.numericText())
 
-                    Text("bonus tokens")
+                    Text("tokens")
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(KinexaTheme.secondaryText)
                 }
@@ -120,13 +122,19 @@ struct TokenStoreView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text("Daily Free")
+                Text(store.isPremium ? "Daily Included" : "Free Scans")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(KinexaTheme.tertiaryText)
 
-                Text("\(AIUsageTracker.shared.remainingToday)/15")
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(KinexaTheme.success)
+                if store.isPremium {
+                    Text("\(tracker.remainingToday)/15")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(KinexaTheme.success)
+                } else {
+                    Text(tracker.hasFreeTrialRemaining ? "1 left" : "0 left")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(tracker.hasFreeTrialRemaining ? KinexaTheme.success : KinexaTheme.warning)
+                }
             }
         }
         .padding(16)
@@ -277,8 +285,8 @@ struct TokenStoreView: View {
 
     private func packSubtitle(_ identifier: String) -> String {
         switch identifier {
-        case "kinexa_tokens_50": return "Starter Pack"
-        case "kinexa_tokens_150": return "Plus Pack · Save 22%"
+        case "kinexa_tokens_50": return "Quick Top-Up"
+        case "kinexa_tokens_150": return "Plus Pack · Save 23%"
         case "kinexa_tokens_500": return "Power Pack · Save 33%"
         default: return ""
         }
@@ -295,11 +303,49 @@ struct TokenStoreView: View {
         return "\(formatter.string(from: perToken as NSDecimalNumber) ?? "")/token"
     }
 
+    private var subscriptionUpsell: some View {
+        Group {
+            if !store.isPremium {
+                VStack(spacing: 10) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "crown.fill")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(KinexaTheme.heroAmber)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Subscribe for the best value")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(KinexaTheme.primaryText)
+                            Text("Get 15 AI scans per day — up to 450/month for $19.99")
+                                .font(.caption2)
+                                .foregroundStyle(KinexaTheme.secondaryText)
+                        }
+                        Spacer(minLength: 0)
+                    }
+
+                    Text("That's ~$0.04/scan vs $0.20–$0.30/token")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(KinexaTheme.accent)
+                }
+                .padding(14)
+                .background(KinexaTheme.heroAmber.opacity(0.08))
+                .clipShape(.rect(cornerRadius: 14))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(KinexaTheme.heroAmber.opacity(0.2))
+                }
+            }
+        }
+    }
+
     private var infoSection: some View {
         VStack(spacing: 12) {
             infoRow(icon: "infinity", text: "Tokens never expire")
-            infoRow(icon: "plus.circle", text: "Stack on top of your 15 daily free analyses")
-            infoRow(icon: "bolt.fill", text: "Used automatically when daily limit is reached")
+            if store.isPremium {
+                infoRow(icon: "plus.circle", text: "Stack on top of your 15 daily included scans")
+            } else {
+                infoRow(icon: "plus.circle", text: "Use tokens anytime — no subscription required")
+            }
+            infoRow(icon: "bolt.fill", text: "Used automatically when your free scans run out")
         }
         .padding(16)
         .background(KinexaTheme.cardSoft)

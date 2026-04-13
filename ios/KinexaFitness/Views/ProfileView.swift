@@ -268,7 +268,7 @@ struct ProfileView: View {
                             Text("AI Tokens")
                                 .font(.subheadline.weight(.medium))
                                 .foregroundStyle(KinexaTheme.primaryText)
-                            Text("\(AIUsageTracker.shared.bonusTokens) bonus tokens available")
+                            Text("\(AIUsageTracker.shared.bonusTokens) tokens available")
                                 .font(.caption2)
                                 .foregroundStyle(KinexaTheme.tertiaryText)
                         }

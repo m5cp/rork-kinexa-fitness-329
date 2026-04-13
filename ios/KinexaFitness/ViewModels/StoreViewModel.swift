@@ -45,13 +45,19 @@ class StoreViewModel {
     }
 
     init() {
+        syncPremiumStatus()
         Task { await listenForUpdates() }
         Task { await fetchOfferings() }
+    }
+
+    private func syncPremiumStatus() {
+        AIUsageTracker.shared.isPremium = isPremium
     }
 
     private func listenForUpdates() async {
         for await info in Purchases.shared.customerInfoStream {
             self._rcPremium = info.entitlements["premium"]?.isActive == true
+            syncPremiumStatus()
         }
     }
 
@@ -71,6 +77,7 @@ class StoreViewModel {
             let result = try await Purchases.shared.purchase(package: package)
             if !result.userCancelled {
                 _rcPremium = result.customerInfo.entitlements["premium"]?.isActive == true
+                syncPremiumStatus()
             }
         } catch ErrorCode.purchaseCancelledError {
         } catch ErrorCode.paymentPendingError {
@@ -105,6 +112,7 @@ class StoreViewModel {
         do {
             let info = try await Purchases.shared.restorePurchases()
             _rcPremium = info.entitlements["premium"]?.isActive == true
+            syncPremiumStatus()
         } catch {
             self.error = error.localizedDescription
         }
@@ -114,6 +122,7 @@ class StoreViewModel {
         do {
             let info = try await Purchases.shared.customerInfo()
             _rcPremium = info.entitlements["premium"]?.isActive == true
+            syncPremiumStatus()
         } catch {
             self.error = error.localizedDescription
         }

@@ -100,21 +100,27 @@ struct LogMealSheet: View {
         let tracker = AIUsageTracker.shared
         let remaining = tracker.remainingToday
         let bonus = tracker.bonusTokens
+        let limit = tracker.dailyLimit
         return HStack(spacing: 4) {
             Image(systemName: "sparkle")
                 .font(.system(size: 8, weight: .bold))
-            Text("\(remaining)/15 today")
-                .font(.system(size: 9, weight: .bold))
+            if store.isPremium {
+                Text("\(remaining)/\(limit) today")
+                    .font(.system(size: 9, weight: .bold))
+            } else {
+                Text(tracker.hasFreeTrialRemaining ? "1 free scan" : "No free scans")
+                    .font(.system(size: 9, weight: .bold))
+            }
             if bonus > 0 {
                 Text("+\(bonus)")
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(Color(hex: "#8B5CF6"))
             }
         }
-        .foregroundStyle(remaining <= 3 && bonus == 0 ? KinexaTheme.warning : KinexaTheme.tertiaryText)
+        .foregroundStyle(remaining <= 0 && bonus == 0 ? KinexaTheme.warning : KinexaTheme.tertiaryText)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(remaining <= 3 && bonus == 0 ? KinexaTheme.warning.opacity(0.1) : KinexaTheme.cardSoft)
+        .background(remaining <= 0 && bonus == 0 ? KinexaTheme.warning.opacity(0.1) : KinexaTheme.cardSoft)
         .clipShape(Capsule())
     }
 
@@ -124,12 +130,21 @@ struct LogMealSheet: View {
                 Image(systemName: "exclamationmark.circle.fill")
                     .foregroundStyle(KinexaTheme.warning)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Daily AI limit reached")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(KinexaTheme.primaryText)
-                    Text("You've used all 15 free AI scans for today.")
-                        .font(.system(size: 10))
-                        .foregroundStyle(KinexaTheme.tertiaryText)
+                    if store.isPremium {
+                        Text("Daily AI limit reached")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Text("You've used all 15 included scans for today.")
+                            .font(.system(size: 10))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    } else {
+                        Text("Free AI scan used")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Text("Subscribe for 15 daily scans, or buy tokens for more.")
+                            .font(.system(size: 10))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
                 }
                 Spacer(minLength: 0)
             }
@@ -157,6 +172,48 @@ struct LogMealSheet: View {
                     .clipShape(.rect(cornerRadius: 10))
                 }
                 .buttonStyle(PressScaleButtonStyle())
+            } else {
+                HStack(spacing: 8) {
+                    Button {
+                        showUpgrade = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "crown.fill")
+                                .font(.system(size: 11, weight: .bold))
+                            Text("Subscribe")
+                                .font(.caption.weight(.bold))
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 36)
+                        .background(
+                            LinearGradient(
+                                colors: [KinexaTheme.accent, Color(hex: "#2E7D52")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(.rect(cornerRadius: 10))
+                    }
+                    .buttonStyle(PressScaleButtonStyle())
+
+                    Button {
+                        showTokenStore = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 11, weight: .bold))
+                            Text("Buy Tokens")
+                                .font(.caption.weight(.bold))
+                        }
+                        .foregroundStyle(Color(hex: "#8B5CF6"))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 36)
+                        .background(Color(hex: "#8B5CF6").opacity(0.12))
+                        .clipShape(.rect(cornerRadius: 10))
+                    }
+                    .buttonStyle(PressScaleButtonStyle())
+                }
             }
         }
         .padding(12)
@@ -207,8 +264,8 @@ struct LogMealSheet: View {
                 inputModeButton(mode: .manual, icon: "pencil.line", label: "Manual")
                 inputModeButton(mode: .barcode, icon: "barcode.viewfinder", label: "Barcode")
                 inputModeButton(mode: .favorites, icon: "star.fill", label: "Favorites")
-                inputModeButton(mode: .text, icon: "sparkles", label: "AI Text", isPremiumFeature: true)
-                inputModeButton(mode: .photo, icon: "camera.fill", label: "Photo", isPremiumFeature: true)
+                inputModeButton(mode: .text, icon: "sparkles", label: "AI Text")
+                inputModeButton(mode: .photo, icon: "camera.fill", label: "Photo")
             }
         }
         .contentMargins(.horizontal, 0)
@@ -790,7 +847,7 @@ struct LogMealSheet: View {
         let description = foodDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !description.isEmpty else { return }
         guard !AIUsageTracker.shared.hasReachedLimit else {
-            errorMessage = "AI limit reached. Buy tokens or wait until tomorrow."
+            errorMessage = store.isPremium ? "Daily limit reached. Buy tokens for more scans." : "Subscribe or buy tokens to continue scanning."
             return
         }
 
@@ -810,7 +867,7 @@ struct LogMealSheet: View {
 
     private func analyzePhoto(_ data: Data) async {
         guard !AIUsageTracker.shared.hasReachedLimit else {
-            errorMessage = "AI limit reached. Buy tokens or wait until tomorrow."
+            errorMessage = store.isPremium ? "Daily limit reached. Buy tokens for more scans." : "Subscribe or buy tokens to continue scanning."
             return
         }
 
