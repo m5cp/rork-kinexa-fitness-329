@@ -10,6 +10,7 @@ class StoreViewModel {
     var isLoading = false
     var isPurchasing = false
     var error: String?
+    var tokenPurchaseSuccess = false
 
     var testBypassEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: "kinexa_test_bypass") }
@@ -27,6 +28,20 @@ class StoreViewModel {
         #else
         return _rcPremium
         #endif
+    }
+
+    var tokenOffering: Offering? {
+        offerings?.offering(identifier: "tokens")
+    }
+
+    var tokenPackages: [Package] {
+        guard let offering = tokenOffering else { return [] }
+        let order = ["tokens_50", "tokens_150", "tokens_500"]
+        return offering.availablePackages.sorted { a, b in
+            let aIdx = order.firstIndex(of: a.identifier) ?? 99
+            let bIdx = order.firstIndex(of: b.identifier) ?? 99
+            return aIdx < bIdx
+        }
     }
 
     init() {
@@ -56,6 +71,27 @@ class StoreViewModel {
             let result = try await Purchases.shared.purchase(package: package)
             if !result.userCancelled {
                 _rcPremium = result.customerInfo.entitlements["premium"]?.isActive == true
+            }
+        } catch ErrorCode.purchaseCancelledError {
+        } catch ErrorCode.paymentPendingError {
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isPurchasing = false
+    }
+
+    func purchaseTokens(package: Package) async {
+        isPurchasing = true
+        tokenPurchaseSuccess = false
+        do {
+            let result = try await Purchases.shared.purchase(package: package)
+            if !result.userCancelled {
+                let identifier = package.storeProduct.productIdentifier
+                let count = AIUsageTracker.shared.tokenCountForProduct(identifier)
+                if count > 0 {
+                    AIUsageTracker.shared.addBonusTokens(count)
+                    tokenPurchaseSuccess = true
+                }
             }
         } catch ErrorCode.purchaseCancelledError {
         } catch ErrorCode.paymentPendingError {

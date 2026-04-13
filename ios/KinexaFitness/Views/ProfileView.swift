@@ -20,6 +20,7 @@ struct ProfileView: View {
     @State private var resetAllTrigger = false
     @State private var showAvatarPicker = false
     @State private var showUpgrade = false
+    @State private var showTokenStore = false
     @State private var restoreTrigger = false
     @State private var imageManager = ProfileImageManager()
     @State private var isEditingName: Bool = false
@@ -252,6 +253,32 @@ struct ProfileView: View {
                         .clipShape(Capsule())
                 }
                 .frame(minHeight: 48)
+
+                sectionDivider
+
+                Button {
+                    showTokenStore = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "sparkles")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color(hex: "#8B5CF6"))
+                            .frame(width: 24)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("AI Tokens")
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(KinexaTheme.primaryText)
+                            Text("\(AIUsageTracker.shared.bonusTokens) bonus tokens available")
+                                .font(.caption2)
+                                .foregroundStyle(KinexaTheme.tertiaryText)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+                    .frame(minHeight: 48)
+                }
             } else {
                 Button {
                     showUpgrade = true
@@ -282,6 +309,9 @@ struct ProfileView: View {
         }
         .sheet(isPresented: $showUpgrade) {
             UpgradeView()
+        }
+        .sheet(isPresented: $showTokenStore) {
+            TokenStoreView()
         }
     }
 

@@ -20,6 +20,7 @@ struct LogMealSheet: View {
     @State private var inputMode: MealInputMode = .manual
     @State private var showManualEntry: Bool = false
     @State private var showUpgrade: Bool = false
+    @State private var showTokenStore: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -90,34 +91,72 @@ struct LogMealSheet: View {
         .sheet(isPresented: $showUpgrade) {
             UpgradeView()
         }
+        .sheet(isPresented: $showTokenStore) {
+            TokenStoreView()
+        }
     }
 
     private var aiUsageBadge: some View {
-        let remaining = AIUsageTracker.shared.remainingToday
+        let tracker = AIUsageTracker.shared
+        let remaining = tracker.remainingToday
+        let bonus = tracker.bonusTokens
         return HStack(spacing: 4) {
             Image(systemName: "sparkle")
                 .font(.system(size: 8, weight: .bold))
             Text("\(remaining)/15 today")
                 .font(.system(size: 9, weight: .bold))
+            if bonus > 0 {
+                Text("+\(bonus)")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(Color(hex: "#8B5CF6"))
+            }
         }
-        .foregroundStyle(remaining <= 3 ? KinexaTheme.warning : KinexaTheme.tertiaryText)
+        .foregroundStyle(remaining <= 3 && bonus == 0 ? KinexaTheme.warning : KinexaTheme.tertiaryText)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(remaining <= 3 ? KinexaTheme.warning.opacity(0.1) : KinexaTheme.cardSoft)
+        .background(remaining <= 3 && bonus == 0 ? KinexaTheme.warning.opacity(0.1) : KinexaTheme.cardSoft)
         .clipShape(Capsule())
     }
 
     private var dailyLimitReachedBanner: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "exclamationmark.circle.fill")
-                .foregroundStyle(KinexaTheme.warning)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Daily AI limit reached")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(KinexaTheme.primaryText)
-                Text("You've used all 15 AI scans for today. Use manual entry or barcode instead.")
-                    .font(.system(size: 10))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
+        VStack(spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundStyle(KinexaTheme.warning)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Daily AI limit reached")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("You've used all 15 free AI scans for today.")
+                        .font(.system(size: 10))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                Spacer(minLength: 0)
+            }
+
+            if store.isPremium {
+                Button {
+                    showTokenStore = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 11, weight: .bold))
+                        Text("Get More Tokens")
+                            .font(.caption.weight(.bold))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 36)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#8B5CF6"), Color(hex: "#6366F1")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(.rect(cornerRadius: 10))
+                }
+                .buttonStyle(PressScaleButtonStyle())
             }
         }
         .padding(12)
@@ -751,7 +790,7 @@ struct LogMealSheet: View {
         let description = foodDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !description.isEmpty else { return }
         guard !AIUsageTracker.shared.hasReachedLimit else {
-            errorMessage = "Daily AI limit reached (15/day). Use manual entry or barcode."
+            errorMessage = "AI limit reached. Buy tokens or wait until tomorrow."
             return
         }
 
@@ -771,7 +810,7 @@ struct LogMealSheet: View {
 
     private func analyzePhoto(_ data: Data) async {
         guard !AIUsageTracker.shared.hasReachedLimit else {
-            errorMessage = "Daily AI limit reached (15/day). Use manual entry or barcode."
+            errorMessage = "AI limit reached. Buy tokens or wait until tomorrow."
             return
         }
 
