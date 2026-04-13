@@ -37,6 +37,7 @@ struct ProfileView: View {
                 VStack(spacing: 28) {
                     profileHeader
                     subscriptionSection
+                    activityJournalSection
                     currentGoalSection
                     notificationsSection
                     appControlsSection
@@ -319,6 +320,49 @@ struct ProfileView: View {
         }
         .sheet(isPresented: $showTokenStore) {
             TokenStoreView()
+        }
+    }
+
+    // MARK: - Activity Journal
+
+    private var activityJournalSection: some View {
+        settingsSection(title: "ACTIVITY JOURNAL", icon: "book.closed") {
+            NavigationLink {
+                ActivityJournalView()
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 40, height: 40)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(.rect(cornerRadius: 10))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Activity Journal")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Text("View workout & nutrition history by day")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                .frame(minHeight: 48)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
         }
     }
 
