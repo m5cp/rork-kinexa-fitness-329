@@ -192,29 +192,46 @@ struct MealDetailSheet: View {
                 .foregroundStyle(KinexaTheme.secondaryText)
 
             ForEach(meal.foods) { food in
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(food.name)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(KinexaTheme.primaryText)
-                        Text(food.quantity)
-                            .font(.caption)
-                            .foregroundStyle(KinexaTheme.tertiaryText)
-                    }
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 3) {
-                        Text("\(food.nutrition.calories) cal")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(KinexaTheme.primaryText)
-                        HStack(spacing: 4) {
-                            Text("P:\(String(format: "%.0f", food.nutrition.protein)) C:\(String(format: "%.0f", food.nutrition.carbs)) F:\(String(format: "%.0f", food.nutrition.fat))")
-                                .font(.system(size: 10, weight: .medium))
+                VStack(spacing: 10) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(food.name)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(KinexaTheme.primaryText)
+                            Text(food.quantity)
+                                .font(.caption)
                                 .foregroundStyle(KinexaTheme.tertiaryText)
-                            if food.nutrition.alcohol > 0 {
-                                Text("A:\(String(format: "%.0f", food.nutrition.alcohol))")
-                                    .font(.system(size: 10, weight: .medium))
-                                    .foregroundStyle(Color(hex: "#A855F7"))
+                        }
+                        Spacer()
+                        HStack(spacing: 8) {
+                            VStack(alignment: .trailing, spacing: 3) {
+                                Text("\(food.nutrition.calories) cal")
+                                    .font(.subheadline.weight(.bold))
+                                    .foregroundStyle(KinexaTheme.primaryText)
+                                HStack(spacing: 4) {
+                                    Text("P:\(String(format: "%.0f", food.nutrition.protein)) C:\(String(format: "%.0f", food.nutrition.carbs)) F:\(String(format: "%.0f", food.nutrition.fat))")
+                                        .font(.system(size: 10, weight: .medium))
+                                        .foregroundStyle(KinexaTheme.tertiaryText)
+                                    if food.nutrition.alcohol > 0 {
+                                        Text("A:\(String(format: "%.0f", food.nutrition.alcohol))")
+                                            .font(.system(size: 10, weight: .medium))
+                                            .foregroundStyle(Color(hex: "#A855F7"))
+                                    }
+                                }
                             }
+                            Button {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    nutritionVM.toggleFavorite(food)
+                                }
+                            } label: {
+                                Image(systemName: nutritionVM.isFavorite(food.name) ? "star.fill" : "star")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundStyle(Color(hex: "#F59E0B"))
+                                    .frame(width: 32, height: 32)
+                                    .background(Color(hex: "#F59E0B").opacity(nutritionVM.isFavorite(food.name) ? 0.2 : 0.08))
+                                    .clipShape(Circle())
+                            }
+                            .buttonStyle(PressScaleButtonStyle())
                         }
                     }
                 }

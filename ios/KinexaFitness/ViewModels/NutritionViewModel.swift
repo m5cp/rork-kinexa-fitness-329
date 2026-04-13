@@ -129,6 +129,30 @@ final class NutritionViewModel {
         persistData()
     }
 
+    func isFavorite(_ name: String) -> Bool {
+        favorites.contains { $0.name.lowercased() == name.lowercased() }
+    }
+
+    func toggleFavorite(_ food: FoodItem) {
+        if let idx = favorites.firstIndex(where: { $0.name.lowercased() == food.name.lowercased() }) {
+            favorites.remove(at: idx)
+        } else {
+            let fav = FavoriteFoodItem(
+                name: food.name,
+                quantity: food.quantity,
+                nutrition: food.nutrition
+            )
+            favorites.append(fav)
+        }
+        persistData()
+    }
+
+    func quickLogFavorite(_ fav: FavoriteFoodItem, mealType: MealType) {
+        let food = fav.toFoodItem()
+        let meal = MealEntry(mealType: mealType, foods: [food])
+        addMeal(meal)
+    }
+
     func addFoodsToFavorites(_ foods: [FoodItem]) {
         for food in foods {
             addToFavorites(food)
