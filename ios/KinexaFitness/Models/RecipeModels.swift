@@ -102,11 +102,11 @@ nonisolated enum RecipeCategory: String, CaseIterable, Sendable {
     }
 }
 
-nonisolated struct GroqRecipeResponse: Codable, Sendable {
-    let recipes: [GroqRecipeItem]
+nonisolated struct GeminiRecipeResponse: Codable, Sendable {
+    let recipes: [GeminiRecipeItem]
 }
 
-nonisolated struct GroqRecipeItem: Codable, Sendable {
+nonisolated struct GeminiRecipeItem: Codable, Sendable {
     let title: String
     let summary: String
     let prepTime: String
@@ -114,7 +114,7 @@ nonisolated struct GroqRecipeItem: Codable, Sendable {
     let servings: Int
     let difficulty: String
     let tags: [String]
-    let ingredients: [GroqIngredientItem]
+    let ingredients: [GeminiIngredientItem]
     let instructions: [String]
     let calories: Int
     let protein: Double
@@ -123,7 +123,7 @@ nonisolated struct GroqRecipeItem: Codable, Sendable {
     let fiber: Double
 }
 
-nonisolated struct GroqIngredientItem: Codable, Sendable {
+nonisolated struct GeminiIngredientItem: Codable, Sendable {
     let name: String
     let amount: String
 }

@@ -15,7 +15,7 @@ struct RecipesView: View {
             VStack(spacing: 0) {
                 VStack(spacing: 20) {
                     headerSection
-                    if !recipeVM.isGroqConfigured {
+                    if !recipeVM.isGeminiConfigured {
                         apiKeyMissing
                     } else {
                         generateCard
@@ -87,10 +87,10 @@ struct RecipesView: View {
             Image(systemName: "key.fill")
                 .font(.system(size: 36))
                 .foregroundStyle(KinexaTheme.tertiaryText)
-            Text("Groq API Key Required")
+            Text("API Key Required")
                 .font(.headline.weight(.bold))
                 .foregroundStyle(KinexaTheme.primaryText)
-            Text("Add your Groq API key in settings to enable AI recipe generation.")
+            Text("Gemini API key is needed to enable AI recipe generation.")
                 .font(.subheadline)
                 .foregroundStyle(KinexaTheme.secondaryText)
                 .multilineTextAlignment(.center)
@@ -212,7 +212,7 @@ struct RecipesView: View {
             Text("Generating recipes...")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(KinexaTheme.secondaryText)
-            Text("Groq AI is creating personalized meals")
+            Text("Gemini AI is creating personalized meals")
                 .font(.caption)
                 .foregroundStyle(KinexaTheme.tertiaryText)
         }

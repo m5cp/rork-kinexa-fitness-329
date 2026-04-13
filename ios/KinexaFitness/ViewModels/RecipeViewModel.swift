@@ -8,9 +8,9 @@ final class RecipeViewModel {
     var selectedCategory: RecipeCategory = .all
     var errorMessage: String?
 
-    private let groq = GroqService()
+    private let gemini = GeminiService()
 
-    var isGroqConfigured: Bool { groq.isConfigured }
+    var isGeminiConfigured: Bool { gemini.isConfigured }
 
     init() {
         loadRecipes()
@@ -31,8 +31,8 @@ final class RecipeViewModel {
     }
 
     func generateRecipes(profile: NutritionProfile, currentNutrition: NutritionInfo, goal: DailyNutritionGoal, category: RecipeCategory = .all, customRequest: String? = nil) async {
-        guard isGroqConfigured else {
-            errorMessage = "Groq API key not configured"
+        guard isGeminiConfigured else {
+            errorMessage = "Gemini API key not configured"
             return
         }
 
@@ -73,12 +73,10 @@ final class RecipeViewModel {
         let systemPrompt = "You are a professional chef and sports nutritionist. Create delicious, macro-friendly recipes that taste great and support athletic performance goals. Use common ingredients. Return valid JSON only."
 
         do {
-            let response = try await groq.generateJSON(
+            let response = try await gemini.generateJSON(
                 prompt: prompt,
                 systemPrompt: systemPrompt,
-                temperature: 0.8,
-                maxTokens: 4096,
-                type: GroqRecipeResponse.self
+                type: GeminiRecipeResponse.self
             )
 
             let newRecipes = response.recipes.map { item in
@@ -126,10 +124,17 @@ final class RecipeViewModel {
     }
 
     private func persistRecipes() {
-        LocalStore.save(recipes, forKey: "groqRecipes")
+        LocalStore.save(recipes, forKey: "geminiRecipes")
     }
 
     private func loadRecipes() {
-        recipes = LocalStore.load([Recipe].self, forKey: "groqRecipes", fallback: [])
+        let saved = LocalStore.load([Recipe].self, forKey: "geminiRecipes", fallback: [])
+        let legacy = LocalStore.load([Recipe].self, forKey: "groqRecipes", fallback: [])
+        if saved.isEmpty && !legacy.isEmpty {
+            recipes = legacy
+            persistRecipes()
+        } else {
+            recipes = saved
+        }
     }
 }

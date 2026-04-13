@@ -622,7 +622,7 @@ struct NutritionTabView: View {
                     Text("AI Recipes")
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(KinexaTheme.primaryText)
-                    Text("Groq-powered meals matched to your macros")
+                    Text("AI-powered meals matched to your macros")
                         .font(.caption)
                         .foregroundStyle(KinexaTheme.tertiaryText)
                         .lineLimit(1)
