@@ -285,15 +285,10 @@ enum LegalPages {
         title: "EULA",
         icon: "doc.badge.gearshape",
         accent: KinexaTheme.slateAccent,
-        subtitle: "End User License Agreement — governed by Apple's Standard EULA.",
+        subtitle: "This app is licensed under Apple's Standard End User License Agreement.",
         updated: "April 2026",
         sections: [
-            LegalSection(icon: "apple.logo", title: "Apple Standard EULA", body: "Kinexa Fitness is licensed under Apple's Standard End User License Agreement (EULA) for apps distributed through the Apple App Store.\n\nYou can review the full EULA here:\nhttps://www.apple.com/legal/internet-services/itunes/dev/stdeula/", tint: KinexaTheme.slateAccent),
-            LegalSection(icon: "doc.text", title: "License Grant", body: "Subject to the terms of the Apple Standard EULA, you are granted a limited, non-exclusive, non-transferable license to use Kinexa Fitness on any Apple-branded device that you own or control, as permitted by the Usage Rules set forth in the Apple Media Services Terms and Conditions.", tint: KinexaTheme.accent),
-            LegalSection(icon: "creditcard", title: "Subscriptions & Consumable Purchases", body: "Kinexa Fitness offers the following in-app purchases:\n\n• Auto-renewable subscriptions (Monthly, Annual) that unlock premium features including daily AI scan allowances\n• A one-time Lifetime purchase for permanent premium access\n• Consumable AI Token Packs that add bonus AI analysis credits\n\nSubscriptions automatically renew unless cancelled at least 24 hours before the end of the current billing period. Payment is charged to your Apple ID account at confirmation of purchase. Manage or cancel subscriptions in Settings > Apple ID > Subscriptions.\n\nAI Token Packs are consumable, non-restorable purchases. Token balances are stored locally on your device. Deleting the app or resetting all data will erase your token balance. Refunds are handled by Apple per their standard refund policy.", tint: Color(hex: "#8B5CF6")),
-            LegalSection(icon: "xmark.circle", title: "Restrictions", body: "You may not:\n\n• Reverse-engineer, decompile, or disassemble the app\n• Redistribute, sublicense, or rent the app\n• Use the app for any unlawful purpose\n• Remove or alter any proprietary notices", tint: KinexaTheme.warning),
-            LegalSection(icon: "shield.checkered", title: "Disclaimer of Warranties", body: "Kinexa Fitness is provided \"as is\" and \"as available\" without warranties of any kind. The developer does not warrant that the app will be error-free, uninterrupted, or suitable for any particular purpose.", tint: KinexaTheme.tertiaryText),
-            LegalSection(icon: "building.columns", title: "Governing Terms", body: "This license is governed by the terms of the Apple Standard EULA. In the event of any conflict between these terms and the Apple Standard EULA, the Apple Standard EULA prevails.", tint: KinexaTheme.accent2)
+            LegalSection(icon: "apple.logo", title: "Apple Standard EULA", body: "Kinexa Fitness is licensed to you subject to Apple's Standard Licensed Application End User License Agreement (EULA), which is available at:\n\nhttps://www.apple.com/legal/internet-services/itunes/dev/stdeula/\n\nBy downloading or using this app, you agree to the terms of Apple's Standard EULA.", tint: KinexaTheme.slateAccent)
         ]
     )
 }
