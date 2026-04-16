@@ -15,6 +15,8 @@ struct TrainingCalendarView: View {
     @State private var showWorkoutDetail: Bool = false
     @State private var selectedWODTemplate: WODTemplate?
     @State private var selectedCompletedRecord: CompletedWorkoutRecord?
+    @State private var selectedQuickStartRecord: QuickStartRecord?
+    @State private var selectedCardioSession: CardioSession?
 
     private let calendar = Calendar.current
     private let daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
@@ -43,7 +45,11 @@ struct TrainingCalendarView: View {
             CalendarDayDetailView(date: selectedDate)
         }
         .navigationDestination(isPresented: $showWorkoutDetail) {
-            if let record = selectedCompletedRecord {
+            if let qs = selectedQuickStartRecord {
+                QuickStartDetailView(record: qs)
+            } else if let cs = selectedCardioSession {
+                CardioSessionDetailView(session: cs)
+            } else if let record = selectedCompletedRecord {
                 CompletedWorkoutDetailView(record: record)
             } else if let template = selectedWODTemplate {
                 WODDetailView(template: template)
@@ -55,7 +61,14 @@ struct TrainingCalendarView: View {
             guard let entry = selectedWorkoutEntry else { return }
             selectedCompletedRecord = nil
             selectedWODTemplate = nil
-            if entry.status == .completed {
+            selectedQuickStartRecord = nil
+            selectedCardioSession = nil
+
+            if let qs = vm.quickStartRecords.first(where: { $0.id == entry.id }) {
+                selectedQuickStartRecord = qs
+            } else if let cs = vm.cardioSessions.first(where: { $0.id == entry.id }) {
+                selectedCardioSession = cs
+            } else if entry.status == .completed {
                 if let record = vm.completedRecordsForDate(entry.date).first(where: { $0.title == entry.title }) {
                     selectedCompletedRecord = record
                 } else if entry.source == .wod, let wPlan = vm.wodPlan {

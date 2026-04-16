@@ -865,19 +865,8 @@ final class AppViewModel {
         let isPast = cal.startOfDay(for: date) < cal.startOfDay(for: .now)
         let isToday = cal.isDateInToday(date)
 
-        if let plan = currentPlan {
-            for day in plan.days where cal.isDate(day.date, inSameDayAs: date) && !day.isRestDay {
-                let status: CalendarWorkoutStatus
-                if day.isCompleted { status = .completed }
-                else if isPast && !isToday { status = .missed }
-                else { status = .planned }
-                entries.append(CalendarWorkoutEntry(
-                    id: day.id, title: day.title, date: day.date,
-                    type: "PT", duration: max(day.exercises.count * 4, 15),
-                    status: status, source: day.source, exerciseCount: day.exercises.count
-                ))
-            }
-        }
+        _ = isPast
+        _ = isToday
 
         if let wPlan = wodPlan {
             for wDay in wPlan.days where cal.isDate(wDay.date, inSameDayAs: date) && !wDay.isRestDay {
@@ -892,6 +881,22 @@ final class AppViewModel {
                     status: status, source: .wod, exerciseCount: wDay.template.movements.count
                 ))
             }
+        }
+
+        for qs in quickStartRecords where cal.isDate(qs.startDate, inSameDayAs: date) {
+            entries.append(CalendarWorkoutEntry(
+                id: qs.id, title: qs.activity.rawValue, date: qs.startDate,
+                type: qs.activity.rawValue, duration: max(qs.elapsedSeconds / 60, 1),
+                status: .completed, source: .individual, exerciseCount: 1
+            ))
+        }
+
+        for session in cardioSessions where cal.isDate(session.date, inSameDayAs: date) {
+            entries.append(CalendarWorkoutEntry(
+                id: session.id, title: session.workoutName, date: session.date,
+                type: session.category, duration: session.durationMinutes,
+                status: .completed, source: .individual, exerciseCount: 1
+            ))
         }
 
         for record in completedRecords where cal.isDate(record.date, inSameDayAs: date) {

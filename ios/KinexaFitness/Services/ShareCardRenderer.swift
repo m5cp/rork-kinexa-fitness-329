@@ -112,16 +112,7 @@ enum ShareCardCGHelpers {
             .font: UIFont.systemFont(ofSize: 28, weight: .bold),
             .foregroundColor: accentBlue
         ]
-        let shieldStr = NSAttributedString(string: "⬡", attributes: attrs)
-        shieldStr.draw(at: CGPoint(x: 60, y: 50))
-
-        let titleAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 22, weight: .heavy),
-            .foregroundColor: UIColor.white.withAlphaComponent(0.7),
-            .kern: 3.0
-        ]
-        let titleStr = NSAttributedString(string: "GETFIT", attributes: titleAttrs)
-        titleStr.draw(at: CGPoint(x: 100, y: 54))
+        _ = attrs
 
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM d, yyyy"

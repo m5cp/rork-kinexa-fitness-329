@@ -1,28 +1,9 @@
-# Remove Nutrition Partner, fix Support contact, hide PT-style routines
+# Fix share card title, calendar Outdoor Run detail, hide PT, and rewrite AI tone
 
-## Changes
+**Four small fixes:**
 
-**Profile screen**
-
-- Remove the "Nutrition Partner" row and the entire "Support & Partners" section header tied to it
-- Replace "Contact Support" with a clean support entry that opens a sheet
-
-**Support sheet (new)**
-
-- Tidy sheet showing a mail icon, "Contact Support" title, and the email **[contact@m5cairo.com](mailto:contact@m5cairo.com)**
-- Tap-to-copy the email (with haptic + "Copied" confirmation)
-- Primary "Send Email" button that opens the Mail composer
-- "Done" button to dismiss
-
-**Hide PT-style routines**
-
-- Suppress drill-based routines (Preparation Drill, Conditioning Drill, Sprint, Recovery Drill, and other Army/PT-style templates) from appearing anywhere in the app — Home scheduled card, Workouts library, plan generation, and calendar day details
-- Filter these out in the workout generator and any curated template lists so users only see standard fitness workouts
-- Remove the "On-Duty Conditioning Drill" style session currently showing on the Home screen
-- Keep the underlying plan/workout framework intact so the rest of the app continues to work
-
-## Out of scope
-
-- No changes to subscription, tokens, nutrition logging, or progress screens
-- Renaming every "PT" label app-wide is not included — only the drill-style routine content is hidden
+- **Share card header** — Remove the "GETFIT" text at the top of the share/social image. The header area will stay blank on the left, with just the date on the right.
+- **Outdoor Run on Training Calendar** — Tapping an Outdoor Run (or any Quick Start cardio session) from the Training Calendar currently opens a blank "No Exercise Details" screen. It will instead open the proper cardio session detail with distance, duration, pace, and date — the same view used elsewhere in the app for cardio sessions.
+- **Hide PT from Training Calendar** — The Training Calendar will no longer list PT workouts or show PT dots on the month grid. Only individual, functional fitness, cardio, and user-logged workouts will appear there.
+- **AI summary tone** — All AI Insights (Insight, Weekly, Coaching) will refer to the user as "you" / "your" instead of "the athlete" / "their". The summaries will read as direct, personal feedback to the user.
 
