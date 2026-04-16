@@ -2,12 +2,24 @@ import Foundation
 
 enum ArmyGenerator {
 
+    private static func isDrillStyleTemplate(_ template: ArmyWorkoutTemplate) -> Bool {
+        let title = template.title.lowercased()
+        if title.contains("drill session") || title.contains("conditioning drill") {
+            return true
+        }
+        return false
+    }
+
+    private static var cleanTemplates: [ArmyWorkoutTemplate] {
+        ArmyTemplateLibrary.templates.filter { !isDrillStyleTemplate($0) }
+    }
+
     static func templates(
         mode: ArmyWorkoutMode,
         focus: ArmyFocus,
         equipment: ArmyEquipment
     ) -> [ArmyWorkoutTemplate] {
-        ArmyTemplateLibrary.templates.filter {
+        cleanTemplates.filter {
             $0.mode == mode &&
             $0.focus == focus &&
             $0.equipment.contains(equipment)
@@ -23,11 +35,11 @@ enum ArmyGenerator {
         let pool = templates(mode: mode, focus: focus, equipment: equipment)
             .filter { $0.title != lastTitle }
         if let result = pool.randomElement() { return result }
-        let fallback = ArmyTemplateLibrary.templates.filter {
+        let fallback = cleanTemplates.filter {
             $0.mode == mode && $0.equipment.contains(equipment) && $0.title != lastTitle
         }
         if let result = fallback.randomElement() { return result }
-        return ArmyTemplateLibrary.templates.filter { $0.mode == mode }.randomElement()
+        return cleanTemplates.filter { $0.mode == mode }.randomElement()
     }
 
     static func weeklyPlan(
@@ -93,32 +105,37 @@ enum ArmyGenerator {
     static func convertToWorkoutExercises(_ template: ArmyWorkoutTemplate) -> [WorkoutExercise] {
         var exercises: [WorkoutExercise] = []
 
-        let warmupText = template.warmup.map { ex in
-            "\(ex.name)\(ex.reps.map { " — \($0)" } ?? "")\(ex.duration.map { " — \($0)" } ?? "")"
-        }.joined(separator: ", ")
-
         exercises.append(WorkoutExercise(
-            name: "Preparation Drill",
+            name: "Dynamic Warm-Up",
             sets: 1,
             durationSeconds: 300,
-            notes: warmupText.isEmpty ? "PD: 10 exercises, 5 reps each" : String(warmupText.prefix(200)),
+            notes: "Light cardio, joint mobility, and activation movements.",
             category: .timed
         ))
 
         for armyEx in template.mainEffort {
+            if shouldSkipExercise(armyEx) { continue }
             let ex = convertArmyExercise(armyEx)
             exercises.append(ex)
         }
 
         exercises.append(WorkoutExercise(
-            name: "Recovery Drill",
+            name: "Cool Down & Stretch",
             sets: 1,
             durationSeconds: 240,
-            notes: "RD: Overhead Arm Pull, Rear Lunge, Extend and Flex, Thigh Stretch, Single-Leg Over",
+            notes: "Light walk and full-body static stretching.",
             category: .timed
         ))
 
         return exercises
+    }
+
+    private static func shouldSkipExercise(_ ex: ArmyExercise) -> Bool {
+        let name = ex.name.lowercased()
+        if name.contains("drill") { return true }
+        if name == "sprint" { return true }
+        if name.contains("pmcs") { return true }
+        return false
     }
 
     static func convertArmyExercise(_ armyEx: ArmyExercise) -> WorkoutExercise {

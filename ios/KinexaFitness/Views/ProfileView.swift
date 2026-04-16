@@ -565,61 +565,20 @@ struct ProfileView: View {
         }
     }
 
-    // MARK: - Support & Partners
+    // MARK: - Support
 
-    @State private var showNutritionPartner: Bool = false
+    @State private var showSupportSheet: Bool = false
 
     private var supportSection: some View {
-        settingsSection(title: "SUPPORT & PARTNERS", icon: "person.2") {
+        settingsSection(title: "SUPPORT", icon: "lifepreserver") {
             Button {
-                showNutritionPartner = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "leaf.fill")
-                        .font(.title3.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: "#059669"), Color(hex: "#10B981")],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .clipShape(.rect(cornerRadius: 10))
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Nutrition Partner")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(KinexaTheme.primaryText)
-                        Text("Personalized nutrition consultations")
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(KinexaTheme.tertiaryText)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Image(systemName: "chevron.right")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(KinexaTheme.tertiaryText)
-                }
-                .frame(minHeight: 48)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            sectionDivider
-
-            Button {
-                if let url = URL(string: "mailto:support@kinexafit.com") {
-                    UIApplication.shared.open(url)
-                }
+                showSupportSheet = true
             } label: {
                 settingsRow(icon: "questionmark.circle", title: "Contact Support", color: KinexaTheme.accent, showChevron: true)
             }
         }
-        .sheet(isPresented: $showNutritionPartner) {
-            NutritionPartnerView()
+        .sheet(isPresented: $showSupportSheet) {
+            SupportSheet()
         }
     }
 

@@ -251,10 +251,10 @@ final class AppViewModel {
             date: Calendar.current.startOfDay(for: .now),
             title: "Recovery & Mobility",
             exercises: [
-                WorkoutExercise(name: "PMCS Drill", sets: 1, durationSeconds: 360, notes: "Full mobility sequence", category: .timed),
-                WorkoutExercise(name: "Hip Stability Drill", sets: 1, durationSeconds: 300, notes: "Through sequence", category: .timed),
-                WorkoutExercise(name: "Shoulder Stability Drill", sets: 1, durationSeconds: 300, notes: "Through sequence", category: .timed),
-                WorkoutExercise(name: "Recovery Drill", sets: 1, durationSeconds: 300, notes: "Full sequence", category: .timed)
+                WorkoutExercise(name: "Full-Body Mobility", sets: 1, durationSeconds: 360, notes: "Gentle full-body mobility sequence", category: .timed),
+                WorkoutExercise(name: "Hip Mobility Flow", sets: 1, durationSeconds: 300, notes: "Hip openers and glute activation", category: .timed),
+                WorkoutExercise(name: "Shoulder Mobility Flow", sets: 1, durationSeconds: 300, notes: "Shoulder CARs and band work", category: .timed),
+                WorkoutExercise(name: "Cool Down & Stretch", sets: 1, durationSeconds: 300, notes: "Light walk and full-body static stretching.", category: .timed)
             ],
             templateTag: "recovery_fallback",
             tags: ["Recovery", "Active Rest"]

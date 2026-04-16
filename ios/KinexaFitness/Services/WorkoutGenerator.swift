@@ -271,12 +271,12 @@ enum WorkoutGenerator {
             date: Calendar.current.startOfDay(for: .now),
             title: "General Fitness",
             exercises: [
-                WorkoutExercise(name: "Preparation Drill", sets: 1, durationSeconds: 300, notes: "PD: 10 exercises, 5 reps each", category: .timed),
+                WorkoutExercise(name: "Dynamic Warm-Up", sets: 1, durationSeconds: 300, notes: "Light cardio and joint mobility.", category: .timed),
                 WorkoutExercise(name: "Push-Up", sets: 4, reps: 15, category: .bodyweight),
                 WorkoutExercise(name: "Air Squat", sets: 4, reps: 20, category: .bodyweight),
                 WorkoutExercise(name: "Plank Hold", sets: 3, durationSeconds: 60, category: .timed),
                 WorkoutExercise(name: "400 m Run", sets: 3, durationSeconds: 120, notes: "Moderate pace", category: .cardio, cardioType: .run),
-                WorkoutExercise(name: "Recovery Drill", sets: 1, durationSeconds: 240, notes: "RD: Full sequence", category: .timed)
+                WorkoutExercise(name: "Cool Down & Stretch", sets: 1, durationSeconds: 240, notes: "Light walk and full-body static stretching.", category: .timed)
             ],
             templateTag: "fallback_general",
             tags: modeTags + ["General"]
