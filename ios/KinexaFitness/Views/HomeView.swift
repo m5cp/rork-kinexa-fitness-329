@@ -4,6 +4,14 @@ struct HomeView: View {
     @Environment(AppViewModel.self) private var vm
     @Environment(StoreViewModel.self) private var store
 
+    @State private var nutritionVM = NutritionViewModel()
+    @State private var ringsVM = ReflectionRingsViewModel()
+    @State private var showMoodSheet: Bool = false
+    @State private var showRingsDetail: Bool = false
+    @State private var showLeaderboard: Bool = false
+    @State private var showLogMealFromRing: Bool = false
+    @State private var selectedTabForRing: AppTab? = nil
+
     @State private var showUpgrade: Bool = false
     @State private var showTokenStore: Bool = false
 
@@ -56,6 +64,8 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 VStack(spacing: 24) {
                     greetingHeader
+
+                    reflectionRingsSection
 
                     todayFunctionalSection
 
@@ -289,6 +299,33 @@ struct HomeView: View {
         .sheet(isPresented: $showPDFUploadSheet) {
             PDFUploadView()
         }
+        .sheet(isPresented: $showMoodSheet) {
+            MoodCheckInSheet(ringsVM: ringsVM)
+        }
+        .sheet(isPresented: $showRingsDetail) {
+            RingsDetailView(
+                nutritionVM: nutritionVM,
+                ringsVM: ringsVM,
+                onTapRing: { ring in
+                    showRingsDetail = false
+                    handleRingTap(ring)
+                },
+                onOpenLeaderboard: {
+                    showRingsDetail = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        showLeaderboard = true
+                    }
+                }
+            )
+            .environment(vm)
+        }
+        .sheet(isPresented: $showLeaderboard) {
+            LeaderboardView(nutritionVM: nutritionVM, ringsVM: ringsVM)
+                .environment(vm)
+        }
+        .sheet(isPresented: $showLogMealFromRing) {
+            LogMealSheet(nutritionVM: nutritionVM)
+        }
         .sheet(isPresented: $showFunctionalWODSheet) {
             if let template = vm.todayFunctionalWOD {
                 WODDetailView(template: template)
@@ -402,6 +439,38 @@ struct HomeView: View {
         .ignoresSafeArea()
     }
 
+
+    // MARK: - Reflection Rings
+
+    private var reflectionRingsSection: some View {
+        ReflectionRingsHeroCard(
+            nutritionVM: nutritionVM,
+            ringsVM: ringsVM,
+            onTapRing: { ring in handleRingTap(ring) },
+            onOpenDetail: { showRingsDetail = true },
+            onOpenLeaderboard: { showLeaderboard = true }
+        )
+        .opacity(animateHero ? 1 : 0)
+        .offset(y: animateHero ? 0 : 8)
+    }
+
+    private func handleRingTap(_ ring: RingType) {
+        switch ring {
+        case .fitness:
+            showQuickStartSheet = true
+        case .meals:
+            showLogMealFromRing = true
+        case .mood:
+            showMoodSheet = true
+        case .water:
+            showLogMealFromRing = false
+            showRingsDetail = false
+            showMoodSheet = false
+            // Nutrition tab hosts water tracker; open meal sheet as fallback is not ideal.
+            // Instead, just add a standard 8oz via NutritionViewModel.
+            nutritionVM.addWater(8)
+        }
+    }
 
     private func workoutIcon(for workout: WorkoutDay) -> String {
         let title = workout.title.lowercased()
