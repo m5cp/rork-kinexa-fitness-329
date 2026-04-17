@@ -8,7 +8,6 @@ struct HomeView: View {
     @State private var ringsVM = ReflectionRingsViewModel()
     @State private var showMoodSheet: Bool = false
     @State private var showRingsDetail: Bool = false
-    @State private var showLeaderboard: Bool = false
     @State private var showLogMealFromRing: Bool = false
     @State private var selectedTabForRing: AppTab? = nil
 
@@ -309,19 +308,9 @@ struct HomeView: View {
                 onTapRing: { ring in
                     showRingsDetail = false
                     handleRingTap(ring)
-                },
-                onOpenLeaderboard: {
-                    showRingsDetail = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                        showLeaderboard = true
-                    }
                 }
             )
             .environment(vm)
-        }
-        .sheet(isPresented: $showLeaderboard) {
-            LeaderboardView(nutritionVM: nutritionVM, ringsVM: ringsVM)
-                .environment(vm)
         }
         .sheet(isPresented: $showLogMealFromRing) {
             LogMealSheet(nutritionVM: nutritionVM)
@@ -447,8 +436,7 @@ struct HomeView: View {
             nutritionVM: nutritionVM,
             ringsVM: ringsVM,
             onTapRing: { ring in handleRingTap(ring) },
-            onOpenDetail: { showRingsDetail = true },
-            onOpenLeaderboard: { showLeaderboard = true }
+            onOpenDetail: { showRingsDetail = true }
         )
         .opacity(animateHero ? 1 : 0)
         .offset(y: animateHero ? 0 : 8)

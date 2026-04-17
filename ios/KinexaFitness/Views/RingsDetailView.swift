@@ -6,7 +6,6 @@ struct RingsDetailView: View {
     let ringsVM: ReflectionRingsViewModel
 
     var onTapRing: (RingType) -> Void
-    var onOpenLeaderboard: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var showHistory: Bool = false
@@ -21,7 +20,6 @@ struct RingsDetailView: View {
                     ringsList
                     historyCard
                     viewAllHistoryButton
-                    leaderboardButton
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
@@ -223,40 +221,4 @@ struct RingsDetailView: View {
         return f.string(from: date).uppercased()
     }
 
-    private var leaderboardButton: some View {
-        Button {
-            onOpenLeaderboard()
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: "trophy.fill")
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(Color(hex: "#F59E0B"))
-                    .frame(width: 44, height: 44)
-                    .background(Color(hex: "#F59E0B").opacity(0.15))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Leaderboards")
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(KinexaTheme.primaryText)
-                    Text("Compete with friends and the world")
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(KinexaTheme.tertiaryText)
-                }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-            }
-            .padding(14)
-            .background(KinexaTheme.card)
-            .clipShape(.rect(cornerRadius: 16))
-            .overlay {
-                RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
-            }
-        }
-        .buttonStyle(.plain)
-    }
 }

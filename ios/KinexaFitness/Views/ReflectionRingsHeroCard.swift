@@ -7,7 +7,6 @@ struct ReflectionRingsHeroCard: View {
 
     var onTapRing: (RingType) -> Void
     var onOpenDetail: () -> Void
-    var onOpenLeaderboard: () -> Void
 
     @State private var animate: Bool = false
     @State private var showCelebration: Bool = false
@@ -116,18 +115,6 @@ struct ReflectionRingsHeroCard: View {
                 .background(Color.orange.opacity(0.15))
                 .clipShape(Capsule())
             }
-
-            Button {
-                onOpenLeaderboard()
-            } label: {
-                Image(systemName: "trophy.fill")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color(hex: "#F59E0B"))
-                    .frame(width: 30, height: 30)
-                    .background(Color(hex: "#F59E0B").opacity(0.15))
-                    .clipShape(Circle())
-            }
-            .accessibilityLabel("Open leaderboard")
         }
     }
 
