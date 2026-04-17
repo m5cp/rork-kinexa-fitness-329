@@ -1,39 +1,31 @@
-# Add Reflection Rings gamification
+# Add a full history calendar for Reflection Rings
 
-## Reflection Rings 🎯
+Yes — this is totally doable. We'll build an Apple Fitness–style history view for your Reflection Rings so you can scroll back through every past day and tap in to see details.
 
-A daily gamification system inspired by Apple Watch activity rings.
+**What you'll get**
 
-### Features
+- A new "History" button on the Reflection Rings detail screen (next to the existing 7-day strip).
+- A full-screen scrollable month-by-month calendar showing every day since you started using the app.
+- Each day shows the 4 concentric rings (Fitness, Meals, Mood, Water) filled based on what you logged that day.
+- Today's date is highlighted; future days appear dimmed.
+- Tap any day to open a detail sheet showing:
+  - The rings for that day with % closed for each
+  - A list of workouts you did that day (completed workouts, quick starts, cardio)
+  - Meals you logged (with calories/macros)
+  - Your mood check-in with any note
+  - Water intake vs goal
+  - Points earned that day and whether you hit the bonus
 
-**Four Daily Rings (Home hero card)**
+**How it looks**
 
-- **Fitness** — closes when you log a workout or activity
-- **Meals** — closes when you log at least one meal
-- **Mood** — closes when you complete your mood check-in
-- **Water** — closes when you hit your daily water goal
-- Rings fill in real time as you log throughout the day
-- Tap any ring to jump to that logging flow
+- Dark background matching the rest of the app, with the signature red/orange/purple/blue ring colors.
+- Month headers ("April 2026") separate each section as you scroll.
+- 7-column grid (Mon–Sun) with small stacked rings in each cell — similar to your reference screenshots.
+- Smooth scrolling that auto-jumps to today when you open it.
+- Streak indicator pinned at the top showing current "all-rings-closed" streak.
 
-**Points & Bonuses**
+**Where it lives**
 
-- Each closed ring earns points
-- Closing all four rings in one day unlocks a bonus point boost
-- Daily streak counter shown next to the rings ("🔥 7-day streak")
+- Opens from the Reflection Rings detail screen via a new "History" button.
+- Replaces the current 7-day-only history card with a "View all history →" link for deeper browsing.
 
-### Design
-
-- Hero card at the top of the Home/Dashboard with four concentric animated rings
-- Smooth fill animation with haptic tap when a ring closes
-- Confetti burst + haptic celebration when all four close
-- Clean iOS-native look: rounded card, subtle gradient behind rings, SF Pro typography
-- Supports light and dark mode
-
-### Screens
-
-- **Home (updated)** — Reflection Rings hero card at the top with live progress, streak badge, and points earned today
-- **Rings detail** — Tap the card to see a breakdown of each ring's status, today's points, and a 7-day history grid
-
-### Deferred
-
-- Leaderboards (Friends / Global) — not building for now

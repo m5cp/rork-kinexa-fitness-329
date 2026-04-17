@@ -9,6 +9,7 @@ struct RingsDetailView: View {
     var onOpenLeaderboard: () -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @State private var showHistory: Bool = false
 
     private var today: Date { Calendar.current.startOfDay(for: .now) }
 
@@ -19,6 +20,7 @@ struct RingsDetailView: View {
                     summaryCard
                     ringsList
                     historyCard
+                    viewAllHistoryButton
                     leaderboardButton
                 }
                 .padding(.horizontal, 20)
@@ -36,7 +38,48 @@ struct RingsDetailView: View {
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .sheet(isPresented: $showHistory) {
+                RingsHistoryCalendarView(nutritionVM: nutritionVM, ringsVM: ringsVM)
+                    .environment(appVM)
+            }
         }
+    }
+
+    private var viewAllHistoryButton: some View {
+        Button {
+            showHistory = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "calendar")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(KinexaTheme.accent)
+                    .frame(width: 44, height: 44)
+                    .background(KinexaTheme.accent.opacity(0.15))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("View All History")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("Browse every day and see your streak")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+            .padding(14)
+            .background(KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 16))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     private var summaryCard: some View {
