@@ -1,8 +1,8 @@
-# Add Reflection Rings gamification with leaderboards
+# Add Reflection Rings gamification
 
 ## Reflection Rings 🎯
 
-A daily gamification system inspired by Apple Watch activity rings, plus leaderboards to stay motivated.
+A daily gamification system inspired by Apple Watch activity rings.
 
 ### Features
 
@@ -17,17 +17,9 @@ A daily gamification system inspired by Apple Watch activity rings, plus leaderb
 
 **Points & Bonuses**
 
-- Each closed ring earns points toward the leaderboard
+- Each closed ring earns points
 - Closing all four rings in one day unlocks a bonus point boost
 - Daily streak counter shown next to the rings ("🔥 7-day streak")
-
-**Leaderboards**
-
-- Two tabs: **Friends** and **Global**
-- Ranked by total points
-- Add friends by username or share code
-- Shows your rank, avatar, streak, and points
-- Weekly and all-time views
 
 ### Design
 
@@ -41,6 +33,7 @@ A daily gamification system inspired by Apple Watch activity rings, plus leaderb
 
 - **Home (updated)** — Reflection Rings hero card at the top with live progress, streak badge, and points earned today
 - **Rings detail** — Tap the card to see a breakdown of each ring's status, today's points, and a 7-day history grid
-- **Leaderboard** — New entry point from the rings card and Profile; Friends / Global toggle, podium for top 3, full ranked list below
-- **Add Friends** — Simple sheet to search by username or share your code
 
+### Deferred
+
+- Leaderboards (Friends / Global) — not building for now
