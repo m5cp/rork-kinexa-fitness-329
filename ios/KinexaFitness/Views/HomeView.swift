@@ -70,9 +70,7 @@ struct HomeView: View {
 
                     quickStartSection
 
-                    todayFitnessHero
                     recentCardioSection
-                    dailyActivitySection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
