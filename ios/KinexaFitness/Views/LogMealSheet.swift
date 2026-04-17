@@ -162,6 +162,17 @@ struct LogMealSheet: View {
                 )
 
                 heroCard(
+                    icon: "magnifyingglass",
+                    title: "USDA Search",
+                    subtitle: "Verified database",
+                    gradient: [Color(hex: "#0EA5E9"), Color(hex: "#0369A1")],
+                    badge: nil,
+                    mode: .database
+                )
+            }
+
+            HStack(spacing: 12) {
+                heroCard(
                     icon: "star.fill",
                     title: "Favorites",
                     subtitle: "\(nutritionVM.favorites.count) saved",
@@ -283,6 +294,8 @@ struct LogMealSheet: View {
             foodInputSection
         case .favorites:
             favoritesSection
+        case .database:
+            usdaSearchSection
         case .manual, .none:
             EmptyView()
         }
@@ -486,6 +499,170 @@ struct LogMealSheet: View {
         .overlay {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(Color(hex: "#6366F1").opacity(0.2))
+        }
+    }
+
+    // MARK: - USDA Search Section
+
+    @State private var usdaQuery: String = ""
+    @State private var usdaResults: [USDAFood] = []
+    @State private var usdaSearching: Bool = false
+    @State private var usdaSearchTask: Task<Void, Never>?
+
+    private var usdaSearchSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(Color(hex: "#0EA5E9"))
+                TextField("Search USDA foods (e.g. banana, greek yogurt)", text: $usdaQuery)
+                    .font(.subheadline)
+                    .foregroundStyle(KinexaTheme.primaryText)
+                    .autocorrectionDisabled()
+                    .submitLabel(.search)
+                    .onSubmit { runUSDASearch() }
+                if !usdaQuery.isEmpty {
+                    Button {
+                        usdaQuery = ""
+                        usdaResults = []
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+                }
+            }
+            .padding(12)
+            .background(KinexaTheme.cardSoft)
+            .clipShape(.rect(cornerRadius: 12))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(KinexaTheme.border)
+            }
+            .onChange(of: usdaQuery) { _, newValue in
+                usdaSearchTask?.cancel()
+                guard newValue.trimmingCharacters(in: .whitespaces).count >= 2 else {
+                    usdaResults = []
+                    return
+                }
+                usdaSearchTask = Task {
+                    try? await Task.sleep(for: .milliseconds(350))
+                    if Task.isCancelled { return }
+                    await performUSDASearch(newValue)
+                }
+            }
+
+            if usdaSearching {
+                HStack(spacing: 8) {
+                    ProgressView().tint(Color(hex: "#0EA5E9"))
+                    Text("Searching USDA database...")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+            } else if usdaResults.isEmpty && !usdaQuery.isEmpty {
+                Text("No results. Try a different search term.")
+                    .font(.caption)
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+            } else if usdaResults.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "fork.knife.circle")
+                        .font(.system(size: 36))
+                        .foregroundStyle(Color(hex: "#0EA5E9").opacity(0.5))
+                    Text("Verified nutrition from USDA")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                    Text("Search over 300,000 foods with accurate macros — no AI estimates.")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 18)
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(usdaResults) { food in
+                        usdaRow(food)
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(KinexaTheme.card)
+        .clipShape(.rect(cornerRadius: 18))
+        .overlay {
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color(hex: "#0EA5E9").opacity(0.2))
+        }
+    }
+
+    private func usdaRow(_ food: USDAFood) -> some View {
+        Button {
+            let item = USDAFoodService.shared.toFoodItem(food)
+            estimatedFoods.append(item)
+            hasEstimated = true
+            showQuickLogToast(item.name)
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(food.displayName)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                    HStack(spacing: 6) {
+                        Text(food.displayServing)
+                            .font(.caption)
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                        Text("·")
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                        Text("\(food.calories) cal")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.secondaryText)
+                        Text("· P \(Int(food.protein))g")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color(hex: "#3B82F6"))
+                        Text("C \(Int(food.carbs))g")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color(hex: "#F59E0B"))
+                        Text("F \(Int(food.fat))g")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color(hex: "#EC4899"))
+                    }
+                }
+                Spacer(minLength: 4)
+                Image(systemName: "plus.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(Color(hex: "#0EA5E9"))
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity)
+            .background(KinexaTheme.cardSoft)
+            .clipShape(.rect(cornerRadius: 12))
+        }
+        .buttonStyle(PressScaleButtonStyle())
+    }
+
+    private func runUSDASearch() {
+        usdaSearchTask?.cancel()
+        usdaSearchTask = Task { await performUSDASearch(usdaQuery) }
+    }
+
+    private func performUSDASearch(_ query: String) async {
+        usdaSearching = true
+        defer { usdaSearching = false }
+        do {
+            let results = try await USDAFoodService.shared.search(query: query)
+            if !Task.isCancelled {
+                usdaResults = results
+            }
+        } catch {
+            if !Task.isCancelled {
+                usdaResults = []
+                errorMessage = "Could not search USDA database. Check your connection."
+            }
         }
     }
 
@@ -979,4 +1156,5 @@ nonisolated enum MealInputMode: Sendable {
     case barcode
     case manual
     case favorites
+    case database
 }
