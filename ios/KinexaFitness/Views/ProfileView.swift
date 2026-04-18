@@ -546,14 +546,6 @@ struct ProfileView: View {
 
             sectionDivider
 
-            NavigationLink {
-                StyleEditorView()
-            } label: {
-                settingsRow(icon: "paintpalette.fill", title: "Style Editor", color: KinexaTheme.accent, showChevron: true)
-            }
-
-            sectionDivider
-
             Button {
                 showResetPlanAlert = true
             } label: {

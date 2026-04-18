@@ -770,40 +770,76 @@ struct HomeView: View {
             if let template = vm.todayFunctionalWOD {
                 todayFunctionalCardSimple(template)
             } else {
-                Button {
-                    showFunctionalWODSheet = true
-                } label: {
-                    HStack(spacing: 14) {
-                        Image(systemName: "bolt.heart.fill")
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(KinexaTheme.heroAmber)
-                            .frame(width: 44, height: 44)
-                            .background(KinexaTheme.heroAmber.opacity(0.12))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("Suggest something for today")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(KinexaTheme.primaryText)
-                            Text("Optional — only if you want one")
-                                .font(.caption)
-                                .foregroundStyle(KinexaTheme.tertiaryText)
-                        }
-
-                        Spacer(minLength: 0)
-
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(KinexaTheme.tertiaryText)
-                    }
-                    .padding(16)
-                    .premiumCard()
-                }
-                .buttonStyle(PressScaleButtonStyle())
+                todaySessionEmptyCard
             }
         }
         .opacity(animateHero ? 1 : 0)
         .offset(y: animateHero ? 0 : 8)
+    }
+
+    private var todaySessionEmptyCard: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "figure.strengthtraining.traditional")
+                .font(.system(size: 30, weight: .semibold))
+                .foregroundStyle(KinexaTheme.accent)
+                .frame(width: 56, height: 56)
+                .background(KinexaTheme.accent.opacity(0.12))
+                .clipShape(Circle())
+
+            VStack(spacing: 4) {
+                Text("No session yet")
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(KinexaTheme.primaryText)
+                Text("Generate a plan or pick a workout to get started.")
+                    .font(.subheadline)
+                    .foregroundStyle(KinexaTheme.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    showWODPlanSheet = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "wand.and.stars")
+                            .font(.caption.weight(.bold))
+                        Text("Generate Plan")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(KinexaTheme.accent)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(PressScaleButtonStyle())
+
+                Button {
+                    showFunctionalWODSheet = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "square.grid.2x2.fill")
+                            .font(.caption.weight(.bold))
+                        Text("Browse Workouts")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .foregroundStyle(KinexaTheme.primaryText)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(KinexaTheme.cardSoft)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(KinexaTheme.border)
+                    }
+                }
+                .buttonStyle(PressScaleButtonStyle())
+            }
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity)
+        .premiumCard()
     }
 
     private func todayFunctionalCardSimple(_ template: WODTemplate) -> some View {
