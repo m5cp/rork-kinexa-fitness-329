@@ -190,6 +190,10 @@ struct TokenStoreView: View {
         let isPopular = identifier == "kinexa_tokens_150"
 
         return Button {
+            if !store.isPremium {
+                showUpgrade = true
+                return
+            }
             Task {
                 purchasedTokenCount = tokenCount
                 await store.purchaseTokens(package: package)
@@ -354,13 +358,10 @@ struct TokenStoreView: View {
 
     private var infoSection: some View {
         VStack(spacing: 12) {
+            infoRow(icon: "crown.fill", text: "Requires an active subscription")
+            infoRow(icon: "plus.circle", text: "Tokens extend your daily scan limit")
             infoRow(icon: "infinity", text: "Tokens never expire")
-            if store.isPremium {
-                infoRow(icon: "plus.circle", text: "Stack on top of your 15 daily included scans")
-            } else {
-                infoRow(icon: "plus.circle", text: "Use tokens anytime — no subscription required")
-            }
-            infoRow(icon: "bolt.fill", text: "Used automatically when your free scans run out")
+            infoRow(icon: "bolt.fill", text: "Used automatically when your daily scans run out")
         }
         .padding(16)
         .background(KinexaTheme.cardSoft)

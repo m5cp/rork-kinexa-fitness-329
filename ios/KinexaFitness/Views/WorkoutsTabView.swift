@@ -7,6 +7,7 @@ struct WorkoutsTabView: View {
     @State private var appeared: Bool = false
     @State private var showWODPlanSheet: Bool = false
     @State private var showFunctionalWODSheet: Bool = false
+    @State private var showQuickGeneratorSheet: Bool = false
     @State private var showPDFUploadSheet: Bool = false
     @State private var showLogStrengthSheet: Bool = false
     @State private var toolTapTrigger: Bool = false
@@ -42,6 +43,9 @@ struct WorkoutsTabView: View {
         }
         .sheet(isPresented: $showFunctionalWODSheet) {
             WODDetailView()
+        }
+        .sheet(isPresented: $showQuickGeneratorSheet) {
+            QuickWorkoutGeneratorView()
         }
         .sheet(isPresented: $showPDFUploadSheet) {
             PDFUploadView()
@@ -212,12 +216,12 @@ struct WorkoutsTabView: View {
             HStack(spacing: 10) {
                 smallPlanCard(
                     title: "Quick Workout",
-                    subtitle: "One-off randomized session",
+                    subtitle: "Pick type & time, generate",
                     icon: "sparkles",
                     color: Color(hex: "#8B5CF6")
                 ) {
                     toolTapTrigger.toggle()
-                    showFunctionalWODSheet = true
+                    showQuickGeneratorSheet = true
                 }
 
                 smallPlanCard(

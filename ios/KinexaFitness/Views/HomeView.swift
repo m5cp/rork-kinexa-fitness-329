@@ -56,6 +56,9 @@ struct HomeView: View {
     @State private var quickStartVM: QuickStartViewModel = QuickStartViewModel()
     @State private var showPDFUploadSheet: Bool = false
     @State private var showLogWalkSheet: Bool = false
+    @State private var showWaterSheet: Bool = false
+    @State private var showViewWorkoutSheet: Bool = false
+    @State private var selectedTab: AppTab? = nil
 
     private let calendar = Calendar.current
 
@@ -319,6 +322,23 @@ struct HomeView: View {
         .sheet(isPresented: $showLogMealFromRing) {
             LogMealSheet(nutritionVM: nutritionVM)
         }
+        .sheet(isPresented: $showWaterSheet) {
+            WaterQuickAddSheet(nutritionVM: nutritionVM)
+        }
+        .sheet(isPresented: $showViewWorkoutSheet) {
+            ViewWorkoutSheet(
+                onStartPTSession: { dayIndex in
+                    planSessionDayIndex = dayIndex
+                    navigateToPlanSession = true
+                },
+                onOpenPlanner: {
+                    showWODPlanSheet = true
+                },
+                onOpenManualBuilder: {
+                    showWODPlanSheet = true
+                }
+            )
+        }
         .sheet(isPresented: $showFunctionalWODSheet) {
             if let template = vm.todayFunctionalWOD {
                 WODDetailView(template: template)
@@ -455,12 +475,8 @@ struct HomeView: View {
         case .mood:
             showMoodSheet = true
         case .water:
-            showLogMealFromRing = false
             showRingsDetail = false
-            showMoodSheet = false
-            // Nutrition tab hosts water tracker; open meal sheet as fallback is not ideal.
-            // Instead, just add a standard 8oz via NutritionViewModel.
-            nutritionVM.addWater(8)
+            showWaterSheet = true
         }
     }
 
@@ -1389,26 +1405,73 @@ struct HomeView: View {
                 showLogWalkSheet = true
             }
 
-            quickActionTile(
-                title: "Log Meals",
+            quickActionMenuTile(
+                title: "Log Meals & Water",
                 icon: "fork.knife",
                 colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")]
-            ) {
-                toolTapTrigger.toggle()
-                showLogMealFromRing = true
-            }
+            )
 
             quickActionTile(
-                title: "Start a Workout",
+                title: "View Workout",
                 icon: "dumbbell.fill",
                 colors: [Color(hex: "#6366F1"), Color(hex: "#4F46E5")]
             ) {
                 toolTapTrigger.toggle()
-                showQuickStartSheet = true
+                showViewWorkoutSheet = true
             }
         }
         .opacity(animateHero ? 1 : 0)
         .offset(y: animateHero ? 0 : 8)
+    }
+
+    private func quickActionMenuTile(title: String, icon: String, colors: [Color]) -> some View {
+        Menu {
+            Button {
+                toolTapTrigger.toggle()
+                showLogMealFromRing = true
+            } label: {
+                Label("Log Meal", systemImage: "fork.knife")
+            }
+            Button {
+                toolTapTrigger.toggle()
+                showWaterSheet = true
+            } label: {
+                Label("Log Water", systemImage: "drop.fill")
+            }
+        } label: {
+            VStack(spacing: 10) {
+                ZStack {
+                    LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        .frame(width: 44, height: 44)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    HStack(spacing: 2) {
+                        Image(systemName: icon)
+                            .font(.caption.weight(.bold))
+                        Image(systemName: "drop.fill")
+                            .font(.caption2.weight(.bold))
+                    }
+                    .foregroundStyle(.white)
+                }
+
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(KinexaTheme.primaryText)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .padding(.horizontal, 8)
+            .background(KinexaTheme.card)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .elevatedCardShadow()
+            .overlay {
+                RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
+            }
+            .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
+            .shadow(color: (colors.first ?? .clear).opacity(0.12), radius: 14, y: 6)
+        }
     }
 
     private func quickActionTile(title: String, icon: String, colors: [Color], action: @escaping () -> Void) -> some View {
