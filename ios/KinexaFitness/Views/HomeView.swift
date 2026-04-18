@@ -55,6 +55,7 @@ struct HomeView: View {
     @State private var showActiveQuickStart: Bool = false
     @State private var quickStartVM: QuickStartViewModel = QuickStartViewModel()
     @State private var showPDFUploadSheet: Bool = false
+    @State private var showLogWalkSheet: Bool = false
 
     private let calendar = Calendar.current
 
@@ -65,6 +66,8 @@ struct HomeView: View {
                     greetingHeader
 
                     reflectionRingsSection
+
+                    quickActionsSection
 
                     todayFunctionalSection
 
@@ -295,6 +298,11 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showPDFUploadSheet) {
             PDFUploadView()
+        }
+        .sheet(isPresented: $showLogWalkSheet) {
+            if let walking = CardioLibrary.allWorkouts.first(where: { $0.name == "Walking" }) {
+                LogCardioSessionSheet(workout: walking)
+            }
         }
         .sheet(isPresented: $showMoodSheet) {
             MoodCheckInSheet(ringsVM: ringsVM)
@@ -773,10 +781,10 @@ struct HomeView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12))
 
                         VStack(alignment: .leading, spacing: 3) {
-                            Text("Generate Today's Session")
+                            Text("Suggest something for today")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(KinexaTheme.primaryText)
-                            Text("Get a workout session")
+                            Text("Optional — only if you want one")
                                 .font(.caption)
                                 .foregroundStyle(KinexaTheme.tertiaryText)
                         }
@@ -972,10 +980,10 @@ struct HomeView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("No Workout Scheduled")
+                    Text("Nothing scheduled today")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(KinexaTheme.primaryText)
-                    Text("Create a plan to get started")
+                    Text("A walk or a logged meal counts too")
                         .font(.caption)
                         .foregroundStyle(KinexaTheme.tertiaryText)
                 }
@@ -1063,10 +1071,10 @@ struct HomeView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
 
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("No Cardio Logged Yet")
+                        Text("No walks or cardio yet")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(KinexaTheme.primaryText)
-                        Text("Go to Workouts tab to browse \(CardioLibrary.allWorkouts.count)+ cardio workouts")
+                        Text("Try a short walk — it all counts")
                             .font(.caption2)
                             .foregroundStyle(KinexaTheme.tertiaryText)
                     }
@@ -1325,8 +1333,74 @@ struct HomeView: View {
     private var greetingText: String {
         let hour = Calendar.current.component(.hour, from: .now)
         if hour < 12 { return "Good morning" }
-        if hour < 17 { return "Keep going" }
+        if hour < 17 { return "Good afternoon" }
         return "Good evening"
+    }
+
+    // MARK: - Quick Actions (Walk / Food / Workout)
+
+    private var quickActionsSection: some View {
+        HStack(spacing: 10) {
+            quickActionTile(
+                title: "Log a Walk",
+                icon: "figure.walk",
+                colors: [Color(hex: "#10B981"), Color(hex: "#059669")]
+            ) {
+                toolTapTrigger.toggle()
+                showLogWalkSheet = true
+            }
+
+            quickActionTile(
+                title: "Log Food",
+                icon: "fork.knife",
+                colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")]
+            ) {
+                toolTapTrigger.toggle()
+                showLogMealFromRing = true
+            }
+
+            quickActionTile(
+                title: "Start a Workout",
+                icon: "dumbbell.fill",
+                colors: [Color(hex: "#6366F1"), Color(hex: "#4F46E5")]
+            ) {
+                toolTapTrigger.toggle()
+                showQuickStartSheet = true
+            }
+        }
+        .opacity(animateHero ? 1 : 0)
+        .offset(y: animateHero ? 0 : 8)
+    }
+
+    private func quickActionTile(title: String, icon: String, colors: [Color], action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 44)
+                    .background(
+                        LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(KinexaTheme.primaryText)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .padding(.horizontal, 8)
+            .background(KinexaTheme.card)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
+            }
+        }
+        .buttonStyle(PressScaleButtonStyle())
     }
 
     private var formattedSteps: String {

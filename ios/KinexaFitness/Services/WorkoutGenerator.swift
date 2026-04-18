@@ -27,7 +27,10 @@ enum WorkoutGenerator {
 
         let armyMode = ArmyGenerator.mapArmyMode(ptMode: ptMode, dutyType: dutyType)
         let armyEquipment = ArmyGenerator.mapArmyEquipment(equipment)
-        let armyFocuses: [ArmyFocus] = ptGoal?.armyFocuses ?? ArmyGenerator.mapArmyFocuses(focus)
+        let baseFocuses: [ArmyFocus] = ptGoal?.armyFocuses ?? ArmyGenerator.mapArmyFocuses(focus)
+        let armyFocuses: [ArmyFocus] = (level == .beginner)
+            ? beginnerFriendlyFocuses(from: baseFocuses)
+            : baseFocuses
 
         let progressionFocuses = applyWeeklyProgression(
             baseFocuses: armyFocuses,
@@ -55,7 +58,10 @@ enum WorkoutGenerator {
 
             if isWorkoutDay && templateIndex < armyTemplates.count {
                 let armyTemplate = armyTemplates[templateIndex]
-                let exercises = ArmyGenerator.convertToWorkoutExercises(armyTemplate)
+                var exercises = ArmyGenerator.convertToWorkoutExercises(armyTemplate)
+                if level == .beginner {
+                    exercises = softenForBeginner(exercises)
+                }
                 let templateTags = [armyTemplate.focus.rawValue, armyTemplate.mode.rawValue]
 
                 days.append(WorkoutDay(
@@ -227,6 +233,58 @@ enum WorkoutGenerator {
 
 
 
+
+    // MARK: - Beginner Softening
+
+    static func beginnerFriendlyFocuses(from base: [ArmyFocus]) -> [ArmyFocus] {
+        // Favor endurance (walk-paced), core, and upper endurance (bodyweight).
+        // Replace strength / tactical / work capacity with gentler alternatives.
+        return base.map { focus -> ArmyFocus in
+            switch focus {
+            case .lowerStrength, .tactical, .workCapacity, .aftPrep:
+                return .upperEndurance
+            case .endurance, .coreRun, .upperEndurance, .recovery:
+                return focus
+            }
+        }
+    }
+
+    static func softenForBeginner(_ exercises: [WorkoutExercise]) -> [WorkoutExercise] {
+        exercises.map { ex -> WorkoutExercise in
+            var updated = ex
+            let lower = ex.name.lowercased()
+
+            // Convert runs to walks for beginners.
+            if ex.category == .cardio {
+                if lower.contains("run") || lower.contains("jog") || lower.contains("sprint") {
+                    let newName: String
+                    if lower.contains("mile") {
+                        newName = "Easy Walk"
+                    } else {
+                        newName = ex.name
+                            .replacingOccurrences(of: "Run", with: "Walk")
+                            .replacingOccurrences(of: "Jog", with: "Walk")
+                            .replacingOccurrences(of: "Sprint", with: "Walk")
+                    }
+                    updated.name = newName
+                    updated.cardioType = .walk
+                    if updated.notes.isEmpty {
+                        updated.notes = "Comfortable walking pace."
+                    }
+                }
+            }
+
+            // Reduce set counts for strength / bodyweight work.
+            if ex.category == .strength || ex.category == .bodyweight {
+                updated.sets = max(1, min(ex.sets, 3))
+                if ex.reps > 0 {
+                    updated.reps = max(5, min(ex.reps, 12))
+                }
+            }
+
+            return updated
+        }
+    }
 
     // MARK: - Private
 
