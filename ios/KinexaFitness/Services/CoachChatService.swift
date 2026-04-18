@@ -75,9 +75,6 @@ final class CoachChatService {
         isSending = true
         lastError = nil
 
-        dailyUsageCount += 1
-        saveUsage()
-
         let history = buildHistory()
         let systemPrompt = Self.systemPrompt
 
@@ -89,10 +86,15 @@ final class CoachChatService {
                 maxTokens: 1024
             )
             let clean = reply.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !clean.isEmpty else {
+                throw CoachChatError.emptyReply
+            }
             messages.append(CoachMessage(role: .assistant, text: clean))
             saveMessages()
+            dailyUsageCount += 1
+            saveUsage()
         } catch {
-            let fallback = "I couldn't reach the coach right now. Check your connection and try again in a moment."
+            let fallback = "That one didn't go through — it's on us, not your daily limit. Try again in a moment."
             messages.append(CoachMessage(role: .assistant, text: fallback))
             saveMessages()
             lastError = error.localizedDescription
@@ -195,6 +197,10 @@ final class CoachChatService {
             return CoachMessage(id: s.id, role: role, text: s.text, timestamp: s.timestamp)
         }
     }
+}
+
+nonisolated enum CoachChatError: Error, Sendable {
+    case emptyReply
 }
 
 nonisolated private struct StoredMessage: Codable, Sendable {

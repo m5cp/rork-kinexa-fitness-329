@@ -1,67 +1,26 @@
-# Add a floating AI coach chat + replace "unlimited" with clear daily caps
+# Don't count failed AI requests against the user
 
-## What's changing
+## The issue
 
-### 1. Rework the Pro vs Free offering (no more "unlimited")
+Right now the meal scan already plays it safe — if the AI call fails, no scan is deducted. But the **Coach chat does the opposite**: it counts the message *before* the AI responds, so when the network drops or the model errors out (like the "I couldn't reach the coach right now" screenshot), the user still loses 1 of their 5 daily messages.
 
-Replace every "unlimited" label with concrete daily caps so people know exactly what they're getting.
+## How the fix protects the user
 
-**Free**
+**Coach chat**
+- Only count a message after the coach actually replies successfully.
+- If the request fails (network error, AI service down, timeout, empty reply), the message is free — the daily counter stays exactly where it was.
+- The "I couldn't reach the coach right now" message still appears so the user knows what happened, but their quota is untouched.
 
-- 5 food scans per day
-- 3 AI workout sessions per day
-- 5 coach chat messages per day
-- Basic tracking (meals, workouts, progress)
-- 1 bodyweight functional fitness workout
+**Meal scan & photo analysis**
+- Already correct — confirm and keep that behavior. No token or daily scan is consumed unless the AI returns a real result.
 
-**Pro**
+**Bonus tokens (paid)**
+- Same rule applied across the board: a purchased token is *only* spent on a successful AI response. Any internal/AI/network failure is on us, not the user.
 
-- 20 food scans per day
-- 15 AI workout sessions per day
-- 50 coach chat messages per day
-- Full workout planning (functional fitness, cardio, weights)
-- Advanced progress insights & exports
-- Priority AI responses
+**What the user sees on a failure**
+- A small, friendly inline note ("Didn't go through — that one's on us, try again") instead of silently losing a credit.
+- The remaining count visible in the header (e.g. "4 of 5 messages left today") will not tick down on errors.
 
-Keep the elevated card design from the current paywall — just swap the copy and the bullet list.
+## Principle going forward
 
-### 2. New feature: Floating AI Coach chat
-
-A small circular chat button floats above the bottom tab bar on every screen. Tap it to open a chat sheet.
-
-**What the coach can do**
-
-- Answer questions about how to use the app ("How do I log a meal?", "Where's my weekly plan?")
-- Suggest exercise combinations ("Give me a 20-min push/pull combo")
-- Explain form and technique for any exercise
-- Recommend routines based on goals (strength, cardio, mobility)
-- Suggest swaps when you don't have equipment
-
-**How it feels**
-
-- Calm, motivating tone — like a knowledgeable trainer, not a chatbot
-- Suggested prompt chips at the top ("Plan my week", "Swap an exercise", "Explain a movement")
-- Messages stream in naturally
-- Daily message counter shown subtly at the top ("3 of 5 left today" for Free, "47 of 50 left" for Pro)
-- When Free users hit their cap, a gentle upgrade card appears inline
-
-**Where it lives**
-
-- Floating round button, bottom-right, just above the tab bar
-- Visible on Home, Meals, Workouts, Progress, Profile
-- Hides automatically when a sheet or full-screen flow is open so it doesn't get in the way
-- Tapping opens a large sheet that can be swiped down to dismiss
-
-### 3. Small cleanup
-
-- Update the Home screen circle labels to calm, motivating words (keeping the refresh from last round)
-- Make sure the new daily caps are reflected in the settings/usage area too
-- Coach chat respects existing haptics and the app's elevated-card visual language
-
-## Pages / Screens
-
-- **Every main screen** — gains a floating coach button in the bottom-right
-- **Coach chat sheet** — full-height sheet with suggested prompts, message list, input field, and a remaining-messages indicator
-- **Paywall / Pro page** — bullets rewritten with hard daily caps instead of "unlimited"; adds "50 coach messages/day" as a Pro perk
-- **Upgrade nudge** — inline card that appears in chat when a Free user runs out of messages for the day
-
+Every AI-powered feature in the app follows one rule: **charge on success, never on failure**. Increment counters and deduct tokens *after* the AI returns valid content — never before the call, and never inside an error path.
