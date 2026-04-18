@@ -368,7 +368,7 @@ struct UpgradeView: View {
     private func sortedPackages(from offering: Offering) -> [Package] {
         let order: [PackageType] = [.monthly, .annual]
         return offering.availablePackages
-            .filter { $0.packageType != .lifetime }
+            .filter { $0.packageType == .monthly || $0.packageType == .annual }
             .sorted { a, b in
                 let aIdx = order.firstIndex(of: a.packageType) ?? 99
                 let bIdx = order.firstIndex(of: b.packageType) ?? 99
@@ -377,7 +377,7 @@ struct UpgradeView: View {
     }
 
     private func selectedPackage(from offering: Offering) -> Package? {
-        let filtered = offering.availablePackages.filter { $0.packageType != .lifetime }
+        let filtered = offering.availablePackages.filter { $0.packageType == .monthly || $0.packageType == .annual }
         if let id = selectedPackageID {
             return filtered.first { $0.identifier == id }
         }
