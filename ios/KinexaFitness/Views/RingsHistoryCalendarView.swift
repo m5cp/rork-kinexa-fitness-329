@@ -130,6 +130,7 @@ struct RingsHistoryCalendarView: View {
         .frame(maxWidth: .infinity)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 16))
+        .elevatedCardShadow()
         .overlay { RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border) }
     }
 

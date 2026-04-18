@@ -1118,6 +1118,7 @@ struct WODPlanPDFExportSheet: View {
                             .stroke(KinexaTheme.border)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .elevatedCardShadow()
 
                     VStack(spacing: 12) {
                         Button {

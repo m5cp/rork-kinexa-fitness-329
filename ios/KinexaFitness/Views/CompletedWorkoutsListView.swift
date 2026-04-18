@@ -129,6 +129,7 @@ struct CompletedWorkoutsListView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .elevatedCardShadow()
     }
 
     private func formatDate(_ date: Date) -> String {

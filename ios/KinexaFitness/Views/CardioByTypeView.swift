@@ -284,6 +284,7 @@ struct CardioByTypeView: View {
             .padding(14)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 14))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
             }

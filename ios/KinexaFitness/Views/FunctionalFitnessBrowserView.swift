@@ -411,6 +411,7 @@ struct FunctionalFitnessBrowserView: View {
             .padding(14)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 14))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
             }
@@ -491,6 +492,7 @@ struct ExerciseSearchSheet: View {
                                 .padding(.vertical, 12)
                                 .background(KinexaTheme.card)
                                 .clipShape(.rect(cornerRadius: 12))
+                                .elevatedCardShadow()
                             }
                             .buttonStyle(.plain)
                         }

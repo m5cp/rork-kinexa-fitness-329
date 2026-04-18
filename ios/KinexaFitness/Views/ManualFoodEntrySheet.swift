@@ -105,6 +105,7 @@ struct ManualFoodEntrySheet: View {
                 .padding(14)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 12))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 12).stroke(KinexaTheme.border)
                 }
@@ -135,6 +136,7 @@ struct ManualFoodEntrySheet: View {
             .padding(.vertical, 10)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 10))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 10).stroke(KinexaTheme.border)
             }

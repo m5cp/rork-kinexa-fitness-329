@@ -368,6 +368,7 @@ struct PDFUploadView: View {
         .padding(.vertical, 10)
         .background(KinexaTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 12).stroke(KinexaTheme.border)
         }

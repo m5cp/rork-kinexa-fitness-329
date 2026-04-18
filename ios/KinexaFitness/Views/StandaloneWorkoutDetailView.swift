@@ -108,6 +108,7 @@ struct StandaloneWorkoutDetailView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 20))
+        .elevatedCardShadow()
     }
 
     private func exerciseCard(_ exercise: WorkoutExercise) -> some View {
@@ -153,5 +154,6 @@ struct StandaloneWorkoutDetailView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .elevatedCardShadow()
     }
 }

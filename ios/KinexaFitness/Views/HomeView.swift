@@ -563,6 +563,7 @@ struct HomeView: View {
         .padding(.vertical, 14)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border)
         }
@@ -1039,6 +1040,7 @@ struct HomeView: View {
             .padding(14)
             .background(KinexaTheme.card)
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(Color(hex: "#059669").opacity(0.2))
@@ -1122,6 +1124,7 @@ struct HomeView: View {
         .padding(12)
         .background(KinexaTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
         }
@@ -1182,6 +1185,7 @@ struct HomeView: View {
                     .stroke(KinexaTheme.border)
             }
             .clipShape(RoundedRectangle(cornerRadius: 14))
+            .elevatedCardShadow()
         }
         .buttonStyle(PressScaleButtonStyle())
     }
@@ -1229,6 +1233,7 @@ struct HomeView: View {
                     .stroke(KinexaTheme.border)
             }
             .clipShape(RoundedRectangle(cornerRadius: 20))
+            .elevatedCardShadow()
         }
         .opacity(animateMetrics ? 1 : 0)
         .offset(y: animateMetrics ? 0 : 12)
@@ -1396,6 +1401,7 @@ struct HomeView: View {
             .padding(.horizontal, 8)
             .background(KinexaTheme.card)
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
             }

@@ -73,6 +73,7 @@ struct RingsDetailView: View {
             .padding(14)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 16))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
             }
@@ -106,6 +107,7 @@ struct RingsDetailView: View {
         .padding(.vertical, 14)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 16))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 16).stroke(color.opacity(0.25))
         }
@@ -164,6 +166,7 @@ struct RingsDetailView: View {
             .padding(14)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 14))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
             }
@@ -208,6 +211,7 @@ struct RingsDetailView: View {
         .padding(14)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 16))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
         }

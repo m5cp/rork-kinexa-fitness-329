@@ -209,6 +209,7 @@ struct MealDetailSheet: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
     }
 
     private var divider: some View {
@@ -410,6 +411,7 @@ struct MealDetailSheet: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 14))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 14)
                 .stroke(KinexaTheme.border)

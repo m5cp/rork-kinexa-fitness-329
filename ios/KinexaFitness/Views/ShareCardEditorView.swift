@@ -308,6 +308,7 @@ struct ShareCardEditorView: View {
                             .padding(12)
                             .background(KinexaTheme.card)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .elevatedCardShadow()
                             .overlay {
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(KinexaTheme.border)
@@ -1032,6 +1033,7 @@ struct TextOverlayEditorSheet: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(KinexaTheme.border)

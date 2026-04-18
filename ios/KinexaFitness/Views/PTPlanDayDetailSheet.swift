@@ -423,6 +423,7 @@ struct PTPlanDayDetailSheet: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .elevatedCardShadow()
     }
 
     private func strengthEditor(index: Int) -> some View {

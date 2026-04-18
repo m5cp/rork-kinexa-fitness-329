@@ -122,6 +122,7 @@ struct SaveTemplateSheet: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 14))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
         }

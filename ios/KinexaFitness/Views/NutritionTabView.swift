@@ -355,6 +355,7 @@ struct NutritionTabView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(.rect(cornerRadius: 24))
+        .elevatedCardShadow()
     }
 
     // MARK: - Macro Progress
@@ -418,6 +419,7 @@ struct NutritionTabView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
     }
 
     // MARK: - Alcohol Badge
@@ -540,6 +542,7 @@ struct NutritionTabView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(.rect(cornerRadius: 20))
+        .elevatedCardShadow()
     }
 
     private func mealRow(_ meal: MealEntry) -> some View {
@@ -585,6 +588,7 @@ struct NutritionTabView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(.rect(cornerRadius: 16))
+        .elevatedCardShadow()
     }
 
     // MARK: - Smart Suggestion
@@ -773,6 +777,7 @@ struct NutritionTabView: View {
             .padding(16)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 18))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border)
             }
@@ -814,6 +819,7 @@ struct NutritionTabView: View {
             .padding(16)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 18))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(KinexaTheme.border)

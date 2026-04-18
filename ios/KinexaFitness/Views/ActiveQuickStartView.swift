@@ -179,6 +179,7 @@ struct ActiveQuickStartView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        .elevatedCardShadow()
     }
 
     private func statCell(value: String, label: String, icon: String) -> some View {

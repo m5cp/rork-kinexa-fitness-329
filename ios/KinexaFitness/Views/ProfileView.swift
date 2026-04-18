@@ -42,6 +42,7 @@ struct ProfileView: View {
                     notificationsSection
                     appControlsSection
                     supportSection
+                    referencesSection
                     legalSection
                     footer
                 }
@@ -173,6 +174,7 @@ struct ProfileView: View {
         .padding(.horizontal, 20)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 24))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 24)
                 .stroke(KinexaTheme.border)
@@ -616,6 +618,19 @@ struct ProfileView: View {
         }
     }
 
+    // MARK: - References
+
+    private var referencesSection: some View {
+        settingsSection(title: "REFERENCES", icon: "text.book.closed") {
+            NavigationLink {
+                FoodDataSourceView()
+            } label: {
+                settingsRow(icon: "fork.knife", title: "Food Data Source", color: KinexaTheme.accent, showChevron: true)
+            }
+            .accessibilityHint("View the nutrition data source credit")
+        }
+    }
+
     // MARK: - Legal
 
     private var legalSection: some View {
@@ -765,6 +780,7 @@ struct ProfileView: View {
                     .padding(.vertical, 8)
                     .background(KinexaTheme.card)
                     .clipShape(.rect(cornerRadius: 16))
+                    .elevatedCardShadow()
                     .overlay {
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(KinexaTheme.border)
@@ -830,6 +846,7 @@ struct ProfileView: View {
             .padding(.vertical, 4)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 16))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(KinexaTheme.border)

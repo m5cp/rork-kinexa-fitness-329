@@ -214,6 +214,7 @@ struct WODDetailView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        .elevatedCardShadow()
     }
 
     private var detailDivider: some View {
@@ -289,6 +290,7 @@ struct WODDetailView: View {
                         .stroke(KinexaTheme.border)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 14))
+                .elevatedCardShadow()
             }
 
             if let notes = template.notes, !notes.isEmpty {

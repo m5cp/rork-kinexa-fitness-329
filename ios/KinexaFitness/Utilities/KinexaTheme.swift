@@ -14,6 +14,13 @@ enum KinexaTheme {
                 : UIColor.white.withAlphaComponent(0.08)
         })
     }
+    static var cardShadow: Color {
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor.black.withAlphaComponent(0.08)
+                : UIColor.black.withAlphaComponent(0.35)
+        })
+    }
     static var accent: Color { colors.accent }
     static var accent2: Color { colors.accent2 }
     static var success: Color { colors.success }

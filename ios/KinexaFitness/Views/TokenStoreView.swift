@@ -142,6 +142,7 @@ struct TokenStoreView: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(Color(hex: "#8B5CF6").opacity(0.2))
@@ -271,6 +272,7 @@ struct TokenStoreView: View {
             }
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 18))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(

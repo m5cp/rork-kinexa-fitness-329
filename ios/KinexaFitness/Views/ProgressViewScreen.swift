@@ -178,6 +178,7 @@ struct ProgressViewScreen: View {
         .padding(.vertical, 16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 20))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(KinexaTheme.border)
@@ -466,6 +467,7 @@ struct ProgressViewScreen: View {
         .frame(minHeight: 100)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 20))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 20).stroke(KinexaTheme.border)
         }

@@ -246,6 +246,7 @@ struct LogMealSheet: View {
                             .padding(.vertical, 8)
                             .background(KinexaTheme.card)
                             .clipShape(.rect(cornerRadius: 12))
+                            .elevatedCardShadow()
                             .overlay {
                                 RoundedRectangle(cornerRadius: 12).stroke(KinexaTheme.border)
                             }
@@ -328,8 +329,8 @@ struct LogMealSheet: View {
 
                 heroCard(
                     icon: "magnifyingglass",
-                    title: "USDA Search",
-                    subtitle: "Verified database",
+                    title: "Food Search",
+                    subtitle: "Search foods & brands",
                     gradient: [Color(hex: "#0EA5E9"), Color(hex: "#0369A1")],
                     badge: nil,
                     mode: .database
@@ -369,6 +370,7 @@ struct LogMealSheet: View {
                 .padding(.vertical, 14)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 14))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(KinexaTheme.border)
@@ -483,7 +485,7 @@ struct LogMealSheet: View {
         case .barcode: return "Scan Barcode"
         case .text: return "AI Describe"
         case .favorites: return "Favorites"
-        case .database: return "USDA Search"
+        case .database: return "Food Search"
         case .manual: return "Manual Entry"
         }
     }
@@ -580,6 +582,7 @@ struct LogMealSheet: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(Color(hex: "#22C55E").opacity(0.2))
@@ -628,6 +631,7 @@ struct LogMealSheet: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(Color(hex: "#3B82F6").opacity(0.2))
@@ -693,13 +697,14 @@ struct LogMealSheet: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(Color(hex: "#6366F1").opacity(0.2))
         }
     }
 
-    // MARK: - USDA Search Section
+    // MARK: - Food Search Section
 
     @State private var usdaQuery: String = ""
     @State private var usdaResults: [USDAFood] = []
@@ -712,7 +717,7 @@ struct LogMealSheet: View {
                 Image(systemName: "magnifyingglass")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(Color(hex: "#0EA5E9"))
-                TextField("Search USDA foods (e.g. banana, greek yogurt)", text: $usdaQuery)
+                TextField("Search foods (e.g. banana, greek yogurt)", text: $usdaQuery)
                     .font(.subheadline)
                     .foregroundStyle(KinexaTheme.primaryText)
                     .autocorrectionDisabled()
@@ -751,7 +756,7 @@ struct LogMealSheet: View {
             if usdaSearching {
                 HStack(spacing: 8) {
                     ProgressView().tint(Color(hex: "#0EA5E9"))
-                    Text("Searching USDA database...")
+                    Text("Searching foods...")
                         .font(.caption)
                         .foregroundStyle(KinexaTheme.tertiaryText)
                 }
@@ -768,7 +773,7 @@ struct LogMealSheet: View {
                     Image(systemName: "fork.knife.circle")
                         .font(.system(size: 36))
                         .foregroundStyle(Color(hex: "#0EA5E9").opacity(0.5))
-                    Text("Verified nutrition from USDA")
+                    Text("Verified nutrition database")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(KinexaTheme.secondaryText)
                     Text("Search over 300,000 foods with accurate macros — no AI estimates.")
@@ -789,6 +794,7 @@ struct LogMealSheet: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(Color(hex: "#0EA5E9").opacity(0.2))
@@ -858,7 +864,7 @@ struct LogMealSheet: View {
         } catch {
             if !Task.isCancelled {
                 usdaResults = []
-                errorMessage = "Could not search USDA database. Check your connection."
+                errorMessage = "Could not search food database. Check your connection."
             }
         }
     }
@@ -891,6 +897,7 @@ struct LogMealSheet: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(Color(hex: "#F59E0B").opacity(0.2))
@@ -1076,6 +1083,7 @@ struct LogMealSheet: View {
                 .padding(14)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 14))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(KinexaTheme.border)
@@ -1194,7 +1202,7 @@ struct LogMealSheet: View {
                 fallbackRow(icon: "barcode.viewfinder", title: "Scan a Barcode", tint: Color(hex: "#3B82F6")) {
                     if !navPath.contains(.barcode) { navPath.append(.barcode) }
                 }
-                fallbackRow(icon: "magnifyingglass", title: "Search USDA Database", tint: Color(hex: "#0EA5E9")) {
+                fallbackRow(icon: "magnifyingglass", title: "Search Food Database", tint: Color(hex: "#0EA5E9")) {
                     if !navPath.contains(.database) { navPath.append(.database) }
                 }
                 if !nutritionVM.favorites.isEmpty {
@@ -1235,6 +1243,7 @@ struct LogMealSheet: View {
             .padding(.vertical, 10)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 12))
+            .elevatedCardShadow()
             .opacity(disabled ? 0.5 : 1)
         }
         .buttonStyle(PressScaleButtonStyle())

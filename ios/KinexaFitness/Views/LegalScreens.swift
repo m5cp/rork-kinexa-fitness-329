@@ -82,6 +82,7 @@ struct LegalDetailView: View {
         .padding(.horizontal, 20)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 20))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(accentColor.opacity(0.15))
@@ -121,6 +122,7 @@ struct LegalDetailView: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 14))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 14)
                 .stroke(KinexaTheme.border)

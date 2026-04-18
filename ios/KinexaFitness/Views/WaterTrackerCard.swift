@@ -93,6 +93,7 @@ struct WaterTrackerCard: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(.rect(cornerRadius: 20))
+        .elevatedCardShadow()
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.5)) {
                 animateWave = true
@@ -162,6 +163,7 @@ struct WaterGoalSheet: View {
                 .padding(20)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 16))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
                 }

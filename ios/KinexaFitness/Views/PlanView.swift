@@ -272,6 +272,7 @@ struct PlanView: View {
                     .stroke(KinexaTheme.border)
             }
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .elevatedCardShadow()
         }
     }
 

@@ -168,6 +168,7 @@ struct QuickStartCompletionView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 20))
+        .elevatedCardShadow()
         .scaleEffect(cardScale)
         .opacity(cardOpacity)
     }
@@ -223,6 +224,7 @@ struct QuickStartCompletionView: View {
             .padding(14)
             .background(KinexaTheme.card)
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(KinexaTheme.border)
@@ -278,6 +280,7 @@ struct QuickStartCompletionView: View {
             .padding(14)
             .background(KinexaTheme.card)
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(KinexaTheme.border)
@@ -325,6 +328,7 @@ struct QuickStartCompletionView: View {
             .padding(14)
             .background(KinexaTheme.card)
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(logged ? KinexaTheme.success.opacity(0.3) : KinexaTheme.border)

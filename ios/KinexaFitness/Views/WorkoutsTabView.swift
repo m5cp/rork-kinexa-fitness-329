@@ -127,6 +127,7 @@ struct WorkoutsTabView: View {
                 .padding(16)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 16))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 16)
                         .stroke(Color(hex: "#F59E0B").opacity(0.2))
@@ -301,6 +302,7 @@ struct WorkoutsTabView: View {
             .padding(.vertical, 18)
             .background(KinexaTheme.card)
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
             }

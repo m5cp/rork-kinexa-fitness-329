@@ -75,6 +75,7 @@ struct LogStrengthWorkoutSheet: View {
                 .padding(14)
                 .background(KinexaTheme.card)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
                 }
@@ -145,6 +146,7 @@ struct LogStrengthWorkoutSheet: View {
         .padding(14)
         .background(KinexaTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
         }

@@ -164,6 +164,7 @@ struct QuickStartSelectionView: View {
                     .stroke(KinexaTheme.accent.opacity(0.2))
             }
             .clipShape(RoundedRectangle(cornerRadius: 14))
+            .elevatedCardShadow()
             .transition(.opacity.combined(with: .move(edge: .bottom)))
         } else {
             HStack(spacing: 12) {
@@ -192,6 +193,7 @@ struct QuickStartSelectionView: View {
                     .stroke(KinexaTheme.border)
             }
             .clipShape(RoundedRectangle(cornerRadius: 14))
+            .elevatedCardShadow()
             .transition(.opacity.combined(with: .move(edge: .bottom)))
         }
     }

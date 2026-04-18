@@ -364,6 +364,7 @@ struct ActiveSessionView: View {
                             .stroke(KinexaTheme.border)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .elevatedCardShadow()
                 }
                 .buttonStyle(PressScaleButtonStyle())
             }
@@ -375,6 +376,7 @@ struct ActiveSessionView: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 20))
+        .elevatedCardShadow()
     }
 
     private var timerTextColor: Color {
@@ -561,6 +563,7 @@ struct ActiveSessionView: View {
                                 .stroke(KinexaTheme.border)
                         }
                         .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .elevatedCardShadow()
                     }
                     .buttonStyle(PressScaleButtonStyle())
                 }
@@ -750,6 +753,7 @@ struct ActiveSessionView: View {
                         .stroke(KinexaTheme.border)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 20))
+                .elevatedCardShadow()
             }
 
             Spacer()

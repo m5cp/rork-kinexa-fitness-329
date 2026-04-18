@@ -90,6 +90,7 @@ struct NutritionHistoryView: View {
         .padding(18)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 20))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 20).stroke(KinexaTheme.border)
         }
@@ -125,6 +126,7 @@ struct NutritionHistoryView: View {
         .padding(18)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 20))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 20).stroke(KinexaTheme.border)
         }
@@ -188,6 +190,7 @@ struct NutritionHistoryView: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border)
         }

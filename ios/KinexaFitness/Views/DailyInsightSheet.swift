@@ -79,6 +79,7 @@ struct DailyInsightSheet: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 18))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(KinexaTheme.border)
@@ -103,6 +104,7 @@ struct DailyInsightSheet: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 18))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(KinexaTheme.border)
@@ -138,6 +140,7 @@ struct DailyInsightSheet: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 18))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 18)
                         .stroke(KinexaTheme.border)

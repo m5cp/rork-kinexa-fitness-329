@@ -385,6 +385,7 @@ struct WODPlanDayDetailSheet: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        .elevatedCardShadow()
     }
 
     private var detailDivider: some View {
@@ -537,6 +538,7 @@ struct WODPlanDayDetailSheet: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .elevatedCardShadow()
     }
 
     private func movementField(title: String, text: Binding<String>) -> some View {

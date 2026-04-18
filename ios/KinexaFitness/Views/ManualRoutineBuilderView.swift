@@ -115,6 +115,7 @@ struct ManualRoutineBuilderView: View {
                 .padding(14)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 14))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
                 }
@@ -177,6 +178,7 @@ struct ManualRoutineBuilderView: View {
             .padding(.vertical, 14)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 14))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
             }
@@ -497,6 +499,7 @@ struct CardioBrowserForRoutineView: View {
                 .padding(16)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 18))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border)
                 }
@@ -548,6 +551,7 @@ struct CardioBrowserForRoutineView: View {
                 .padding(16)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 18))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border)
                 }
@@ -619,6 +623,7 @@ struct CardioBrowserForRoutineView: View {
                     .padding(14)
                     .background(KinexaTheme.card)
                     .clipShape(.rect(cornerRadius: 14))
+                    .elevatedCardShadow()
                     .overlay {
                         RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
                     }

@@ -114,6 +114,7 @@ struct LogCardioSessionSheet: View {
                 .padding(14)
                 .background(KinexaTheme.card)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
                 }
@@ -134,6 +135,7 @@ struct LogCardioSessionSheet: View {
                 .padding(14)
                 .background(KinexaTheme.card)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
                 }
@@ -156,6 +158,7 @@ struct LogCardioSessionSheet: View {
                 .padding(14)
                 .background(KinexaTheme.card)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
                 }
@@ -176,6 +179,7 @@ struct LogCardioSessionSheet: View {
                 .padding(14)
                 .background(KinexaTheme.card)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
                 }

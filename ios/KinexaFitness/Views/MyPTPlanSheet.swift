@@ -736,6 +736,7 @@ struct MyPTPlanSheet: View {
                 .stroke(KinexaTheme.border)
         }
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .elevatedCardShadow()
         .opacity(animateCards ? 1 : 0)
         .offset(y: animateCards ? 0 : 8)
     }
@@ -1174,6 +1175,7 @@ struct PlanPDFExportSheet: View {
                             .stroke(KinexaTheme.border)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .elevatedCardShadow()
 
                     VStack(spacing: 12) {
                         Button {

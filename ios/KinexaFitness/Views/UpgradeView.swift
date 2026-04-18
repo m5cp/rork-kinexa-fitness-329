@@ -153,6 +153,7 @@ struct UpgradeView: View {
                 .padding(12)
                 .background(KinexaTheme.card)
                 .clipShape(.rect(cornerRadius: 14))
+                .elevatedCardShadow()
                 .overlay {
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(KinexaTheme.border)

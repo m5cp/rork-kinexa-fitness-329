@@ -79,6 +79,7 @@ struct PreMadeCardioProgramDetailView: View {
         .padding(16)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 18))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border)
         }
@@ -112,6 +113,7 @@ struct PreMadeCardioProgramDetailView: View {
         .padding(.vertical, 12)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 12))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 12).stroke(KinexaTheme.border)
         }
@@ -177,6 +179,7 @@ struct PreMadeCardioProgramDetailView: View {
         }
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 14))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
         }

@@ -299,6 +299,7 @@ struct PreMadeRoutinesView: View {
             .padding(16)
             .background(KinexaTheme.card)
             .clipShape(.rect(cornerRadius: 16))
+            .elevatedCardShadow()
             .overlay {
                 RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
             }
@@ -453,6 +454,7 @@ struct PreMadeRoutineDetailSheet: View {
         .padding(14)
         .background(KinexaTheme.card)
         .clipShape(.rect(cornerRadius: 14))
+        .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
         }
