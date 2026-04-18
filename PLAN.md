@@ -1,31 +1,36 @@
-# Remove Today's Session, equalize workout cards, and clarify plan vs session
+# Add Manual Build card, make premade routines editable, and rename home circles
 
-## Answers to your questions
+## Workouts Tab
 
-**Does the weekly routine appear after you build a plan?**
-Yes — once you build a training plan, the week is saved and each day shows up on the Home screen (under Recent / upcoming areas) and inside the "Build My Training Plan" sheet itself, where you can reorder, export, or regenerate. It is not shown directly below the workout tiles on the Workouts tab — I can add a "This Week's Plan" section there if you want a clearer view.
+**New Manual Build hero card**
 
-**Are "Build My Training Plan" and "Generate Session" the same?**
-No, they are different:
+- Add a dedicated hero card for **Manual Build** directly below the **Generate Plan** card, matching the same elevated shadow styling and size as the other hero cards.
+- Tapping it opens the existing Manual Build flow (routine name, add exercises by Weights / Functional / Cardio, day-by-day builder).
+- When saved, the manual routine behaves exactly like a generated plan:
+  - Syncs to the **Calendar**
+  - Appears in **Progress** and all other places plans currently sync
+  - Contributes to the **weekly progress circle** on the Home screen
 
-- **Build My Training Plan** — creates a full **multi-week program** (goal, frequency, days). Think of it as your ongoing training calendar.
-- **Generate Session** — creates **one single workout for right now** (randomized based on your equipment/duty type). No calendar, no week — just a workout you can start immediately.
+**Premade Workouts — same look + editable**
 
-They do look similar on the Workouts page, which is confusing. I'll rename "Generate Session" to **"Quick Workout"** and add a short subtitle to both so it's obvious what each one does.
+- Premade workout cards get the same elevated hero-card styling as Manual Build and Generate Plan (consistent sizing and shadow).
+- Inside a premade routine detail view:
+  - Each exercise can be **swapped**. Tapping an exercise shows **suggested alternatives first** (same muscle group / category), with an option to **browse the full exercise library**.
+  - Each day has an **"Add more"** row at the bottom — a subtle dashed/placeholder entry that opens the add-exercise picker for that day.
+  - When the user makes any change, prompt: **"Modify this routine or save as a copy?"** — keeping the original premade routine intact if they choose "Save as copy."
 
-## Changes I'll make
+## Home Screen — Rename the Circles
 
-**Home screen**
+The three daily circles will be renamed to something calm and motivating:
 
-- Remove the "Today's Session" section entirely (both the header and the orange card). It will no longer appear whether or not a workout is planned.
+- **Move** — activity / workout progress
+- **Nourish** — nutrition / calorie progress
+- **Restore** — recovery / sleep / mindfulness progress
 
-**Workouts screen**
+Soft, encouraging language that feels supportive rather than performance-driven.
 
-- Make the three hero cards (Functional Fitness, Free Weights, Cardio) exactly the same height, so a two-line label like "Functional Fitness" doesn't make its card taller than the others.
-- Rename the bottom-left tile from **"Generate Session"** to **"Quick Workout"** with a small subtitle "One-off randomized session" so it's clearly different from Build My Training Plan.
-- Add a short subtitle to **"Import PDF"** ("Upload your own workout") to balance the pair.
+## Consistency
 
-**Optional (tell me yes/no)**
-
-- Add a "This Week's Plan" section on the Workouts tab (below the tiles) that lists the days of your current training plan once one exists, with tap-to-open. If you'd rather keep the Workouts tab clean and only see the plan inside the Build sheet, I'll leave it as-is.
+- All new and updated cards follow the elevated shadow style already used on the Progress page.
+- No gray-on-white readability issues; all text meets contrast standards in light, dark, and system mode.
 

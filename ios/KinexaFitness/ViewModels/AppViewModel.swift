@@ -1095,6 +1095,82 @@ final class AppViewModel {
         return cardioSessions.filter { $0.date >= startOfWeek }.reduce(0) { $0 + $1.durationMinutes }
     }
 
+    // MARK: - Manual Routine Activation
+
+    func activateManualRoutine(_ routine: ManualRoutine) {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)) ?? today
+
+        let weekdayFormatter = DateFormatter()
+        weekdayFormatter.dateFormat = "EEEE"
+
+        var days: [WorkoutDay] = []
+        for dayOffset in 0..<7 {
+            guard let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek) else { continue }
+            let dayName = weekdayFormatter.string(from: date)
+            if let routineDay = routine.days.first(where: { $0.dayName.caseInsensitiveCompare(dayName) == .orderedSame }),
+               !routineDay.exercises.isEmpty {
+                let exercises = routineDay.exercises.map { AppViewModel.convertManualExercise($0) }
+                days.append(WorkoutDay(
+                    dayIndex: dayOffset,
+                    date: date,
+                    title: routine.name,
+                    exercises: exercises,
+                    isRestDay: false,
+                    templateTag: "manual:\(routine.id.uuidString)",
+                    tags: ["Manual", routineDay.dayName]
+                ))
+            } else {
+                days.append(WorkoutDay(
+                    dayIndex: dayOffset,
+                    date: date,
+                    title: "Rest Day",
+                    exercises: [],
+                    isRestDay: true,
+                    templateTag: "rest"
+                ))
+            }
+        }
+
+        currentPlan = WeeklyPlan(
+            weekStartDate: startOfWeek,
+            goal: routine.name,
+            level: currentLevel.rawValue,
+            equipment: currentEquipment.rawValue,
+            minutesPerWorkout: currentMinutes,
+            days: days,
+            totalWeeks: 1,
+            currentWeek: 1,
+            ptGoal: "Manual"
+        )
+        persistAll()
+    }
+
+    nonisolated static func convertManualExercise(_ ex: ManualRoutineExercise) -> WorkoutExercise {
+        let reps = ex.reps.trimmingCharacters(in: .whitespaces)
+        let lower = reps.lowercased()
+        if lower.contains("sec") {
+            let digits = reps.filter { $0.isNumber }
+            let secs = Int(digits) ?? 30
+            return WorkoutExercise(name: ex.name, sets: ex.sets, durationSeconds: secs, notes: ex.notes, category: .timed)
+        }
+        if lower.contains("min") {
+            let digits = reps.filter { $0.isNumber }
+            let mins = Int(digits) ?? 1
+            return WorkoutExercise(name: ex.name, sets: ex.sets, durationSeconds: mins * 60, notes: ex.notes, category: ex.sourceType == .cardio ? .cardio : .timed)
+        }
+        let repCount = Int(reps.filter { $0.isNumber }) ?? 10
+        let category: ExerciseCategory = {
+            switch ex.sourceType {
+            case .cardio: return .cardio
+            case .functionalFitness: return .bodyweight
+            case .weightTraining: return .strength
+            }
+        }()
+        return WorkoutExercise(name: ex.name, sets: ex.sets, reps: repCount, notes: ex.notes, category: category)
+    }
+
     func resetAllData() {
         currentPlan = nil
         completedRecords = []

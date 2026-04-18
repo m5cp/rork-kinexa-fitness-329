@@ -11,10 +11,10 @@ nonisolated enum RingType: String, Codable, CaseIterable, Sendable, Identifiable
 
     var title: String {
         switch self {
-        case .fitness: return "Fitness"
-        case .meals: return "Meals"
-        case .mood: return "Mood"
-        case .water: return "Water"
+        case .fitness: return "Move"
+        case .meals: return "Nourish"
+        case .mood: return "Reflect"
+        case .water: return "Hydrate"
         }
     }
 
@@ -40,10 +40,10 @@ nonisolated enum RingType: String, Codable, CaseIterable, Sendable, Identifiable
 
     var subtitle: String {
         switch self {
-        case .fitness: return "Log a workout"
-        case .meals: return "Log at least one meal"
-        case .mood: return "Check in with yourself"
-        case .water: return "Hit your water goal"
+        case .fitness: return "A little movement today"
+        case .meals: return "Fuel yourself well"
+        case .mood: return "A quiet check-in"
+        case .water: return "Stay hydrated"
         }
     }
 

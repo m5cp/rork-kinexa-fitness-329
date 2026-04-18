@@ -336,12 +336,35 @@ struct PreMadeRoutinesView: View {
     }
 }
 
+// MARK: - Editable Premade Detail Sheet
+
 struct PreMadeRoutineDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppViewModel.self) private var appVM
     let routine: PreMadeRoutine
     let onAddExercise: (ManualRoutineExercise) -> Void
 
     @State private var addedTrigger: Bool = false
+    @State private var editableDays: [EditableDay] = []
+    @State private var hasEdits: Bool = false
+    @State private var swapTarget: SwapTarget?
+    @State private var addTargetDayIndex: Int?
+    @State private var showSaveDecision: Bool = false
+    @State private var saveTrigger: Bool = false
+
+    struct EditableDay: Identifiable, Hashable {
+        let id: UUID
+        var dayName: String
+        var focus: String
+        var exercises: [ManualRoutineExercise]
+    }
+
+    struct SwapTarget: Identifiable {
+        let id = UUID()
+        let dayIndex: Int
+        let exerciseIndex: Int
+        let bodyPart: WeightBodyPart?
+    }
 
     var body: some View {
         NavigationStack {
@@ -352,8 +375,8 @@ struct PreMadeRoutineDetailSheet: View {
                     VStack(alignment: .leading, spacing: 16) {
                         routineHeader
 
-                        ForEach(routine.days) { day in
-                            dayCard(day)
+                        ForEach(Array(editableDays.enumerated()), id: \.element.id) { dayIdx, day in
+                            dayCard(day, dayIndex: dayIdx)
                         }
                     }
                     .padding(.horizontal, 20)
@@ -364,14 +387,67 @@ struct PreMadeRoutineDetailSheet: View {
             .navigationTitle(routine.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .foregroundStyle(KinexaTheme.primaryText)
+                    Button {
+                        if hasEdits {
+                            showSaveDecision = true
+                        } else {
+                            activateAsIs()
+                            dismiss()
+                        }
+                    } label: {
+                        Text(hasEdits ? "Save" : "Use Plan")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.accent)
+                    }
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            
             .sensoryFeedback(.impact(weight: .light), trigger: addedTrigger)
+            .sensoryFeedback(.success, trigger: saveTrigger)
+            .onAppear(perform: loadEditable)
+            .sheet(item: $swapTarget) { target in
+                ExerciseSwapPickerSheet(
+                    suggestedBodyPart: target.bodyPart,
+                    onPick: { newExercise in
+                        editableDays[target.dayIndex].exercises[target.exerciseIndex] = newExercise
+                        hasEdits = true
+                    }
+                )
+            }
+            .sheet(isPresented: Binding(
+                get: { addTargetDayIndex != nil },
+                set: { if !$0 { addTargetDayIndex = nil } }
+            )) {
+                ExerciseSwapPickerSheet(
+                    suggestedBodyPart: nil,
+                    onPick: { newExercise in
+                        if let idx = addTargetDayIndex {
+                            editableDays[idx].exercises.append(newExercise)
+                            hasEdits = true
+                        }
+                    }
+                )
+            }
+            .confirmationDialog("Save Changes", isPresented: $showSaveDecision, titleVisibility: .visible) {
+                Button("Save as New Routine") {
+                    saveAsCopy()
+                    saveTrigger.toggle()
+                    dismiss()
+                }
+                Button("Use for This Week Only") {
+                    activateEdited()
+                    saveTrigger.toggle()
+                    dismiss()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("You've modified this routine. Save as a new custom routine, or use these changes for this week only (original stays intact).")
+            }
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
@@ -402,7 +478,7 @@ struct PreMadeRoutineDetailSheet: View {
             .clipShape(Capsule())
     }
 
-    private func dayCard(_ day: PreMadeRoutineDay) -> some View {
+    private func dayCard(_ day: EditableDay, dayIndex: Int) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text(day.dayName)
@@ -415,40 +491,33 @@ struct PreMadeRoutineDetailSheet: View {
                     .foregroundStyle(Color(hex: "#6366F1"))
             }
 
-            VStack(spacing: 6) {
-                ForEach(day.exercises) { exercise in
-                    HStack(spacing: 10) {
-                        Circle()
-                            .fill(Color(hex: "#6366F1").opacity(0.5))
-                            .frame(width: 6, height: 6)
+            VStack(spacing: 8) {
+                ForEach(Array(day.exercises.enumerated()), id: \.element.id) { exIdx, exercise in
+                    exerciseRow(exercise, dayIndex: dayIndex, exerciseIndex: exIdx, focus: day.focus)
+                }
 
-                        Text(exercise.name)
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(KinexaTheme.primaryText)
-
+                Button {
+                    addTargetDayIndex = dayIndex
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.caption)
+                        Text("Add More")
+                            .font(.caption.weight(.semibold))
                         Spacer(minLength: 0)
-
-                        Text("\(exercise.sets)x\(exercise.reps)")
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(KinexaTheme.tertiaryText)
-
-                        Button {
-                            addedTrigger.toggle()
-                            let routineExercise = ManualRoutineExercise(
-                                name: exercise.name,
-                                category: day.focus,
-                                sets: exercise.sets,
-                                reps: exercise.reps,
-                                sourceType: .weightTraining
-                            )
-                            onAddExercise(routineExercise)
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.body)
-                                .foregroundStyle(Color(hex: "#6366F1"))
-                        }
+                    }
+                    .foregroundStyle(KinexaTheme.accent)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(KinexaTheme.accent.opacity(0.06))
+                    .clipShape(.rect(cornerRadius: 10))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 10)
+                            .strokeBorder(KinexaTheme.accent.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
                     }
                 }
+                .buttonStyle(PressScaleButtonStyle())
             }
         }
         .padding(14)
@@ -457,6 +526,239 @@ struct PreMadeRoutineDetailSheet: View {
         .elevatedCardShadow()
         .overlay {
             RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
+        }
+    }
+
+    private func exerciseRow(_ exercise: ManualRoutineExercise, dayIndex: Int, exerciseIndex: Int, focus: String) -> some View {
+        HStack(spacing: 10) {
+            Circle()
+                .fill(Color(hex: "#6366F1").opacity(0.5))
+                .frame(width: 6, height: 6)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(exercise.name)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(KinexaTheme.primaryText)
+                    .lineLimit(1)
+                Text("\(exercise.sets)×\(exercise.reps)")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+
+            Spacer(minLength: 0)
+
+            Button {
+                swapTarget = SwapTarget(
+                    dayIndex: dayIndex,
+                    exerciseIndex: exerciseIndex,
+                    bodyPart: inferBodyPart(from: focus)
+                )
+            } label: {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.caption)
+                    .foregroundStyle(KinexaTheme.accent)
+                    .padding(7)
+                    .background(KinexaTheme.accent.opacity(0.12))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                editableDays[dayIndex].exercises.remove(at: exerciseIndex)
+                hasEdits = true
+            } label: {
+                Image(systemName: "minus.circle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.red.opacity(0.7))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 4)
+    }
+
+    private func inferBodyPart(from focus: String) -> WeightBodyPart? {
+        let f = focus.lowercased()
+        if f.contains("chest") { return .chest }
+        if f.contains("back") { return .back }
+        if f.contains("shoulder") { return .shoulders }
+        if f.contains("bicep") { return .biceps }
+        if f.contains("tricep") { return .triceps }
+        if f.contains("leg") || f.contains("quad") || f.contains("hamstring") { return .legs }
+        if f.contains("glute") { return .glutes }
+        if f.contains("core") || f.contains("ab") { return .core }
+        return nil
+    }
+
+    private func loadEditable() {
+        guard editableDays.isEmpty else { return }
+        editableDays = routine.days.map { day in
+            EditableDay(
+                id: day.id,
+                dayName: day.dayName,
+                focus: day.focus,
+                exercises: day.exercises.map {
+                    ManualRoutineExercise(
+                        name: $0.name,
+                        category: day.focus,
+                        sets: $0.sets,
+                        reps: $0.reps,
+                        notes: $0.notes,
+                        sourceType: .weightTraining
+                    )
+                }
+            )
+        }
+    }
+
+    private func toManualRoutine(name: String) -> ManualRoutine {
+        let days = editableDays.map { ed in
+            ManualRoutineDay(dayName: ed.dayName, exercises: ed.exercises)
+        }
+        return ManualRoutine(name: name, days: days)
+    }
+
+    private func activateAsIs() {
+        appVM.activateManualRoutine(toManualRoutine(name: routine.name))
+    }
+
+    private func activateEdited() {
+        appVM.activateManualRoutine(toManualRoutine(name: routine.name))
+    }
+
+    private func saveAsCopy() {
+        let copy = toManualRoutine(name: "\(routine.name) (My Copy)")
+        var saved = LocalStore.load([ManualRoutine].self, forKey: "manualRoutines", fallback: [])
+        saved.append(copy)
+        LocalStore.save(saved, forKey: "manualRoutines")
+        appVM.activateManualRoutine(copy)
+    }
+}
+
+// MARK: - Swap / Add Picker
+
+struct ExerciseSwapPickerSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let suggestedBodyPart: WeightBodyPart?
+    let onPick: (ManualRoutineExercise) -> Void
+
+    @State private var searchText: String = ""
+    @State private var viewAll: Bool = false
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                KinexaTheme.background.ignoresSafeArea()
+
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 14) {
+                        if let part = suggestedBodyPart, !viewAll, searchText.isEmpty {
+                            sectionHeader("Suggested for \(part.rawValue)")
+                            exerciseList(WeightExerciseLibrary.exercises(for: part))
+
+                            Button {
+                                viewAll = true
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "books.vertical.fill")
+                                    Text("Browse Full Library")
+                                        .font(.subheadline.weight(.semibold))
+                                }
+                                .foregroundStyle(KinexaTheme.accent)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(KinexaTheme.accent.opacity(0.08))
+                                .clipShape(.rect(cornerRadius: 12))
+                            }
+                            .buttonStyle(PressScaleButtonStyle())
+                            .padding(.top, 4)
+                        } else {
+                            sectionHeader(searchText.isEmpty ? "All Exercises" : "Results")
+                            exerciseList(filteredExercises)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 12)
+                    .padding(.bottom, 48)
+                }
+            }
+            .navigationTitle("Pick Exercise")
+            .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $searchText, prompt: "Search exercises")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+            }
+            .toolbarBackground(KinexaTheme.background, for: .navigationBar)
+        }
+    }
+
+    private var filteredExercises: [WeightExerciseDefinition] {
+        if searchText.isEmpty {
+            return WeightExerciseLibrary.allExercises
+        }
+        return WeightExerciseLibrary.allExercises.filter {
+            $0.name.localizedStandardContains(searchText)
+        }
+    }
+
+    private func sectionHeader(_ text: String) -> some View {
+        Text(text.uppercased())
+            .font(.caption.weight(.heavy))
+            .tracking(1.2)
+            .foregroundStyle(KinexaTheme.tertiaryText)
+            .padding(.leading, 4)
+    }
+
+    private func exerciseList(_ exercises: [WeightExerciseDefinition]) -> some View {
+        LazyVStack(spacing: 8) {
+            ForEach(exercises) { ex in
+                Button {
+                    let picked = ManualRoutineExercise(
+                        name: ex.name,
+                        category: ex.bodyPart.rawValue,
+                        sets: ex.defaultSets,
+                        reps: ex.defaultReps,
+                        sourceType: .weightTraining
+                    )
+                    onPick(picked)
+                    dismiss()
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: ex.bodyPart.icon)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Color(hex: "#6366F1"))
+                            .frame(width: 32, height: 32)
+                            .background(Color(hex: "#6366F1").opacity(0.12))
+                            .clipShape(.rect(cornerRadius: 8))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(ex.name)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(KinexaTheme.primaryText)
+                            Text("\(ex.bodyPart.rawValue) · \(ex.equipment)")
+                                .font(.caption2.weight(.medium))
+                                .foregroundStyle(KinexaTheme.tertiaryText)
+                        }
+
+                        Spacer(minLength: 0)
+
+                        Text("\(ex.defaultSets)×\(ex.defaultReps)")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+                    .padding(12)
+                    .background(KinexaTheme.card)
+                    .clipShape(.rect(cornerRadius: 12))
+                    .elevatedCardShadow()
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12).stroke(KinexaTheme.border)
+                    }
+                }
+                .buttonStyle(PressScaleButtonStyle())
+            }
         }
     }
 }

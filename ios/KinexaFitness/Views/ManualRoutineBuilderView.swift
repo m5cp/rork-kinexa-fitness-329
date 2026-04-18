@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ManualRoutineBuilderView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppViewModel.self) private var appVM
 
     @State private var routine: ManualRoutine
     @State private var showWeightBrowser: Bool = false
@@ -381,6 +382,7 @@ struct ManualRoutineBuilderView: View {
             saved.append(routine)
         }
         LocalStore.save(saved, forKey: "manualRoutines")
+        appVM.activateManualRoutine(routine)
     }
 }
 

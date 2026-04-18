@@ -90,55 +90,74 @@ struct WorkoutsTabView: View {
     // MARK: - Top Action Buttons
 
     private var topActionButtons: some View {
-        VStack(spacing: 10) {
-            Button {
+        VStack(spacing: 12) {
+            heroActionCard(
+                title: "Build My Training Plan",
+                subtitle: "AI-generated weekly programming",
+                icon: "sparkles",
+                gradient: [Color(hex: "#F59E0B"), Color(hex: "#D97706")]
+            ) {
                 toolTapTrigger.toggle()
                 showWODPlanSheet = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "sparkles")
-                        .font(.body.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 42, height: 42)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .clipShape(.rect(cornerRadius: 11))
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("Build My Training Plan")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(KinexaTheme.primaryText)
-                        Text("AI-generated weekly programming")
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(KinexaTheme.tertiaryText)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(KinexaTheme.tertiaryText)
-                }
-                .padding(16)
-                .background(KinexaTheme.card)
-                .clipShape(.rect(cornerRadius: 16))
-                .elevatedCardShadow()
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color(hex: "#F59E0B").opacity(0.2))
-                }
             }
-            .buttonStyle(PressScaleButtonStyle())
 
-
+            heroActionCard(
+                title: "Manual Build",
+                subtitle: "Design your own weekly routine",
+                icon: "square.and.pencil",
+                gradient: [Color(hex: "#6366F1"), Color(hex: "#4338CA")]
+            ) {
+                toolTapTrigger.toggle()
+                pendingExercises = []
+                showManualBuilder = true
+            }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
+    }
+
+    private func heroActionCard(title: String, subtitle: String, icon: String, gradient: [Color], action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.body.weight(.bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 42, height: 42)
+                    .background(
+                        LinearGradient(
+                            colors: gradient,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .clipShape(.rect(cornerRadius: 11))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text(subtitle)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background(KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 16))
+            .elevatedCardShadow()
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke((gradient.first ?? .clear).opacity(0.2))
+            }
+        }
+        .buttonStyle(PressScaleButtonStyle())
     }
 
     // MARK: - Planner Blocks
