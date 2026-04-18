@@ -1,40 +1,37 @@
-# Make Kinexa welcoming for walkers, beginners, and calorie trackers
+# Add Light, Dark & System appearance with per-palette light variants
 
-Soften the app so casual users — walkers, beginners, and people mainly tracking calories — feel welcomed instead of pushed.
+## What you'll get
 
-## Home screen — neutral choice tiles
+A premium appearance system that respects Apple's standards — the app can follow the device setting, or be forced Light or Dark, and every color palette will look polished in both modes.
 
-- Replace the "Generate Today's Session" hero with three equal-weight tiles:
-  - **Log a Walk** (jumps into quick walk logging in Cardio)
-  - **Log Food** (jumps into the nutrition log)
-  - **Start a Workout** (jumps into workouts)
-- Move "Today's Session" suggestion lower on the screen as an optional card, not the headline.
-- Keep the rest of the home layout (rings, stats, recent activity) intact.
+## Features
 
-## Plan generator — beginner tier expanded
+- **Appearance toggle** with three options: System, Light, and Dark
+- The toggle lives in **two places**: at the top of the Style Editor, and inside Profile → App settings
+- **System** mode automatically follows the iPhone's own Light/Dark setting and flips instantly when the user changes it in Control Center
+- **All 8 color palettes** (Ocean, Sunset, Berry, Sage, Slate, Ember, Lavender, Midnight) get a hand-tuned Light variant — soft off-white backgrounds, proper card tints, readable text, and accent colors adjusted for contrast on light surfaces
+- Switching appearance or palette animates smoothly with a subtle haptic tap
+- Text, icons, dividers, and card surfaces throughout the app adapt correctly — no more stark white text on a white background
 
-- Expand the existing **Beginner** level so it:
-  - Defaults cardio to **walking** (with optional light jog progression)
-  - Uses **bodyweight or light dumbbell** routines instead of heavier lifting
-  - Keeps session count and duration modest (short, approachable sessions)
-- No new level added — keeps the picker clean.
-- Walking stays inside the Cardio section (not promoted to its own top-level area).
+## Design
 
-## Softer tone across the app
+- **Style Editor** gets a new section at the very top called "Appearance" with a clean three-option segmented control (System / Light / Dark), each with an SF Symbol icon (iPhone, sun, moon)
+- Below it, the existing palette grid now shows each palette's preview in the currently-selected appearance, so users see exactly what they'll get
+- **Profile → App** gets a new row "Appearance" that shows the current choice and opens a compact picker
+- Light mode uses warm off-whites (not pure white) for a premium editorial feel, with soft shadows and properly tinted cards — inspired by Apple Fitness, Health, and Journal
+- Dark mode stays exactly as it is today, so nothing looks different for current users
+- System mode badge shows a tiny live indicator so users know it's tracking their device
 
-Rewrite aggressive or "gym-bro" language to feel calm and encouraging. Examples:
-- "Generate Today's Session" → "Suggest something for today"
-- "Crush your workout" / "Push yourself" style copy → "Move a little today" / "Nice work"
-- Empty states celebrate any activity (a walk, a logged meal), not just workouts
-- Plan generator descriptions use friendlier, less intense wording
-- Beginner plan copy reassures rather than challenges
+## Screens touched
 
-## What stays the same
+- **Style Editor** — new Appearance section at top, palette previews become appearance-aware
+- **Profile → App settings** — new Appearance row with inline picker
+- **Every screen in the app** — backgrounds, cards, text, borders, and dividers automatically adapt because the theme system now returns the right color for the active mode
 
-- All existing features remain — workouts, cardio browser, nutrition, scan, plan generator, progress rings.
-- No data model changes, no removal of existing functionality.
-- Advanced users still get the full intensity if they pick higher levels.
+## Stability & safety
 
-## Result
+- The existing dark experience is preserved byte-for-byte as the Dark variant
+- Your saved palette choice carries over — no reset, no lost preferences
+- All hardcoded white text is replaced with adaptive text colors in one pass so nothing ends up invisible in Light mode
+- No new dependencies, no architectural changes to nutrition, workouts, or any other feature
 
-A walker who opens the app sees three simple choices and friendly language. A beginner who generates a plan gets walking + bodyweight by default. Someone who mainly tracks calories can log food in one tap from the home screen without being nudged into a workout.

@@ -47,7 +47,7 @@ struct ProgressViewScreen: View {
         .navigationTitle("Progress")
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .navigationDestination(isPresented: $showCompletedWorkouts) {
             CompletedWorkoutsListView()
         }

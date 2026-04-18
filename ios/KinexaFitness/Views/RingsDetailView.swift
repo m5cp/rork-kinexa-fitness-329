@@ -35,7 +35,7 @@ struct RingsDetailView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sheet(isPresented: $showHistory) {
                 RingsHistoryCalendarView(nutritionVM: nutritionVM, ringsVM: ringsVM)
                     .environment(appVM)

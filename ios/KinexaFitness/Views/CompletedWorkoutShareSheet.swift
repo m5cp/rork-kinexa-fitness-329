@@ -110,7 +110,7 @@ struct CompletedWorkoutShareSheet: View {
             .navigationTitle("Share Workout")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }

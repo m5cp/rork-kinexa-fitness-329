@@ -64,7 +64,7 @@ struct PreMadeCardioProgramsView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sheet(item: $selectedProgram) { program in
                 PreMadeCardioProgramDetailView(program: program)
             }

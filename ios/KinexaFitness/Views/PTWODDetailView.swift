@@ -39,7 +39,7 @@ struct PTWODDetailView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sheet(isPresented: $showQRSheet) {
                 if let workout {
                     WorkoutQRSheet(workout: workout, workoutType: "Training Plan")
@@ -587,7 +587,7 @@ struct PTWODShareSheet: View {
             .navigationTitle("Share Workout")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }

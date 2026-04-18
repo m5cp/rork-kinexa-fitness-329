@@ -55,7 +55,7 @@ struct ProfileView: View {
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .onAppear {
             reminderTime = Calendar.current.date(from: DateComponents(hour: reminderHour, minute: reminderMinute)) ?? .now
         }
@@ -536,8 +536,14 @@ struct ProfileView: View {
 
     // MARK: - App Controls
 
+    @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
+
     private var appControlsSection: some View {
         settingsSection(title: "APP", icon: "gearshape") {
+            appearanceRow
+
+            sectionDivider
+
             NavigationLink {
                 StyleEditorView()
             } label: {
@@ -563,6 +569,34 @@ struct ProfileView: View {
             .sensoryFeedback(.warning, trigger: resetAllTrigger)
 
         }
+    }
+
+    private var appearanceRow: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(KinexaTheme.accent.opacity(0.15))
+                    .frame(width: 30, height: 30)
+                Image(systemName: (AppearanceMode(rawValue: appearanceModeRaw) ?? .system).iconName)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(KinexaTheme.accent)
+            }
+
+            Text("Appearance")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(KinexaTheme.primaryText)
+
+            Spacer()
+
+            Picker("Appearance", selection: $appearanceModeRaw) {
+                ForEach(AppearanceMode.allCases) { mode in
+                    Text(mode.title).tag(mode.rawValue)
+                }
+            }
+            .pickerStyle(.menu)
+            .tint(KinexaTheme.accent)
+        }
+        .frame(minHeight: 44)
     }
 
     // MARK: - Support
@@ -762,7 +796,7 @@ struct ProfileView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
@@ -938,7 +972,7 @@ struct ProfileView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)

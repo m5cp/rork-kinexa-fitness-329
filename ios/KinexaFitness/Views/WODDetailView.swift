@@ -45,7 +45,7 @@ struct WODDetailView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sheet(isPresented: $showQRSheet) {
                 if let workout {
                     WorkoutQRSheet(workout: workout, workoutType: "FunctionFitness")

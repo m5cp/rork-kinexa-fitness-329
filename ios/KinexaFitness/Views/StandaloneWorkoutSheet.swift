@@ -44,7 +44,7 @@ struct StandaloneWorkoutSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sheet(isPresented: $showQRSheet) {
                 WorkoutQRSheet(workout: workout, workoutType: sheetTitle)
             }

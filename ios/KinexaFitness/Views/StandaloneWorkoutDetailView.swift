@@ -55,7 +55,7 @@ struct StandaloneWorkoutDetailView: View {
         .navigationTitle(workout.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .sensoryFeedback(.success, trigger: completeTrigger)
     }
 

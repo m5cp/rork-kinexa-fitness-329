@@ -74,7 +74,7 @@ struct RingsHistoryCalendarView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sheet(item: Binding(
                 get: { selectedDate.map { IdentifiableDate(date: $0) } },
                 set: { selectedDate = $0?.date }

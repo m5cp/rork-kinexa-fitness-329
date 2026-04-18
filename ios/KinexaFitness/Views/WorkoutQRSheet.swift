@@ -37,7 +37,7 @@ struct WorkoutQRSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .alert("Saved", isPresented: $showSavedAlert) {
                 Button("OK", role: .cancel) {}
             } message: {

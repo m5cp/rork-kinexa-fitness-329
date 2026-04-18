@@ -34,7 +34,7 @@ struct LogStrengthWorkoutSheet: View {
             .navigationTitle("Log Strength Workout")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

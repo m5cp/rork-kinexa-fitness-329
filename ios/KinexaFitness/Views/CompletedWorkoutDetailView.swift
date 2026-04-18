@@ -63,7 +63,7 @@ struct CompletedWorkoutDetailView: View {
         .navigationTitle(record.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 12) {

@@ -60,7 +60,7 @@ struct ShareCardEditorView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sheet(isPresented: $showStickerPicker) {
                 StickerPickerSheet { sticker in
                     stickers.append(sticker)
@@ -1011,7 +1011,7 @@ struct TextOverlayEditorSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
@@ -1170,7 +1170,7 @@ struct StickerPickerSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)

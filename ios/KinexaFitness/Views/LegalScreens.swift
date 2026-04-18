@@ -43,7 +43,7 @@ struct LegalDetailView: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
     }
 
     private var headerCard: some View {

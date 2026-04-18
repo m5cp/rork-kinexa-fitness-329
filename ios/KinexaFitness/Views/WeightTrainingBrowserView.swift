@@ -74,7 +74,7 @@ struct WeightTrainingBrowserView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sensoryFeedback(.impact(weight: .light), trigger: addedTrigger)
             .sheet(isPresented: $showPreMadeRoutines) {
                 PreMadeRoutinesView(onAddExercise: onAddExercise)

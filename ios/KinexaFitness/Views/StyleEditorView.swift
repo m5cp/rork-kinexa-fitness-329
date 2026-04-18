@@ -3,7 +3,12 @@ import SwiftUI
 struct StyleEditorView: View {
     @State private var themeManager = ThemeManager.shared
     @State private var selectedPalette: ColorPalette = ThemeManager.shared.currentPalette
+    @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
     @State private var changeTrigger: Bool = false
+
+    private var appearanceMode: AppearanceMode {
+        AppearanceMode(rawValue: appearanceModeRaw) ?? .system
+    }
 
     var body: some View {
         ZStack {
@@ -11,6 +16,7 @@ struct StyleEditorView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 28) {
+                    appearanceSection
                     palettePicker
                 }
                 .padding(.horizontal, 20)
@@ -22,8 +28,63 @@ struct StyleEditorView: View {
         .navigationTitle("Style Editor")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
         .sensoryFeedback(.impact(weight: .medium), trigger: changeTrigger)
+    }
+
+    private var appearanceSection: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 6) {
+                Image(systemName: "circle.lefthalf.filled")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+                Text("APPEARANCE")
+                    .font(.caption.weight(.bold))
+                    .tracking(0.8)
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 4)
+            .padding(.bottom, 10)
+
+            HStack(spacing: 8) {
+                ForEach(AppearanceMode.allCases) { mode in
+                    appearanceButton(mode)
+                }
+            }
+        }
+    }
+
+    private func appearanceButton(_ mode: AppearanceMode) -> some View {
+        let isSelected = appearanceMode == mode
+        return Button {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                appearanceModeRaw = mode.rawValue
+                changeTrigger.toggle()
+            }
+        } label: {
+            VStack(spacing: 8) {
+                Image(systemName: mode.iconName)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(isSelected ? KinexaTheme.accent : KinexaTheme.secondaryText)
+                Text(mode.title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(isSelected ? KinexaTheme.primaryText : KinexaTheme.secondaryText)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(isSelected ? KinexaTheme.accent.opacity(0.12) : KinexaTheme.card)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(
+                        isSelected ? KinexaTheme.accent.opacity(0.5) : KinexaTheme.border,
+                        lineWidth: isSelected ? 1.5 : 1
+                    )
+            }
+        }
+        .buttonStyle(PressScaleButtonStyle())
     }
 
     private var palettePicker: some View {
@@ -75,7 +136,7 @@ struct StyleEditorView: View {
                 VStack(spacing: 4) {
                     Text(palette.displayName)
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(KinexaTheme.primaryText)
 
                     RoundedRectangle(cornerRadius: 4)
                         .fill(
@@ -96,7 +157,7 @@ struct StyleEditorView: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
-                        isSelected ? colors.accent : Color.white.opacity(0.06),
+                        isSelected ? colors.accent : KinexaTheme.border,
                         lineWidth: isSelected ? 2 : 1
                     )
             }
@@ -112,6 +173,4 @@ struct StyleEditorView: View {
         }
         .buttonStyle(PressScaleButtonStyle())
     }
-
-
 }

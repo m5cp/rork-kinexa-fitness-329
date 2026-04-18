@@ -49,7 +49,7 @@ struct ActiveSessionView: View {
         .navigationTitle(workoutTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if !showCompletion && !exercises.isEmpty {

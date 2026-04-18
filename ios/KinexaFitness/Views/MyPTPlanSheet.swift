@@ -73,7 +73,7 @@ struct MyPTPlanSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sensoryFeedback(.impact(weight: .medium), trigger: refreshTrigger)
             .sensoryFeedback(.success, trigger: actionTrigger)
             .sheet(isPresented: $showCalendarSheet) {
@@ -1095,7 +1095,7 @@ struct PlanShareSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .alert("Saved", isPresented: $showSavedAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
@@ -1214,7 +1214,7 @@ struct PlanPDFExportSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sheet(isPresented: $showShareSheet) {
                 if let pdfURL {
                     ShareSheet(items: [pdfURL])

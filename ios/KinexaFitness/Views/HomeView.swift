@@ -164,7 +164,7 @@ struct HomeView: View {
             }
         }
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .navigationDestination(isPresented: $showWorkoutDetail) {
             if let today = vm.todayWorkout {
                 WorkoutDetailView(dayIndex: today.dayIndex, isStandalone: false)
@@ -251,7 +251,7 @@ struct HomeView: View {
                         }
                     }
                     .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-                    .toolbarColorScheme(.dark, for: .navigationBar)
+                    
                 }
             }
         }

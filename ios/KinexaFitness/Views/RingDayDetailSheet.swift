@@ -78,7 +78,7 @@ struct RingDayDetailSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
     }
 

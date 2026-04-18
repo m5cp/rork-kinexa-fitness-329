@@ -130,7 +130,7 @@ struct WorkoutCompletionShareSheet: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Workout Complete")

@@ -100,7 +100,7 @@ struct EditWorkoutSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sheet(isPresented: $showAddExercise) {
                 AddExerciseSheet { newExercise in
                     exercises.append(newExercise)
@@ -583,7 +583,7 @@ struct AddExerciseSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)

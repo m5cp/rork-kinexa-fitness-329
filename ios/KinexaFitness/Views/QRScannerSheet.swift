@@ -43,7 +43,7 @@ struct QRScannerSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sensoryFeedback(.success, trigger: savedConfirmation)
         }
     }

@@ -71,7 +71,7 @@ struct CompletedWorkoutsListView: View {
         .navigationTitle("Completed Workouts")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .navigationDestination(isPresented: $showDetail) {
             if let record = selectedRecord {
                 CompletedWorkoutDetailView(record: record)

@@ -39,7 +39,7 @@ struct TokenStoreView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .alert("Error", isPresented: .init(
                 get: { store.error != nil },
                 set: { if !$0 { store.error = nil } }

@@ -24,7 +24,7 @@ struct CardioSessionDetailView: View {
         .navigationTitle(session.workoutName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
     }
 
     private var header: some View {

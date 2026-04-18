@@ -52,7 +52,7 @@ struct ActiveQuickStartView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack(spacing: 6) {

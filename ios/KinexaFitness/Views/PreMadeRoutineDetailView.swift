@@ -33,7 +33,7 @@ struct PreMadeRoutineDetailView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
 
         }
     }

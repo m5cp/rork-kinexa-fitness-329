@@ -32,7 +32,7 @@ struct NutritionPartnerView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)

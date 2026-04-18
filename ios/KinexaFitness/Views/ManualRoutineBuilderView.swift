@@ -72,7 +72,7 @@ struct ManualRoutineBuilderView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sensoryFeedback(.success, trigger: saveTrigger)
             .sheet(isPresented: $showWeightBrowser) {
                 WeightTrainingBrowserView { exercise in
@@ -421,7 +421,7 @@ struct CardioBrowserForRoutineView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sensoryFeedback(.impact(weight: .light), trigger: addedTrigger)
             .sheet(isPresented: $showCardioByType) {
                 CardioByTypeView(onAddExercise: onAddExercise)

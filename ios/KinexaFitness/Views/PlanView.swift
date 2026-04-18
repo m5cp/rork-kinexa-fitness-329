@@ -78,7 +78,7 @@ struct PlanView: View {
             }
         }
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .navigationDestination(isPresented: $navigateToDetail) {
             if vm.currentPlan?.days.contains(where: { $0.dayIndex == detailDayIndex }) == true {
                 WorkoutDetailView(dayIndex: detailDayIndex, isStandalone: false)
@@ -114,7 +114,7 @@ struct PlanView: View {
                         }
                     }
                     .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-                    .toolbarColorScheme(.dark, for: .navigationBar)
+                    
                 }
             }
         }

@@ -41,7 +41,7 @@ struct CardioWorkoutsView: View {
         .navigationTitle("Cardio")
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .searchable(text: $searchText, prompt: "Search workouts")
         .sheet(item: $workoutToLog) { workout in
             LogCardioSessionSheet(workout: workout)

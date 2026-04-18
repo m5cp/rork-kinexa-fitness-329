@@ -58,7 +58,7 @@ struct WODPlanDayDetailSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
         .onAppear {
             movements = day.template.movements

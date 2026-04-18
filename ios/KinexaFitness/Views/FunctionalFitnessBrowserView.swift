@@ -64,7 +64,7 @@ struct FunctionalFitnessBrowserView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sensoryFeedback(.impact(weight: .light), trigger: addedTrigger)
             .sensoryFeedback(.success, trigger: setAsTodayTrigger)
             .sheet(isPresented: $showSearchExerciseSheet) {
@@ -521,7 +521,7 @@ struct ExerciseSearchSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .sensoryFeedback(.impact(weight: .light), trigger: addedTrigger)
         }
         .presentationDetents([.large])

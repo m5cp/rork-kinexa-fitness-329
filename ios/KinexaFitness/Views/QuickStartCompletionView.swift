@@ -57,7 +57,7 @@ struct QuickStartCompletionView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
             .fullScreenCover(isPresented: $showShareCardEditor) {
                 if let image = shareCardImage {
                     ShareCardEditorView(baseImage: image)

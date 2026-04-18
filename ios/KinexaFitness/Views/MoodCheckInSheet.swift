@@ -98,7 +98,7 @@ struct MoodCheckInSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
         .onAppear {
             if let existing = ringsVM.todayMood {

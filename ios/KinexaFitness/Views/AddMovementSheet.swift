@@ -82,7 +82,7 @@ struct AddMovementSheet: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)

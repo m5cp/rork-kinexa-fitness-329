@@ -40,7 +40,7 @@ struct TrainingCalendarView: View {
         .navigationTitle("Training Calendar")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .navigationDestination(isPresented: $navigateToCalendarDay) {
             CalendarDayDetailView(date: selectedDate)
         }

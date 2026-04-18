@@ -36,7 +36,7 @@ struct WorkoutsTabView: View {
         .navigationTitle("Workouts")
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .sheet(isPresented: $showWODPlanSheet) {
             WODPlanSheet()
         }

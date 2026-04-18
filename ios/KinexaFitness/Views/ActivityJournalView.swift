@@ -31,7 +31,7 @@ struct ActivityJournalView: View {
         .navigationTitle("Activity Journal")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        
         .navigationDestination(isPresented: $navigateToDay) {
             JournalDayDetailView(date: selectedDate)
         }
