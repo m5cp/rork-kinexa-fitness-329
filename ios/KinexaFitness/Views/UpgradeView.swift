@@ -13,7 +13,7 @@ struct UpgradeView: View {
     private let proFeatures: [(icon: String, title: String, desc: String)] = [
         ("bolt.shield.fill", "Advanced PT Plans", "Full plan generation & customization"),
         ("chart.line.uptrend.xyaxis", "AI Insights", "On-device intelligence for smarter training"),
-        ("fork.knife", "Full Nutrition Suite", "AI food scanning, recipes & macro insights"),
+        ("fork.knife", "Full Nutrition Suite", "AI food scanning & macro insights"),
         ("person.3.fill", "Unit PT Builder", "Build & share group workouts"),
         ("doc.text.fill", "PDF & Calendar Export", "Export plans, scores & schedules"),
         ("square.and.arrow.up.fill", "Share Cards & QR", "Share progress & import workouts")
