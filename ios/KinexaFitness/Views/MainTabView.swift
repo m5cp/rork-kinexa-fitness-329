@@ -30,6 +30,8 @@ nonisolated enum AppTab: Int, CaseIterable, Sendable {
 
 struct MainTabView: View {
     @Environment(AppViewModel.self) private var vm
+    @AppStorage("pendingInitialTab") private var pendingInitialTab: Int = AppTab.home.rawValue
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     @State private var selectedTab: AppTab = .home
     @State private var homePath = NavigationPath()
     @State private var workoutsPath = NavigationPath()
@@ -94,6 +96,13 @@ struct MainTabView: View {
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
                 .presentationContentInteraction(.scrolls)
+        }
+        .onChange(of: hasCompletedOnboarding) { _, completed in
+            if completed, let tab = AppTab(rawValue: pendingInitialTab) {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                    selectedTab = tab
+                }
+            }
         }
     }
 

@@ -1,503 +1,440 @@
 import SwiftUI
 
-struct OnboardingView: View {
-    @AppStorage("onboardingComplete") private var onboardingComplete: Bool = false
-    @AppStorage("ptMode") private var ptModeRaw: String = PTMode.both.rawValue
-    @AppStorage("trainingFocus") private var trainingFocusRaw: String = TrainingFocus.generalFitness.rawValue
-    @AppStorage("fitnessLevel") private var fitnessLevelRaw: String = FitnessLevel.intermediate.rawValue
-    @AppStorage("equipment") private var equipmentRaw: String = EquipmentOption.bodyweight.rawValue
-    @AppStorage("daysPerWeek") private var daysPerWeek: Int = 3
-    @AppStorage("minutesPerWorkout") private var minutesPerWorkout: Int = 30
-    @AppStorage("disclaimerAccepted") private var disclaimerAccepted: Bool = false
+nonisolated enum OnboardingGoal: String, CaseIterable, Sendable {
+    case loseFat = "Lose Fat"
+    case buildMuscle = "Build Muscle"
+    case improvePerformance = "Improve Performance"
+    case stayConsistent = "Stay Consistent"
 
-    @Environment(AppViewModel.self) private var vm
+    var icon: String {
+        switch self {
+        case .loseFat: return "flame.fill"
+        case .buildMuscle: return "dumbbell.fill"
+        case .improvePerformance: return "bolt.fill"
+        case .stayConsistent: return "checkmark.seal.fill"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .loseFat: return "Cut calories, keep strength"
+        case .buildMuscle: return "Train heavy, eat more protein"
+        case .improvePerformance: return "Push harder, recover smarter"
+        case .stayConsistent: return "Build the habit, no pressure"
+        }
+    }
+}
+
+nonisolated enum TrackingPreference: String, CaseIterable, Sendable {
+    case caloriesOnly = "Calories Only"
+    case caloriesProtein = "Calories + Protein"
+    case fullMacros = "Full Macros"
+
+    var subtitle: String {
+        switch self {
+        case .caloriesOnly: return "Fastest — just the basics"
+        case .caloriesProtein: return "Recommended"
+        case .fullMacros: return "Protein, carbs, and fat"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .caloriesOnly: return "number"
+        case .caloriesProtein: return "chart.bar.fill"
+        case .fullMacros: return "chart.pie.fill"
+        }
+    }
+}
+
+struct OnboardingView: View {
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+    @AppStorage("selectedGoal") private var selectedGoalRaw: String = OnboardingGoal.stayConsistent.rawValue
+    @AppStorage("trackingPreference") private var trackingPreferenceRaw: String = TrackingPreference.caloriesProtein.rawValue
+    @AppStorage("pendingInitialTab") private var pendingInitialTab: Int = AppTab.home.rawValue
+    @AppStorage("showFirstMealHint") private var showFirstMealHint: Bool = false
 
     @State private var step: Int = 0
-    @State private var isGenerating: Bool = false
-    @State private var hasAgreed: Bool = false
-
-    private let totalSteps: Int = 5
+    @State private var selectionTrigger: Bool = false
 
     var body: some View {
         GeometryReader { geo in
             ZStack {
                 KinexaTheme.background.ignoresSafeArea()
 
-                VStack(spacing: 0) {
-                    if step > 0 {
-                        progressIndicator
-                            .padding(.top, 16)
-                            .padding(.horizontal, 32)
-                    }
+                backgroundGlow
+                    .ignoresSafeArea()
 
-                    ScrollView(.vertical, showsIndicators: false) {
-                        currentStepContent
+                VStack(spacing: 0) {
+                    topBar
+                        .padding(.horizontal, 20)
+                        .padding(.top, 8)
+
+                    ScrollView(showsIndicators: false) {
+                        content
                             .padding(.horizontal, 24)
-                            .frame(maxWidth: min(geo.size.width - 48, 440))
+                            .frame(maxWidth: min(geo.size.width, 480))
                             .frame(maxWidth: .infinity)
-                            .padding(.top, step == 0 ? 60 : 32)
+                            .padding(.top, step == 0 ? 40 : 16)
                             .padding(.bottom, 24)
                     }
 
-                    bottomButtons
+                    bottomBar
                         .padding(.horizontal, 24)
-                        .padding(.bottom, geo.safeAreaInsets.bottom > 0 ? 12 : 20)
-                        .frame(maxWidth: min(geo.size.width - 48, 440))
+                        .padding(.bottom, geo.safeAreaInsets.bottom > 0 ? 8 : 20)
+                        .frame(maxWidth: min(geo.size.width, 480))
                         .frame(maxWidth: .infinity)
                 }
             }
         }
-        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: step)
+        .animation(.spring(response: 0.45, dampingFraction: 0.85), value: step)
+        .sensoryFeedback(.selection, trigger: selectionTrigger)
     }
 
-    // MARK: - Progress
+    private var backgroundGlow: some View {
+        Circle()
+            .fill(
+                RadialGradient(
+                    colors: [KinexaTheme.accent.opacity(0.22), .clear],
+                    center: .center,
+                    startRadius: 20,
+                    endRadius: 280
+                )
+            )
+            .frame(width: 520, height: 520)
+            .offset(y: -220)
+            .blur(radius: 40)
+    }
 
-    private var progressIndicator: some View {
+    // MARK: - Top bar
+
+    private var topBar: some View {
+        HStack(alignment: .center) {
+            if step > 0 && step < 3 {
+                progressBar
+                    .frame(maxWidth: 160)
+            } else {
+                Spacer()
+            }
+
+            Spacer()
+
+            Button {
+                complete(initialTab: .home)
+            } label: {
+                Text("Skip")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(KinexaTheme.secondaryText)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(Color.white.opacity(0.06))
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(height: 36)
+    }
+
+    private var progressBar: some View {
         HStack(spacing: 6) {
-            ForEach(1..<totalSteps, id: \.self) { i in
+            ForEach(1...2, id: \.self) { i in
                 Capsule()
-                    .fill(i <= step ? KinexaTheme.accent : Color.white.opacity(0.1))
+                    .fill(i <= step ? KinexaTheme.accent : Color.white.opacity(0.12))
                     .frame(height: 4)
-                    .animation(.spring(response: 0.3), value: step)
             }
         }
     }
 
-    // MARK: - Step Router
+    // MARK: - Content
 
     @ViewBuilder
-    private var currentStepContent: some View {
+    private var content: some View {
         switch step {
-        case 0: welcomeStep
-        case 1: trainingSetupStep
-        case 2: scheduleStep
-        case 3: disclaimerStep
-        case 4: reviewStep
-        default: EmptyView()
+        case 0: hookStep
+        case 1: goalStep
+        case 2: trackingStep
+        default: readyStep
         }
     }
 
-    // MARK: - Step 0: Welcome
+    // MARK: - Step 0 — Hook
 
-    private var welcomeStep: some View {
-        VStack(spacing: 32) {
-            Image("AppLogo")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 120, height: 120)
-                .clipShape(RoundedRectangle(cornerRadius: 28))
+    private var hookStep: some View {
+        VStack(spacing: 28) {
+            ZStack {
+                Circle()
+                    .fill(KinexaTheme.accent.opacity(0.12))
+                    .frame(width: 120, height: 120)
+
+                Image("AppLogo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 96, height: 96)
+                    .clipShape(RoundedRectangle(cornerRadius: 22))
+            }
+
+            VStack(spacing: 14) {
+                Text("Train hard.\nFuel smarter.\nStay consistent.")
+                    .font(.system(size: 34, weight: .heavy))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(2)
+
+                Text("Track workouts, log meals, and stay on track without overthinking it.")
+                    .font(.body)
+                    .foregroundStyle(KinexaTheme.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+                    .padding(.horizontal, 8)
+            }
+        }
+    }
+
+    // MARK: - Step 1 — Goal
+
+    private var goalStep: some View {
+        VStack(spacing: 24) {
+            stepHeader(
+                eyebrow: "Step 1 of 2",
+                title: "What are you focused on right now?",
+                subtitle: "Pick one — you can change this anytime."
+            )
 
             VStack(spacing: 10) {
-                Text("KINEXA FIT")
-                    .font(.system(size: 30, weight: .heavy))
-                    .tracking(2.5)
-                    .foregroundStyle(.white)
+                ForEach(OnboardingGoal.allCases, id: \.rawValue) { goal in
+                    optionCard(
+                        title: goal.rawValue,
+                        subtitle: goal.subtitle,
+                        icon: goal.icon,
+                        isSelected: selectedGoalRaw == goal.rawValue
+                    ) {
+                        selectedGoalRaw = goal.rawValue
+                        selectionTrigger.toggle()
+                        advance()
+                    }
+                }
+            }
+        }
+    }
 
-                Text("Rise Before The Sun")
-                    .font(.title3.weight(.medium))
+    // MARK: - Step 2 — Tracking
+
+    private var trackingStep: some View {
+        VStack(spacing: 24) {
+            stepHeader(
+                eyebrow: "Step 2 of 2",
+                title: "How do you want to track meals?",
+                subtitle: "Keep it simple. You can switch later."
+            )
+
+            VStack(spacing: 10) {
+                ForEach(TrackingPreference.allCases, id: \.rawValue) { pref in
+                    optionCard(
+                        title: pref.rawValue,
+                        subtitle: pref.subtitle,
+                        icon: pref.icon,
+                        isSelected: trackingPreferenceRaw == pref.rawValue
+                    ) {
+                        trackingPreferenceRaw = pref.rawValue
+                        selectionTrigger.toggle()
+                        advance()
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Step 3 — Ready
+
+    private var readyStep: some View {
+        VStack(spacing: 28) {
+            ZStack {
+                Circle()
+                    .fill(KinexaTheme.accent.opacity(0.14))
+                    .frame(width: 96, height: 96)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 40, weight: .heavy))
                     .foregroundStyle(KinexaTheme.accent)
             }
 
-            Text("Answer a few quick questions so we\ncan build your PT plan.")
-                .font(.body)
-                .foregroundStyle(KinexaTheme.secondaryText)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
-        }
-    }
-
-    // MARK: - Step 1: Training Setup (Mode + Focus + Equipment)
-
-    private var trainingSetupStep: some View {
-        VStack(spacing: 28) {
-            sectionHeader(icon: "figure.strengthtraining.traditional", title: "Training Setup")
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("PT Mode")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-                    .tracking(0.5)
-
-                VStack(spacing: 8) {
-                    selectionRow("Individual PT", icon: "person.fill", subtitle: "Personal sessions", isSelected: ptModeRaw == PTMode.individual.rawValue) {
-                        ptModeRaw = PTMode.individual.rawValue
-                    }
-                    selectionRow("Group PT", icon: "person.3.fill", subtitle: "Lead group training", isSelected: ptModeRaw == PTMode.unit.rawValue) {
-                        ptModeRaw = PTMode.unit.rawValue
-                    }
-                    selectionRow("Both", icon: "person.2.fill", subtitle: "Individual + Unit PT", isSelected: ptModeRaw == PTMode.both.rawValue) {
-                        ptModeRaw = PTMode.both.rawValue
-                    }
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Training Focus")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-                    .tracking(0.5)
-
-                VStack(spacing: 8) {
-                    ForEach(TrainingFocus.allCases) { focus in
-                        selectionRow(focus.rawValue, icon: focus.icon, isSelected: trainingFocusRaw == focus.rawValue) {
-                            trainingFocusRaw = focus.rawValue
-                        }
-                    }
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Equipment")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-                    .tracking(0.5)
-
-                VStack(spacing: 8) {
-                    ForEach(EquipmentOption.allCases) { equip in
-                        selectionRow(equip.rawValue, icon: equip.icon, isSelected: equipmentRaw == equip.rawValue) {
-                            equipmentRaw = equip.rawValue
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Step 2: Schedule
-
-    private var scheduleStep: some View {
-        VStack(spacing: 28) {
-            sectionHeader(icon: "calendar", title: "Your Schedule")
-
-            VStack(spacing: 20) {
-                VStack(spacing: 10) {
-                    HStack {
-                        Text("Days per week")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.white)
-                        Spacer()
-                        Text("\(daysPerWeek)")
-                            .font(.headline.weight(.bold))
-                            .foregroundStyle(KinexaTheme.accent)
-                            .contentTransition(.numericText())
-                    }
-
-                    HStack(spacing: 6) {
-                        ForEach([2, 3, 4, 5, 6, 7], id: \.self) { d in
-                            Button {
-                                withAnimation(.spring(response: 0.25)) { daysPerWeek = d }
-                            } label: {
-                                Text("\(d)")
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(daysPerWeek == d ? .white : KinexaTheme.secondaryText)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 48)
-                                    .background(daysPerWeek == d ? KinexaTheme.accent : Color.white.opacity(0.06))
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-
-                VStack(spacing: 10) {
-                    HStack {
-                        Text("Session length")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.white)
-                        Spacer()
-                        Text("\(minutesPerWorkout) min")
-                            .font(.headline.weight(.bold))
-                            .foregroundStyle(KinexaTheme.accent)
-                            .contentTransition(.numericText())
-                    }
-
-                    HStack(spacing: 6) {
-                        ForEach([20, 30, 45, 60], id: \.self) { m in
-                            Button {
-                                withAnimation(.spring(response: 0.25)) { minutesPerWorkout = m }
-                            } label: {
-                                Text("\(m)")
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(minutesPerWorkout == m ? .white : KinexaTheme.secondaryText)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 48)
-                                    .background(minutesPerWorkout == m ? KinexaTheme.accent : Color.white.opacity(0.06))
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Fitness Level")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(KinexaTheme.tertiaryText)
-                        .tracking(0.5)
-
-                    HStack(spacing: 8) {
-                        ForEach(FitnessLevel.allCases) { level in
-                            Button {
-                                fitnessLevelRaw = level.rawValue
-                            } label: {
-                                Text(level.rawValue)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(fitnessLevelRaw == level.rawValue ? .white : KinexaTheme.secondaryText)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 48)
-                                    .background(fitnessLevelRaw == level.rawValue ? KinexaTheme.accent : Color.white.opacity(0.06))
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Step 3: Disclaimer
-
-    private var disclaimerStep: some View {
-        VStack(spacing: 32) {
-            sectionHeader(icon: "shield.checkered", title: "Before You Begin")
-
-            Text("Kinexa Fitness is a fitness tracking and accountability tool. All workout templates are based on publicly available fitness standards. This app does not provide medical advice, coaching, or exercise instruction. You choose and perform all exercises at your own risk.")
-                .font(.subheadline)
-                .foregroundStyle(KinexaTheme.secondaryText)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
-                .padding(.horizontal, 8)
-
             VStack(spacing: 12) {
-                Button {
-                    withAnimation(.spring(response: 0.3)) {
-                        hasAgreed = true
-                    }
-                    withAnimation { step += 1 }
-                } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "checkmark.shield.fill")
-                            .font(.body.weight(.semibold))
-                        Text("I Acknowledge — Full Access")
-                            .font(.headline.weight(.bold))
-                    }
+                Text("You're ready to start.")
+                    .font(.system(size: 30, weight: .heavy))
                     .foregroundStyle(.white)
-                    .frame(height: 54)
-                    .frame(maxWidth: .infinity)
-                    .background(KinexaTheme.heroGradient)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                }
-                .buttonStyle(PressScaleButtonStyle())
+                    .multilineTextAlignment(.center)
 
-                Button {
-                    withAnimation(.spring(response: 0.3)) {
-                        hasAgreed = false
-                    }
-                    withAnimation { step += 1 }
-                } label: {
-                    Text("Skip — Limited Access")
-                        .font(.headline.weight(.bold))
+                Text("Log your first meal or start your first workout.")
+                    .font(.body)
                     .foregroundStyle(KinexaTheme.secondaryText)
-                    .frame(height: 54)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.white.opacity(0.06))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.white.opacity(0.08), lineWidth: 1)
-                    )
-                }
-                .buttonStyle(PressScaleButtonStyle())
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+                    .padding(.horizontal, 8)
             }
         }
     }
 
-    // MARK: - Step 4: Review + Build
+    // MARK: - Bottom bar
 
-    private var reviewStep: some View {
-        VStack(spacing: 28) {
-            sectionHeader(icon: "checkmark.shield.fill", title: "Ready to Build")
-
-            VStack(spacing: 2) {
-                reviewRow(label: "PT Mode", value: ptModeRaw)
-                reviewRow(label: "Focus", value: trainingFocusRaw)
-                reviewRow(label: "Equipment", value: equipmentRaw)
-                reviewRow(label: "Days / Week", value: "\(daysPerWeek)")
-                reviewRow(label: "Session", value: "\(minutesPerWorkout) min")
-                reviewRow(label: "Level", value: fitnessLevelRaw)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-
-            if hasAgreed {
-                HStack(spacing: 8) {
-                    Image(systemName: "checkmark.seal.fill")
-                        .foregroundStyle(KinexaTheme.success)
-                    Text("Terms accepted — full access enabled")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(KinexaTheme.success)
+    @ViewBuilder
+    private var bottomBar: some View {
+        switch step {
+        case 0:
+            primaryButton(title: "Get Started") { advance() }
+        case 3:
+            VStack(spacing: 10) {
+                primaryButton(title: "Log Meal", icon: "fork.knife") {
+                    complete(initialTab: .nutrition, showHint: true)
                 }
-                .padding(12)
-                .frame(maxWidth: .infinity)
-                .background(KinexaTheme.success.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            } else {
-                HStack(spacing: 8) {
-                    Image(systemName: "info.circle.fill")
-                        .foregroundStyle(KinexaTheme.warning)
-                    Text("Calculator only — go back to accept terms for full access")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(KinexaTheme.warning)
+                primaryButton(title: "Start Workout", icon: "dumbbell.fill", style: .outline) {
+                    complete(initialTab: .workouts)
                 }
-                .padding(12)
-                .frame(maxWidth: .infinity)
-                .background(KinexaTheme.warning.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-        }
-    }
-
-    private func reviewRow(label: String, value: String) -> some View {
-        HStack {
-            Text(label)
-                .font(.subheadline)
-                .foregroundStyle(KinexaTheme.secondaryText)
-            Spacer()
-            Text(value)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.white)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(KinexaTheme.card)
-    }
-
-    // MARK: - Buttons
-
-    private var bottomButtons: some View {
-        VStack(spacing: 8) {
-            if step != 3 {
                 Button {
-                    handleNext()
+                    complete(initialTab: .home)
                 } label: {
-                    HStack(spacing: 8) {
-                        if isGenerating {
-                            ProgressView()
-                                .tint(step == 0 ? Color(hex: "#0A0A0F") : .white)
-                        }
-                        Text(nextButtonTitle)
-                            .font(.headline.weight(.bold))
-                    }
-                    .foregroundStyle(step == 0 ? Color(hex: "#0A0A0F") : .white)
-                    .frame(height: 54)
-                    .frame(maxWidth: .infinity)
-                    .background {
-                        if step == 0 {
-                            Color.white
-                        } else {
-                            KinexaTheme.heroGradient
-                        }
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                }
-                .disabled(isGenerating)
-                .buttonStyle(PressScaleButtonStyle())
-            }
-
-            if step > 0 {
-                Button {
-                    withAnimation { step -= 1 }
-                } label: {
-                    Text("Back")
-                        .font(.subheadline.weight(.medium))
+                    Text("Explore App")
+                        .font(.subheadline.weight(.semibold))
                         .foregroundStyle(KinexaTheme.secondaryText)
                         .frame(height: 44)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.plain)
             }
+        default:
+            EmptyView()
         }
     }
 
-    private var nextButtonTitle: String {
-        switch step {
-        case 0: return "Get Started"
-        case totalSteps - 1: return isGenerating ? "Building Your Plan..." : (hasAgreed ? "Build My Plan" : "Enter App")
-        default: return "Continue"
-        }
-    }
+    private enum ButtonStyleKind { case filled, outline }
 
-    private func handleNext() {
-        if step < totalSteps - 1 {
-            withAnimation { step += 1 }
-        } else {
-            disclaimerAccepted = hasAgreed
-            if hasAgreed {
-                isGenerating = true
-                Task {
-                    try? await Task.sleep(for: .milliseconds(600))
-                    vm.generateWeeklyPlan()
-                    onboardingComplete = true
+    private func primaryButton(
+        title: String,
+        icon: String? = nil,
+        style: ButtonStyleKind = .filled,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                if let icon {
+                    Image(systemName: icon)
+                        .font(.headline.weight(.bold))
                 }
-            } else {
-                onboardingComplete = true
+                Text(title)
+                    .font(.headline.weight(.bold))
             }
+            .foregroundStyle(style == .filled ? .white : .white)
+            .frame(height: 56)
+            .frame(maxWidth: .infinity)
+            .background {
+                if style == .filled {
+                    KinexaTheme.heroGradient
+                } else {
+                    Color.white.opacity(0.06)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay {
+                if style == .outline {
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                }
+            }
+            .shadow(
+                color: style == .filled ? KinexaTheme.accent.opacity(0.3) : .clear,
+                radius: 14, y: 6
+            )
         }
+        .buttonStyle(PressScaleButtonStyle())
     }
 
-    // MARK: - Reusable Components
+    // MARK: - Reusable
 
-    private func sectionHeader(icon: String, title: String) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title2.weight(.semibold))
+    private func stepHeader(eyebrow: String, title: String, subtitle: String) -> some View {
+        VStack(spacing: 10) {
+            Text(eyebrow.uppercased())
+                .font(.caption2.weight(.heavy))
+                .tracking(1.5)
                 .foregroundStyle(KinexaTheme.accent)
 
             Text(title)
-                .font(.title3.weight(.bold))
+                .font(.system(size: 26, weight: .heavy))
                 .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .lineSpacing(2)
+
+            Text(subtitle)
+                .font(.subheadline)
+                .foregroundStyle(KinexaTheme.secondaryText)
+                .multilineTextAlignment(.center)
         }
+        .padding(.horizontal, 8)
     }
 
-    private func selectionRow(_ title: String, icon: String, subtitle: String? = nil, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        Button {
-            action()
-        } label: {
-            HStack(spacing: 12) {
+    private func optionCard(
+        title: String,
+        subtitle: String,
+        icon: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
                 Image(systemName: icon)
-                    .font(.body.weight(.semibold))
+                    .font(.title3.weight(.bold))
                     .foregroundStyle(isSelected ? .white : KinexaTheme.accent)
-                    .frame(width: 34, height: 34)
-                    .background(isSelected ? KinexaTheme.accent : KinexaTheme.accent.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .frame(width: 44, height: 44)
+                    .background(isSelected ? KinexaTheme.accent : KinexaTheme.accent.opacity(0.14))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(title)
-                        .font(.subheadline.weight(.semibold))
+                        .font(.headline.weight(.bold))
                         .foregroundStyle(.white)
-                    if let subtitle {
-                        Text(subtitle)
-                            .font(.caption)
-                            .foregroundStyle(KinexaTheme.secondaryText)
-                    }
+                    Text(subtitle)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(KinexaTheme.secondaryText)
                 }
 
                 Spacer(minLength: 0)
 
-                if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(KinexaTheme.accent)
-                }
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(isSelected ? KinexaTheme.accent : KinexaTheme.tertiaryText.opacity(0.5))
             }
-            .padding(12)
-            .background(isSelected ? KinexaTheme.accent.opacity(0.1) : Color.white.opacity(0.03))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? KinexaTheme.accent.opacity(0.4) : Color.white.opacity(0.06), lineWidth: 1)
+            .padding(14)
+            .background(
+                isSelected ? KinexaTheme.accent.opacity(0.10) : Color.white.opacity(0.04)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        isSelected ? KinexaTheme.accent.opacity(0.5) : Color.white.opacity(0.08),
+                        lineWidth: isSelected ? 1.5 : 1
+                    )
+            }
+            .shadow(
+                color: isSelected ? KinexaTheme.accent.opacity(0.2) : .clear,
+                radius: 12, y: 4
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
+    }
+
+    // MARK: - Flow
+
+    private func advance() {
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
+            step = min(step + 1, 3)
+        }
+    }
+
+    private func complete(initialTab: AppTab, showHint: Bool = false) {
+        pendingInitialTab = initialTab.rawValue
+        if showHint {
+            showFirstMealHint = true
+        }
+        withAnimation(.easeOut(duration: 0.25)) {
+            hasCompletedOnboarding = true
+        }
     }
 }
