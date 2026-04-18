@@ -8,6 +8,7 @@ struct WeightTrainingBrowserView: View {
     @State private var searchText: String = ""
     @State private var addedTrigger: Bool = false
     @State private var showPreMadeRoutines: Bool = false
+    @State private var guideExercise: WeightExerciseDefinition?
 
     private enum WeightBrowseMode: Equatable {
         case landing
@@ -78,6 +79,14 @@ struct WeightTrainingBrowserView: View {
             .sensoryFeedback(.impact(weight: .light), trigger: addedTrigger)
             .sheet(isPresented: $showPreMadeRoutines) {
                 PreMadeRoutinesView(onAddExercise: onAddExercise)
+            }
+            .sheet(item: $guideExercise) { exercise in
+                ExerciseGuideSheet(
+                    exerciseName: exercise.name,
+                    accent: Color(hex: "#6366F1"),
+                    muscleTag: exercise.bodyPart.rawValue,
+                    equipment: exercise.equipment
+                )
             }
         }
     }
@@ -262,25 +271,35 @@ struct WeightTrainingBrowserView: View {
 
     private func exerciseRow(_ exercise: WeightExerciseDefinition) -> some View {
         HStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(exercise.name)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(KinexaTheme.primaryText)
+            Button {
+                guideExercise = exercise
+            } label: {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text(exercise.name)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Image(systemName: "info.circle")
+                            .font(.caption2)
+                            .foregroundStyle(Color(hex: "#6366F1").opacity(0.6))
+                    }
 
-                HStack(spacing: 8) {
-                    Text(exercise.bodyPart.rawValue)
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(Color(hex: "#6366F1"))
-                    Text(exercise.equipment)
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(KinexaTheme.tertiaryText)
-                    Text("\(exercise.defaultSets)x\(exercise.defaultReps)")
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(KinexaTheme.tertiaryText)
+                    HStack(spacing: 8) {
+                        Text(exercise.bodyPart.rawValue)
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(Color(hex: "#6366F1"))
+                        Text(exercise.equipment)
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                        Text("\(exercise.defaultSets)x\(exercise.defaultReps)")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
             }
-
-            Spacer(minLength: 0)
+            .buttonStyle(.plain)
 
             Button {
                 addedTrigger.toggle()

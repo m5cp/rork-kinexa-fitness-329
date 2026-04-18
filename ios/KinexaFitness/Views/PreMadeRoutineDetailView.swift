@@ -6,6 +6,7 @@ struct PreMadeRoutineDetailView: View {
     let onAddExercise: (ManualRoutineExercise) -> Void
 
     @State private var expandedDay: UUID?
+    @State private var guideExerciseName: String?
 
 
     var body: some View {
@@ -33,7 +34,12 @@ struct PreMadeRoutineDetailView: View {
                 }
             }
             .toolbarBackground(KinexaTheme.background, for: .navigationBar)
-            
+            .sheet(item: Binding<GuideName?>(
+                get: { guideExerciseName.map(GuideName.init) },
+                set: { guideExerciseName = $0?.name }
+            )) { item in
+                ExerciseGuideSheet(exerciseName: item.name, accent: Color(hex: "#6366F1"))
+            }
 
         }
     }
@@ -183,30 +189,45 @@ struct PreMadeRoutineDetailView: View {
     }
 
     private func exerciseRow(_ exercise: PreMadeRoutineExercise) -> some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(exercise.name)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(KinexaTheme.primaryText)
+        Button {
+            guideExerciseName = exercise.name
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text(exercise.name)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Color(hex: "#6366F1").opacity(0.6))
+                    }
 
-                HStack(spacing: 6) {
-                    Text("\(exercise.sets)x\(exercise.reps)")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(Color(hex: "#6366F1"))
+                    HStack(spacing: 6) {
+                        Text("\(exercise.sets)x\(exercise.reps)")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(Color(hex: "#6366F1"))
 
-                    if !exercise.notes.isEmpty {
-                        Text(exercise.notes)
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(KinexaTheme.tertiaryText)
+                        if !exercise.notes.isEmpty {
+                            Text(exercise.notes)
+                                .font(.caption2.weight(.medium))
+                                .foregroundStyle(KinexaTheme.tertiaryText)
+                        }
                     }
                 }
-            }
 
-            Spacer(minLength: 0)
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+            .padding(10)
+            .background(KinexaTheme.background.opacity(0.5))
+            .clipShape(.rect(cornerRadius: 10))
+            .contentShape(Rectangle())
         }
-        .padding(10)
-        .background(KinexaTheme.background.opacity(0.5))
-        .clipShape(.rect(cornerRadius: 10))
+        .buttonStyle(.plain)
     }
 
     private func tagBadge(text: String, color: Color) -> some View {

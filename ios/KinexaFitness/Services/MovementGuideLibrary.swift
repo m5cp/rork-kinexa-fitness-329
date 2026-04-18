@@ -4,6 +4,22 @@ nonisolated struct MovementGuide: Sendable, Hashable {
     let whatIsIt: String
     let howTo: [String]
     let alternatives: [String]
+    let tips: [String]
+    let primaryMuscles: String?
+
+    init(
+        whatIsIt: String,
+        howTo: [String],
+        alternatives: [String],
+        tips: [String] = [],
+        primaryMuscles: String? = nil
+    ) {
+        self.whatIsIt = whatIsIt
+        self.howTo = howTo
+        self.alternatives = alternatives
+        self.tips = tips
+        self.primaryMuscles = primaryMuscles
+    }
 }
 
 enum MovementGuideLibrary {
@@ -16,6 +32,14 @@ enum MovementGuideLibrary {
             }
         }
         return generic
+    }
+
+    static func hasGuide(for name: String) -> Bool {
+        let key = name.lowercased()
+        if entries.contains(where: { entry in entry.patterns.contains(where: { key.contains($0) }) }) {
+            return true
+        }
+        return CardioGuideLibrary.hasGuide(for: name)
     }
 
     private struct Entry {
@@ -480,6 +504,11 @@ enum CardioGuideLibrary {
             }
         }
         return MovementGuideLibrary.guide(for: workout.name)
+    }
+
+    static func hasGuide(for name: String) -> Bool {
+        let key = name.lowercased()
+        return entries.contains(where: { entry in entry.patterns.contains(where: { key.contains($0) }) })
     }
 
     private struct Entry {

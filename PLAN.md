@@ -1,30 +1,48 @@
-# Fix cardio generator pool, add movement guides, and make Cardio by Type workouts tappable
+# Add how-to descriptions to every exercise across the app
 
 ## What will change
 
-### 1. Cardio workout generator — limit the pool
+Every exercise in Kinexa — weights, functional fitness, and cardio — will have a clear "how to do it" guide attached. Anywhere an exercise appears (workout generator results, planned workouts, manual routines, pre-made plans, body part browser, cardio browser), users can tap it to see instructions, form tips, and alternatives.
 
-- When you pick **Cardio** in the Quick Workout generator, it will now only pull from: **Running, Cycling, Class Workouts, Low Impact, and Outdoor**.
-- HIIT & Intervals will no longer appear as a result for the Cardio generator.
+## Features
 
-### 2. Explain every movement in generated workouts
+- **Tap any exercise, anywhere, to see how to do it.** Works in the Quick Workout Generator results, today's planned workout, body part exercise lists, pre-made routine day views, functional fitness browser, and cardio browser.
+- **Consistent guide format** for every exercise:
+  - Short summary of the movement
+  - Numbered step-by-step how-to
+  - 2–3 form tips / common mistakes to avoid
+  - Suggested alternatives (swaps if you don't have the equipment or want variety)
+  - Primary muscles worked
+- **Cardio entries** get a "how to perform it well" guide — pacing, effort level, warm-up/cool-down notes, and alternative options.
+- **Generator results show a small "i" / chevron** on every movement row so users know they can tap for details. A tap opens a clean sheet with the guide.
+- **Planned workout cards** (today's workout) get the same tap-to-view behavior for each listed movement.
+- Works offline — all guidance is built into the app, no network needed.
 
-- Every generated workout (Functional Fitness, Free Weights, and Cardio) will now show an expandable details section under each movement with:
-  - **What it is** — a short plain-English description
-  - **How to do it** — step-by-step form cues
-  - **Alternatives** — 2–3 easier or equipment-free swaps
-- Tap a movement row to expand/collapse its guide. A small chevron indicates it's tappable.
-- For Cardio results, the single workout card gains the same "How to do it / Alternatives" section directly below the summary.
+## Design
 
-### 3. Cardio by Type — tappable workouts & no more cut-off text
+- A single **Exercise Guide sheet** used everywhere: large exercise title, muscle-group tag, clean numbered steps, a tips section with a lightbulb icon, and an "Alternatives" section with tappable chips.
+- Medium-height sheet that scrolls if needed, with a grabber so users can drag it away.
+- Subtle chevron or small info icon on every exercise row across the app to signal tappability.
+- Dark-mode friendly, uses system typography and colors, matches existing Kinexa card styling.
 
-- Every row in each category card (Running, Cycling, Class Workouts, Low Impact, Outdoor) is now tappable and opens a detail view for that workout.
-- The detail view shows: name, category, difficulty, estimated calories/min, a full description, how-to steps, and alternatives — with a "Log this workout" button at the bottom.
-- Row text will wrap properly (up to 2 lines) instead of getting cut off by the difficulty label and chevron, and the difficulty/chevron stay aligned on the right.
-- "See All" continues to show the filtered list, and those rows are tappable too.
+## Coverage
 
-### 4. Everything else stays the same
+Descriptions will be authored for:
 
-- The weight workout generator, functional generator, planner, manual builder, logging, and RevenueCat flows are untouched.
-- No visual redesign of the Quick Workout setup screen — only the result and Cardio by Type detail experience change.
+- All 90+ weight-training exercises (chest, back, shoulders, biceps, triceps, legs, glutes, core, full-body)
+- All functional fitness movements used in WODs and generated workouts
+- All cardio activities (running, cycling, class workouts, low impact, outdoor)
+- Any movement referenced by the Quick Workout Generator or pre-made routines
+
+If a user-added custom exercise has no built-in guide, the sheet shows a friendly "No guide available for this custom exercise" state instead of crashing or looking broken.
+
+## Where it shows up
+
+- **Quick Workout Generator result screen** — each generated movement is tappable
+- **Today's planned workout card** — each movement is tappable
+- **Body Part → exercise list** — each exercise is tappable
+- **Pre-made routine day detail** — each exercise is tappable
+- **Functional Fitness workout detail** — each movement is tappable
+- **Cardio by Type list** — each cardio workout is tappable (also fixes the text-cutoff + no-tap issue previously reported)
+- **Manual routine builder exercise rows** — tappable
 
