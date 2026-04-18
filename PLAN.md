@@ -1,29 +1,35 @@
-# Add Repeat Meals & Meal Templates to Nutrition
+# Add daily AI food scan limit with subtle usage indicator
 
-Your nutrition section already has AI photo scan (camera + gallery), confirmation before saving, editable results, and calorie/protein/carbs/fat/alcohol tracking. I'll keep all of that untouched and layer on the missing pieces.
+Add a simple, reliable daily cap on AI food scans (photo + AI describe) without touching the rest of the nutrition flow or existing AI usage system used for recipes.
 
-**What's new**
+**How it works**
 
-- **Repeat Yesterday's Meal** — one-tap button at the top of the Log Meal sheet that brings back yesterday's meals with their macros preloaded, ready to confirm or tweak.
-- **Log Again from history** — every past meal in the meal detail view gets a "Log Again to Today" action that copies it into today's log instantly.
-- **Frequent & Recent Foods row** — a quick-tap strip at the top of the Log Meal sheet showing your most-used and most-recent foods for one-tap logging (already partly exists; I'll surface it more prominently).
-- **Meal Templates** — save any logged meal as a named template (e.g. "High Protein Breakfast", "Recovery Shake", "Weekend Drinks"). Templates live in a new "Templates" section inside the Log Meal sheet and can be applied with one tap.
-- **Serving size adjuster** — when repeating a food or template, a simple slider (0.5x / 1x / 1.5x / 2x / custom) scales the macros before saving.
+- Each day, you get a set number of AI food scans (default: **5 per day**).
+- A small counter shows "3 / 5 AI scans used today" under the Scan Food and AI Describe buttons in the Log Meal sheet.
+- The counter resets automatically at midnight (based on your phone's local date).
+- When you run out, the Scan Food and AI Describe buttons show a friendly message: "You've used all 5 AI scans today. They refresh tomorrow."
+- Below the message you get instant alternatives:
+  - Enter manually
+  - Repeat yesterday's meals
+  - Scan barcode
+  - USDA search
+  - Favorites
 
-**Design & behavior**
+**Where it shows up**
 
-- Clean, minimal cards matching the existing green Nutrition look — no new dashboards.
-- Repeat / template actions take 1–2 taps max.
-- Nothing saves until you confirm; duplicate-tap protection on save buttons.
-- All preloaded values stay editable, including alcohol.
-- Existing manual, barcode, AI text, USDA, and AI photo scan flows are left exactly as they are.
-- Scanned / repeated items flow into the same daily log and totals you already have — no parallel tracker.
+- Log Meal sheet → Scan Food card and AI Describe card get a subtle "X left today" pill.
+- When the limit is hit, the photo/describe input sections show the friendly message and fallback buttons (keeping all existing alternatives visible).
+- Everything else in nutrition stays exactly the same.
 
-**Screens touched**
+**Behind the scenes**
 
-- **Log Meal sheet** — adds "Repeat Yesterday", "Templates" row, and a more prominent Recent/Frequent strip.
-- **Meal detail sheet** — adds "Log Again to Today" and "Save as Template" buttons.
-- **New Templates picker sheet** — shows saved templates with macros; tap to apply, swipe to delete.
-- **New Serving Adjuster sheet** — quick serving multiplier before confirming a repeat/template.
+- Saved locally on device (no backend, no account required).
+- Safe defaults if anything fails to load — never crashes the nutrition section.
+- The daily limit value is a single setting that's easy to change later (e.g. raise to 10, or make it unlimited for premium users in the future).
+- Structure is ready for a future free-vs-premium split, but no paywall is added now.
 
-No data migration needed — new fields (template id, last used, times repeated) are optional and won't affect your existing meals.
+**What doesn't change**
+
+- Existing manual entry, barcode scan, USDA search, text-describe flow, favorites, meal templates, repeat meals, and recipe generation all keep working as they do today.
+- The existing AI usage tracker (used for recipes) is untouched — this is a separate, simpler daily counter just for food scans.
+

@@ -374,12 +374,14 @@ struct LogMealSheet: View {
     }
 
     private var aiBadgeText: String? {
-        let tracker = AIUsageTracker.shared
-        if store.isPremium {
-            return "\(tracker.remainingToday) left"
-        } else {
-            return tracker.hasFreeTrialRemaining ? "1 free" : nil
-        }
+        let scan = FoodScanUsageTracker.shared
+        if scan.hasReachedLimit { return nil }
+        return "\(scan.remainingToday) left"
+    }
+
+    private var scanUsageCaption: String {
+        let scan = FoodScanUsageTracker.shared
+        return "\(scan.scansUsedToday) / \(scan.dailyLimit) AI scans used today"
     }
 
     private func heroCard(icon: String, title: String, subtitle: String, gradient: [Color], badge: String?, mode: MealInputMode) -> some View {
@@ -490,8 +492,8 @@ struct LogMealSheet: View {
                     }
             }
 
-            if AIUsageTracker.shared.hasReachedLimit {
-                dailyLimitReachedBanner
+            if FoodScanUsageTracker.shared.hasReachedLimit {
+                foodScanLimitBanner
             } else {
                 HStack(spacing: 12) {
                     Button {
@@ -543,6 +545,11 @@ struct LogMealSheet: View {
                     .font(.system(size: 10))
                     .foregroundStyle(KinexaTheme.tertiaryText)
                     .multilineTextAlignment(.center)
+
+                Text(scanUsageCaption)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+                    .frame(maxWidth: .infinity)
             }
         }
         .padding(16)
@@ -606,8 +613,8 @@ struct LogMealSheet: View {
 
     private var foodInputSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if AIUsageTracker.shared.hasReachedLimit {
-                dailyLimitReachedBanner
+            if FoodScanUsageTracker.shared.hasReachedLimit {
+                foodScanLimitBanner
             } else {
                 TextField("e.g. grilled chicken breast with rice and steamed broccoli", text: $foodDescription, axis: .vertical)
                     .font(.subheadline)
@@ -650,6 +657,11 @@ struct LogMealSheet: View {
                     .font(.system(size: 10))
                     .foregroundStyle(KinexaTheme.tertiaryText)
                     .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+
+                Text(scanUsageCaption)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
                     .frame(maxWidth: .infinity)
             }
         }
@@ -1121,6 +1133,90 @@ struct LogMealSheet: View {
         }
     }
 
+    private var foodScanLimitBanner: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(KinexaTheme.warning)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Daily AI scans used up")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("You've used all \(FoodScanUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow.")
+                        .font(.system(size: 11))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+
+            Text("Try one of these instead")
+                .font(.system(size: 10, weight: .heavy))
+                .foregroundStyle(KinexaTheme.tertiaryText)
+                .textCase(.uppercase)
+
+            VStack(spacing: 8) {
+                fallbackRow(icon: "pencil.line", title: "Enter Manually", tint: Color(hex: "#F59E0B")) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { activeMode = .manual }
+                    showManualEntry = true
+                }
+                fallbackRow(icon: "arrow.uturn.backward", title: "Repeat Yesterday's Meals", tint: Color(hex: "#0EA5E9"), disabled: nutritionVM.yesterdaysMeals.isEmpty) {
+                    guard !nutritionVM.yesterdaysMeals.isEmpty else { return }
+                    nutritionVM.repeatYesterday()
+                    showQuickLogToast("Yesterday's meals logged")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { dismiss() }
+                }
+                fallbackRow(icon: "barcode.viewfinder", title: "Scan a Barcode", tint: Color(hex: "#3B82F6")) {
+                    showBarcode = true
+                }
+                fallbackRow(icon: "magnifyingglass", title: "Search USDA Database", tint: Color(hex: "#0EA5E9")) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { activeMode = .database }
+                }
+                if !nutritionVM.favorites.isEmpty {
+                    fallbackRow(icon: "star.fill", title: "Pick a Favorite", tint: Color(hex: "#F59E0B")) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { activeMode = .favorites }
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(KinexaTheme.warning.opacity(0.08))
+        .clipShape(.rect(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(KinexaTheme.warning.opacity(0.2))
+        }
+    }
+
+    private func fallbackRow(icon: String, title: String, tint: Color, disabled: Bool = false, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle().fill(tint.opacity(0.15)).frame(width: 30, height: 30)
+                    Image(systemName: icon)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(tint)
+                }
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(KinexaTheme.primaryText)
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 12))
+            .opacity(disabled ? 0.5 : 1)
+        }
+        .buttonStyle(PressScaleButtonStyle())
+        .disabled(disabled)
+    }
+
     private var dailyLimitReachedBanner: some View {
         VStack(spacing: 10) {
             HStack(spacing: 10) {
@@ -1228,8 +1324,8 @@ struct LogMealSheet: View {
     private func estimateFromText() async {
         let description = foodDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !description.isEmpty else { return }
-        guard !AIUsageTracker.shared.hasReachedLimit else {
-            errorMessage = store.isPremium ? "Daily limit reached. Buy tokens for more scans." : "Subscribe or buy tokens to continue scanning."
+        guard !FoodScanUsageTracker.shared.hasReachedLimit else {
+            errorMessage = "You've used all \(FoodScanUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
             return
         }
 
@@ -1239,7 +1335,7 @@ struct LogMealSheet: View {
         do {
             estimatedFoods = try await nutritionVM.estimateFoodFromText(description)
             hasEstimated = true
-            AIUsageTracker.shared.recordUsage()
+            FoodScanUsageTracker.shared.recordScan()
         } catch {
             errorMessage = "Could not estimate nutrition. Please try again or check your connection."
         }
@@ -1248,8 +1344,8 @@ struct LogMealSheet: View {
     }
 
     private func analyzePhoto(_ data: Data) async {
-        guard !AIUsageTracker.shared.hasReachedLimit else {
-            errorMessage = store.isPremium ? "Daily limit reached. Buy tokens for more scans." : "Subscribe or buy tokens to continue scanning."
+        guard !FoodScanUsageTracker.shared.hasReachedLimit else {
+            errorMessage = "You've used all \(FoodScanUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
             return
         }
 
@@ -1259,7 +1355,7 @@ struct LogMealSheet: View {
         do {
             estimatedFoods = try await nutritionVM.estimateFoodFromImage(data)
             hasEstimated = true
-            AIUsageTracker.shared.recordUsage()
+            FoodScanUsageTracker.shared.recordScan()
         } catch {
             errorMessage = "Could not analyze photo. Please try again or use text description."
         }
