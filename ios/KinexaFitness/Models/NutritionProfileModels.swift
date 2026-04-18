@@ -213,7 +213,7 @@ nonisolated struct WaterEntry: Codable, Identifiable, Sendable {
 nonisolated struct WaterGoal: Codable, Sendable {
     var dailyOunces: Double
 
-    static let `default` = WaterGoal(dailyOunces: 100)
+    static let `default` = WaterGoal(dailyOunces: 48)
 }
 
 nonisolated struct FavoriteFoodItem: Codable, Identifiable, Sendable {

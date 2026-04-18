@@ -1,11 +1,25 @@
-# Remove AI coach, fix Move ring, remove Recent Cardio
+# Adjustable ring goals with new defaults
 
-**Changes**
+**What will change**
 
-- **Remove the AI Coach chat entirely.** The floating sparkle button on every screen, the Coach chat sheet, and all related wiring will be removed. The "Coach Messages / Day" line on the Pro upgrade page will also be removed so nothing references it.
-- **Fix the Move ring on the Reflection Rings card.**
-  - Tapping **Move** now opens today's workout (the same place you go to log your workout). If today is a rest day or no plan exists, it opens the Start a Workout sheet as a fallback.
-  - The Move ring now also fills automatically from your device's step count. Walking enough steps in a day will close the ring even without a logged workout. Any logged workout, quick start, or cardio session still closes it instantly.
-  - The ring shows real progress as steps accumulate during the day (partial fill), instead of only 0% or 100%.
-- **Remove the "Recent Cardio" section** from the Home tab (including the "No walks or cardio yet" placeholder card). The section simply won't appear anymore.
+- **New default ring goals**
+  - Move: **10,000 steps**
+  - Nourish: **2 meals**
+  - Hydrate: **48 oz**
+  - Reflect: **1 mood log**
+- **Adjustable goals** — every ring can be tuned up or down:
+  - Move: any step target (e.g. 3,000 – 30,000)
+  - Nourish: 1 – 6 meals
+  - Hydrate: 16 – 200 oz (already adjustable, keeps existing value)
+  - Reflect: 1 mood check-in per day (fixed — there's only one per day)
+- **Two places to adjust**
+  - **Tap a ring** on the Rings detail screen → opens a small sheet with a stepper/slider for that ring's goal, plus a "Reset to default" option.
+  - **Settings/Profile → Ring Goals** section listing all four rings with the same controls in one place.
+- **Persistence**
+  - Goals saved locally so they stick across launches.
+  - Existing progress calculations update instantly when a goal changes.
+
+**Not in this change (per your note)**
+
+- AI / USDA error diagnostics — leaving for later as requested.
 

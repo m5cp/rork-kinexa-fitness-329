@@ -9,6 +9,7 @@ final class ReflectionRingsViewModel {
     var friends: [Friend] = []
     var username: String = ""
     var shareCode: String = ""
+    var goals: RingGoals = .default
 
     init() {
         loadData()
@@ -44,7 +45,23 @@ final class ReflectionRingsViewModel {
 
     // MARK: - Ring Computation
 
-    static let moveStepsGoal: Int = 6000
+    var moveStepsGoal: Int { max(100, goals.moveSteps) }
+    var mealsGoal: Int { max(1, goals.meals) }
+
+    func updateMoveSteps(_ value: Int) {
+        goals.moveSteps = min(max(value, RingGoals.moveRange.lowerBound), RingGoals.moveRange.upperBound)
+        persist()
+    }
+
+    func updateMealsGoal(_ value: Int) {
+        goals.meals = min(max(value, RingGoals.mealsRange.lowerBound), RingGoals.mealsRange.upperBound)
+        persist()
+    }
+
+    func resetGoalsToDefault() {
+        goals = .default
+        persist()
+    }
 
     func stepsForDate(_ date: Date, appVM: AppViewModel) -> Int {
         let cal = Calendar.current
@@ -65,12 +82,12 @@ final class ReflectionRingsViewModel {
         let hasQuick = appVM.quickStartRecords.contains { cal.isDate($0.startDate, inSameDayAs: date) }
         let hasCardio = appVM.cardioSessions.contains { cal.isDate($0.date, inSameDayAs: date) }
         let steps = stepsForDate(date, appVM: appVM)
-        if hasCompleted || hasQuick || hasCardio || steps >= Self.moveStepsGoal {
+        if hasCompleted || hasQuick || hasCardio || steps >= moveStepsGoal {
             rings.insert(.fitness)
         }
 
         // Meals
-        if !nutritionVM.mealsForDate(date).isEmpty {
+        if nutritionVM.mealsForDate(date).count >= mealsGoal {
             rings.insert(.meals)
         }
 
@@ -94,10 +111,10 @@ final class ReflectionRingsViewModel {
         case .fitness:
             if closedRings(on: date, appVM: appVM, nutritionVM: nutritionVM).contains(.fitness) { return 1 }
             let steps = stepsForDate(date, appVM: appVM)
-            return min(Double(steps) / Double(Self.moveStepsGoal), 1.0)
+            return min(Double(steps) / Double(moveStepsGoal), 1.0)
         case .meals:
             let count = nutritionVM.mealsForDate(date).count
-            return min(Double(count) / 1.0, 1.0)
+            return min(Double(count) / Double(mealsGoal), 1.0)
         case .mood:
             return moodForDate(date) != nil ? 1 : 0
         case .water:
@@ -197,6 +214,7 @@ final class ReflectionRingsViewModel {
         LocalStore.save(moodEntries, forKey: "reflectionMoodEntries")
         LocalStore.save(snapshots, forKey: "reflectionSnapshots")
         LocalStore.save(friends, forKey: "reflectionFriends")
+        LocalStore.save(goals, forKey: "reflectionRingGoals")
         UserDefaults.standard.set(username, forKey: "reflectionUsername")
         UserDefaults.standard.set(shareCode, forKey: "reflectionShareCode")
     }
@@ -205,6 +223,7 @@ final class ReflectionRingsViewModel {
         moodEntries = LocalStore.load([MoodEntry].self, forKey: "reflectionMoodEntries", fallback: [])
         snapshots = LocalStore.load([DailyRingsSnapshot].self, forKey: "reflectionSnapshots", fallback: [])
         friends = LocalStore.load([Friend].self, forKey: "reflectionFriends", fallback: [])
+        goals = LocalStore.load(RingGoals.self, forKey: "reflectionRingGoals", fallback: .default)
         username = UserDefaults.standard.string(forKey: "reflectionUsername") ?? ""
         shareCode = UserDefaults.standard.string(forKey: "reflectionShareCode") ?? ""
     }

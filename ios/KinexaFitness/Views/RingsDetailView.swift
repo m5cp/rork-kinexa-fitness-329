@@ -9,6 +9,7 @@ struct RingsDetailView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var showHistory: Bool = false
+    @State private var goalAdjustRing: RingType?
 
     private var today: Date { Calendar.current.startOfDay(for: .now) }
 
@@ -39,6 +40,9 @@ struct RingsDetailView: View {
             .sheet(isPresented: $showHistory) {
                 RingsHistoryCalendarView(nutritionVM: nutritionVM, ringsVM: ringsVM)
                     .environment(appVM)
+            }
+            .sheet(item: $goalAdjustRing) { ring in
+                RingGoalsSheet(ringsVM: ringsVM, nutritionVM: nutritionVM, focusRing: ring)
             }
         }
     }
@@ -126,7 +130,7 @@ struct RingsDetailView: View {
         let closed = progress >= 1.0
 
         return Button {
-            onTapRing(ring)
+            goalAdjustRing = ring
         } label: {
             HStack(spacing: 14) {
                 ZStack {
@@ -153,12 +157,13 @@ struct RingsDetailView: View {
 
                 Spacer(minLength: 0)
 
-                if closed {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.title3.weight(.bold))
-                        .foregroundStyle(ring.color)
-                } else {
-                    Image(systemName: "chevron.right")
+                HStack(spacing: 10) {
+                    if closed {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(ring.color)
+                    }
+                    Image(systemName: "slider.horizontal.3")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(KinexaTheme.tertiaryText)
                 }

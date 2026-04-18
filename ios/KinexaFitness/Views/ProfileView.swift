@@ -21,6 +21,9 @@ struct ProfileView: View {
     @State private var showAvatarPicker = false
     @State private var showUpgrade = false
     @State private var showTokenStore = false
+    @State private var showRingGoalsSheet = false
+    @State private var ringsVM = ReflectionRingsViewModel()
+    @State private var nutritionVM = NutritionViewModel()
     @State private var restoreTrigger = false
     @State private var imageManager = ProfileImageManager()
     @State private var isEditingName: Bool = false
@@ -38,6 +41,7 @@ struct ProfileView: View {
                     profileHeader
                     subscriptionSection
                     activityJournalSection
+                    ringGoalsSection
                     currentGoalSection
                     notificationsSection
                     appControlsSection
@@ -365,6 +369,52 @@ struct ProfileView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+        }
+    }
+
+    // MARK: - Ring Goals
+
+    private var ringGoalsSection: some View {
+        settingsSection(title: "RING GOALS", icon: "circle.hexagongrid.fill") {
+            Button {
+                showRingGoalsSheet = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "circle.hexagongrid.fill")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 40, height: 40)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "#FF3B30"), Color(hex: "#AF52DE")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(.rect(cornerRadius: 10))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Adjust Ring Goals")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Text("\(ringsVM.goals.moveSteps) steps · \(ringsVM.goals.meals) meal\(ringsVM.goals.meals == 1 ? "" : "s") · \(Int(nutritionVM.waterGoal.dailyOunces)) oz")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                .frame(minHeight: 48)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+        .sheet(isPresented: $showRingGoalsSheet) {
+            RingGoalsSheet(ringsVM: ringsVM, nutritionVM: nutritionVM)
         }
     }
 
