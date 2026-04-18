@@ -36,10 +36,11 @@ struct MainTabView: View {
     @State private var nutritionPath = NavigationPath()
     @State private var progressPath = NavigationPath()
     @State private var profilePath = NavigationPath()
+    @State private var showCoachChat: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
+            ZStack(alignment: .bottomTrailing) {
                 NavigationStack(path: $homePath) {
                     HomeView()
                 }
@@ -69,6 +70,11 @@ struct MainTabView: View {
                 }
                 .opacity(selectedTab == .profile ? 1 : 0)
                 .zIndex(selectedTab == .profile ? 1 : 0)
+
+                coachFloatingButton
+                    .padding(.trailing, 16)
+                    .padding(.bottom, 12)
+                    .zIndex(100)
             }
 
             customTabBar
@@ -78,6 +84,33 @@ struct MainTabView: View {
             get: { vm.activeRecap },
             set: { vm.activeRecap = $0 }
         ))
+        .sheet(isPresented: $showCoachChat) {
+            CoachChatView()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+                .presentationContentInteraction(.scrolls)
+        }
+    }
+
+    private var coachFloatingButton: some View {
+        Button {
+            showCoachChat = true
+        } label: {
+            ZStack {
+                Circle()
+                    .fill(KinexaTheme.heroGradient)
+                    .frame(width: 54, height: 54)
+                    .shadow(color: KinexaTheme.accent.opacity(0.35), radius: 12, y: 6)
+                    .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
+
+                Image(systemName: "sparkles")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(.white)
+            }
+        }
+        .buttonStyle(PressScaleButtonStyle())
+        .accessibilityLabel("Coach chat")
+        .sensoryFeedback(.impact(weight: .medium), trigger: showCoachChat)
     }
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass

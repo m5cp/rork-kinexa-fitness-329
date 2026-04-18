@@ -1,31 +1,67 @@
-# Keep tab bar visible everywhere + full app speed-up
+# Add a floating AI coach chat + replace "unlimited" with clear daily caps
 
-## What you'll notice
+## What's changing
 
-**Navigation**
-- The bottom tab bar stays visible on every screen, even deep inside premade workouts, routine editors, exercise pickers, meal logging, and detail views.
-- Every screen that goes more than one level deep gets a clear back button in the top-left so you always have a way out — plus you can tap the current tab icon to jump straight back to the top.
-- Deep pages slide in as proper pushed pages instead of popping up as full-height sheets that cover the tab bar.
-- A few screens that truly need to be modal (quick confirmations, sharing) stay as sheets, but they sit above the tab bar so Home is always one tap away.
+### 1. Rework the Pro vs Free offering (no more "unlimited")
 
-**Speed & smoothness**
-- The premade workout editor opens instantly and responds immediately when you tap swap, add, or remove. Right now it rebuilds the whole list on every tap — this will be fixed so only the changed row updates.
-- The exercise swap picker loads the full library lazily (only what's on screen), so scrolling is smooth even with hundreds of exercises.
-- Shadows on elevated cards are rendered more efficiently — same look, but lighter on the GPU so scrolling stays at 60fps on older devices.
-- Large lists on Home, Workouts, and Progress switch to lazy loading so they only render what's visible.
-- Heavy data (routines, cardio programs, exercise library, food database) loads once and stays cached instead of being rebuilt every time a screen appears.
-- Tab switches no longer reload their content — each tab keeps its state so returning to it is instant.
-- Animations are tuned to shorter, snappier springs so the app feels more responsive.
-- Images and icons get proper sizing so nothing overflows or causes layout thrash.
+Replace every "unlimited" label with concrete daily caps so people know exactly what they're getting.
 
-## Screens being touched
+**Free**
 
-- **Premade Routines** — editor becomes a pushed page with a back button; row updates are instant
-- **Exercise Swap / Add picker** — pushed page with back button; lazy-loaded list
-- **Manual Routine Builder** — pushed page with back button
-- **Cardio Programs** — detail views pushed instead of sheeted
-- **Meal Log & Food Detail** — detail views pushed with back button
-- **Workout Detail / Edit** — pushed with back button
-- **Home, Progress, Profile** — lazy loading pass, lighter shadows, cached data
+- 5 food scans per day
+- 3 AI workout sessions per day
+- 5 coach chat messages per day
+- Basic tracking (meals, workouts, progress)
+- 1 bodyweight functional fitness workout
 
-Tab bar remains pinned at the bottom throughout. You can always tap Home or any other tab to escape a deep flow in one tap.
+**Pro**
+
+- 20 food scans per day
+- 15 AI workout sessions per day
+- 50 coach chat messages per day
+- Full workout planning (functional fitness, cardio, weights)
+- Advanced progress insights & exports
+- Priority AI responses
+
+Keep the elevated card design from the current paywall — just swap the copy and the bullet list.
+
+### 2. New feature: Floating AI Coach chat
+
+A small circular chat button floats above the bottom tab bar on every screen. Tap it to open a chat sheet.
+
+**What the coach can do**
+
+- Answer questions about how to use the app ("How do I log a meal?", "Where's my weekly plan?")
+- Suggest exercise combinations ("Give me a 20-min push/pull combo")
+- Explain form and technique for any exercise
+- Recommend routines based on goals (strength, cardio, mobility)
+- Suggest swaps when you don't have equipment
+
+**How it feels**
+
+- Calm, motivating tone — like a knowledgeable trainer, not a chatbot
+- Suggested prompt chips at the top ("Plan my week", "Swap an exercise", "Explain a movement")
+- Messages stream in naturally
+- Daily message counter shown subtly at the top ("3 of 5 left today" for Free, "47 of 50 left" for Pro)
+- When Free users hit their cap, a gentle upgrade card appears inline
+
+**Where it lives**
+
+- Floating round button, bottom-right, just above the tab bar
+- Visible on Home, Meals, Workouts, Progress, Profile
+- Hides automatically when a sheet or full-screen flow is open so it doesn't get in the way
+- Tapping opens a large sheet that can be swiped down to dismiss
+
+### 3. Small cleanup
+
+- Update the Home screen circle labels to calm, motivating words (keeping the refresh from last round)
+- Make sure the new daily caps are reflected in the settings/usage area too
+- Coach chat respects existing haptics and the app's elevated-card visual language
+
+## Pages / Screens
+
+- **Every main screen** — gains a floating coach button in the bottom-right
+- **Coach chat sheet** — full-height sheet with suggested prompts, message list, input field, and a remaining-messages indicator
+- **Paywall / Pro page** — bullets rewritten with hard daily caps instead of "unlimited"; adds "50 coach messages/day" as a Pro perk
+- **Upgrade nudge** — inline card that appears in chat when a Free user runs out of messages for the day
+

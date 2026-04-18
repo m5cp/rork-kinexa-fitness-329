@@ -11,12 +11,12 @@ struct UpgradeView: View {
     @State private var purchaseTrigger: Bool = false
 
     private let proFeatures: [(icon: String, title: String, desc: String)] = [
-        ("dumbbell.fill", "Expanded Workout Library", "Full weights, cardio & functional fitness"),
-        ("calendar.badge.plus", "Custom Plan Generator", "Build 4 / 8 / 12-week training plans"),
-        ("chart.line.uptrend.xyaxis", "Advanced Progress Tracking", "Trends, PR history & calendar view"),
-        ("fork.knife", "Full Nutrition Suite", "15 AI food scans/day & macro insights"),
-        ("sparkles", "AI Insights", "On-device intelligence for smarter training"),
-        ("square.and.arrow.up.fill", "PDF & Calendar Export", "Export plans, schedules & share cards")
+        ("fork.knife", "20 Food Scans / Day", "Up from 5 on free"),
+        ("figure.strengthtraining.traditional", "15 AI Workouts / Day", "Up from 3 on free"),
+        ("sparkles", "50 Coach Messages / Day", "Up from 5 on free"),
+        ("calendar.badge.plus", "Full Plan Builder", "Weights, cardio & functional fitness"),
+        ("chart.line.uptrend.xyaxis", "Advanced Progress", "Trends, PR history & exports"),
+        ("square.and.arrow.up.fill", "PDF & Calendar Export", "Share plans and schedules")
     ]
 
     var body: some View {
