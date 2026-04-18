@@ -1,7 +1,11 @@
-# Float chat button above tab bar & equalize Log Meal cards
+# Show splash screen only on first launch
 
-**Fixes**
+**Change**
 
-- Move the floating chat button so it sits in the bottom-right corner, floating above the tab bar with a comfortable gap — instead of being aligned at the tab bar level.
-- In the Log Meal sheet, make the "Repeat Yesterday" and "Templates" cards the exact same size as each other, matching the height and padding of the other paired cards (Scan Food / Barcode and AI Describe / Food Search) so the whole grid feels consistent.
+- The Kinexa logo splash screen will now appear only the very first time someone opens the app.
+- On every launch after that, the app will go straight to the main screen with no splash.
+
+**How it's remembered**
+
+- The app quietly saves a flag after the first time the splash is shown, so it knows to skip it from then on — even after closing and reopening the app, or restarting the phone.
 

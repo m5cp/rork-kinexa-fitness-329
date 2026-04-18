@@ -2,7 +2,12 @@ import SwiftUI
 
 struct RootView: View {
     @Environment(AppViewModel.self) private var vm
-    @State private var showSplash: Bool = true
+    @AppStorage("hasSeenSplash") private var hasSeenSplash: Bool = false
+    @State private var showSplash: Bool
+
+    init() {
+        _showSplash = State(initialValue: !UserDefaults.standard.bool(forKey: "hasSeenSplash"))
+    }
 
     var body: some View {
         ZStack {
@@ -11,6 +16,7 @@ struct RootView: View {
 
             if showSplash {
                 SplashView {
+                    hasSeenSplash = true
                     withAnimation(.spring(response: 0.6, dampingFraction: 0.85)) {
                         showSplash = false
                     }
