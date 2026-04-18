@@ -157,7 +157,8 @@ struct WorkoutsTabView: View {
 
             HStack(spacing: 10) {
                 plannerBlock(
-                    title: "Functional Fitness",
+                    title: "Functional",
+                    subtitle: "Fitness",
                     icon: "bolt.heart.fill",
                     gradient: [Color(hex: "#F59E0B"), Color(hex: "#D97706")],
                     shadowColor: Color(hex: "#F59E0B")
@@ -167,7 +168,8 @@ struct WorkoutsTabView: View {
                 }
 
                 plannerBlock(
-                    title: "Free Weights",
+                    title: "Free",
+                    subtitle: "Weights",
                     icon: "dumbbell.fill",
                     gradient: [Color(hex: "#6366F1"), Color(hex: "#4338CA")],
                     shadowColor: Color(hex: "#6366F1")
@@ -178,6 +180,7 @@ struct WorkoutsTabView: View {
 
                 plannerBlock(
                     title: "Cardio",
+                    subtitle: " ",
                     icon: "heart.fill",
                     gradient: [Color(hex: "#EC4899"), Color(hex: "#BE185D")],
                     shadowColor: Color(hex: "#EC4899")
@@ -189,7 +192,8 @@ struct WorkoutsTabView: View {
 
             HStack(spacing: 10) {
                 smallPlanCard(
-                    title: "Generate Session",
+                    title: "Quick Workout",
+                    subtitle: "One-off randomized session",
                     icon: "sparkles",
                     color: Color(hex: "#8B5CF6")
                 ) {
@@ -199,6 +203,7 @@ struct WorkoutsTabView: View {
 
                 smallPlanCard(
                     title: "Import PDF",
+                    subtitle: "Upload your own workout",
                     icon: "doc.text.fill",
                     color: Color(hex: "#0EA5E9")
                 ) {
@@ -245,7 +250,7 @@ struct WorkoutsTabView: View {
         .buttonStyle(PressScaleButtonStyle())
     }
 
-    private func plannerBlock(title: String, icon: String, gradient: [Color], shadowColor: Color, action: @escaping () -> Void) -> some View {
+    private func plannerBlock(title: String, subtitle: String, icon: String, gradient: [Color], shadowColor: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 12) {
                 Image(systemName: icon)
@@ -255,15 +260,19 @@ struct WorkoutsTabView: View {
                     .background(.white.opacity(0.15))
                     .clipShape(.rect(cornerRadius: 12))
 
-                Text(title)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
+                VStack(spacing: 1) {
+                    Text(title)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white)
+                    Text(subtitle)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white)
+                }
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
+            .frame(height: 130)
             .padding(.horizontal, 8)
             .background {
                 RoundedRectangle(cornerRadius: 22)
@@ -282,7 +291,7 @@ struct WorkoutsTabView: View {
         .accessibilityLabel("Browse \(title) workouts")
     }
 
-    private func smallPlanCard(title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+    private func smallPlanCard(title: String, subtitle: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 10) {
                 Image(systemName: icon)
@@ -292,11 +301,18 @@ struct WorkoutsTabView: View {
                     .background(color.opacity(0.12))
                     .clipShape(.rect(cornerRadius: 10))
 
-                Text(title)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(KinexaTheme.primaryText)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
+                VStack(spacing: 3) {
+                    Text(title)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    Text(subtitle)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)

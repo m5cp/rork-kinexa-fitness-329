@@ -69,8 +69,6 @@ struct HomeView: View {
 
                     quickActionsSection
 
-                    todayFunctionalSection
-
                     quickStartSection
 
                     recentCardioSection

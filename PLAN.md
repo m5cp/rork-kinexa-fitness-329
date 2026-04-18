@@ -1,26 +1,31 @@
-# Remove style editor and make Today's Session empty until a plan is chosen
+# Remove Today's Session, equalize workout cards, and clarify plan vs session
 
-## What will change
+## Answers to your questions
 
-**Remove the Style Editor**
+**Does the weekly routine appear after you build a plan?**
+Yes — once you build a training plan, the week is saved and each day shows up on the Home screen (under Recent / upcoming areas) and inside the "Build My Training Plan" sheet itself, where you can reorder, export, or regenerate. It is not shown directly below the workout tiles on the Workouts tab — I can add a "This Week's Plan" section there if you want a clearer view.
 
-- Take out the style editor entirely — it wasn't applying changes and only added clutter.
-- The app will continue to fully support System, Light, and Dark mode automatically using Apple's native appearance settings.
-- Any entry point to the style editor (from Profile/Settings) will be removed cleanly so nothing feels broken.
+**Are "Build My Training Plan" and "Generate Session" the same?**
+No, they are different:
 
-**Today's Session empty state**
+- **Build My Training Plan** — creates a full **multi-week program** (goal, frequency, days). Think of it as your ongoing training calendar.
+- **Generate Session** — creates **one single workout for right now** (randomized based on your equipment/duty type). No calendar, no week — just a workout you can start immediately.
 
-- When no workout plan has been generated and no session has been chosen, Today's Session will no longer show a default/suggested workout.
-- Instead, it will show a clean, friendly empty state with:
-  - A subtle icon
-  - Headline: "No session yet"
-  - Supporting text: "Generate a plan or pick a workout to get started."
-  - Two clear buttons: **Generate Plan** and **Browse Workouts**
-- Once the user picks a session or generates a plan, Today's Session fills in as it does now.
+They do look similar on the Workouts page, which is confusing. I'll rename "Generate Session" to **"Quick Workout"** and add a short subtitle to both so it's obvious what each one does.
 
-**Polish**
+## Changes I'll make
 
-- Empty state uses the same elevated card styling as the rest of the app for consistency.
-- Works seamlessly in Light, Dark, and System appearance.
-- No changes to nutrition, tracking, progress, or any other area.
+**Home screen**
+
+- Remove the "Today's Session" section entirely (both the header and the orange card). It will no longer appear whether or not a workout is planned.
+
+**Workouts screen**
+
+- Make the three hero cards (Functional Fitness, Free Weights, Cardio) exactly the same height, so a two-line label like "Functional Fitness" doesn't make its card taller than the others.
+- Rename the bottom-left tile from **"Generate Session"** to **"Quick Workout"** with a small subtitle "One-off randomized session" so it's clearly different from Build My Training Plan.
+- Add a short subtitle to **"Import PDF"** ("Upload your own workout") to balance the pair.
+
+**Optional (tell me yes/no)**
+
+- Add a "This Week's Plan" section on the Workouts tab (below the tiles) that lists the days of your current training plan once one exists, with tap-to-open. If you'd rather keep the Workouts tab clean and only see the plan inside the Build sheet, I'll leave it as-is.
 
