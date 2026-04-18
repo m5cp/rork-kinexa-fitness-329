@@ -73,8 +73,6 @@ struct HomeView: View {
                     quickActionsSection
 
                     quickStartSection
-
-                    recentCardioSection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
@@ -469,7 +467,11 @@ struct HomeView: View {
     private func handleRingTap(_ ring: RingType) {
         switch ring {
         case .fitness:
-            showQuickStartSheet = true
+            if let today = vm.todayWorkout, !today.isRestDay {
+                showWorkoutDetail = true
+            } else {
+                showQuickStartSheet = true
+            }
         case .meals:
             showLogMealFromRing = true
         case .mood:

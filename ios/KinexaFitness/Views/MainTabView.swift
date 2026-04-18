@@ -37,7 +37,6 @@ struct MainTabView: View {
     @State private var nutritionPath = NavigationPath()
     @State private var progressPath = NavigationPath()
     @State private var profilePath = NavigationPath()
-    @State private var showCoachChat: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -78,62 +77,12 @@ struct MainTabView: View {
                 .padding(.horizontal, 12)
                 .padding(.bottom, 4)
                 .zIndex(100)
-
-            coachFloatingButton
-                .padding(.trailing, 16)
-                .padding(.bottom, 88)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .zIndex(101)
         }
         .background(KinexaTheme.background.ignoresSafeArea())
         .instantRecapOverlay(recap: Binding(
             get: { vm.activeRecap },
             set: { vm.activeRecap = $0 }
         ))
-        .sheet(isPresented: $showCoachChat) {
-            CoachChatView()
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
-                .presentationContentInteraction(.scrolls)
-        }
-    }
-
-    @ViewBuilder
-    private var coachFloatingButton: some View {
-        if #available(iOS 26.0, *) {
-            Button {
-                showCoachChat = true
-            } label: {
-                Image(systemName: "sparkles")
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 56, height: 56)
-            }
-            .glassEffect(.regular.tint(KinexaTheme.accent).interactive(), in: .circle)
-            .shadow(color: KinexaTheme.accent.opacity(0.35), radius: 12, y: 6)
-            .buttonStyle(PressScaleButtonStyle())
-            .accessibilityLabel("Coach chat")
-            .sensoryFeedback(.impact(weight: .medium), trigger: showCoachChat)
-        } else {
-            Button {
-                showCoachChat = true
-            } label: {
-                ZStack {
-                    Circle()
-                        .fill(KinexaTheme.heroGradient)
-                        .frame(width: 56, height: 56)
-                        .shadow(color: KinexaTheme.accent.opacity(0.35), radius: 12, y: 6)
-                        .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
-
-                    Image(systemName: "sparkles")
-                        .font(.title3.weight(.bold))
-                        .foregroundStyle(.white)
-                }
-            }
-            .buttonStyle(PressScaleButtonStyle())
-            .accessibilityLabel("Coach chat")
-            .sensoryFeedback(.impact(weight: .medium), trigger: showCoachChat)
-        }
     }
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass

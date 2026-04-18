@@ -44,15 +44,28 @@ final class ReflectionRingsViewModel {
 
     // MARK: - Ring Computation
 
+    static let moveStepsGoal: Int = 6000
+
+    func stepsForDate(_ date: Date, appVM: AppViewModel) -> Int {
+        let cal = Calendar.current
+        if cal.isDateInToday(date) {
+            let live = appVM.pedometer.todaySteps
+            let stored = appVM.stepHistory.first { cal.isDate($0.date, inSameDayAs: date) }?.steps ?? 0
+            return max(live, stored)
+        }
+        return appVM.stepHistory.first { cal.isDate($0.date, inSameDayAs: date) }?.steps ?? 0
+    }
+
     func closedRings(on date: Date, appVM: AppViewModel, nutritionVM: NutritionViewModel) -> Set<RingType> {
         let cal = Calendar.current
         var rings: Set<RingType> = []
 
-        // Fitness — any completed workout / quick start / cardio on that date
+        // Fitness — any completed workout / quick start / cardio on that date, OR enough steps
         let hasCompleted = appVM.completedRecords.contains { cal.isDate($0.date, inSameDayAs: date) }
         let hasQuick = appVM.quickStartRecords.contains { cal.isDate($0.startDate, inSameDayAs: date) }
         let hasCardio = appVM.cardioSessions.contains { cal.isDate($0.date, inSameDayAs: date) }
-        if hasCompleted || hasQuick || hasCardio {
+        let steps = stepsForDate(date, appVM: appVM)
+        if hasCompleted || hasQuick || hasCardio || steps >= Self.moveStepsGoal {
             rings.insert(.fitness)
         }
 
@@ -79,7 +92,9 @@ final class ReflectionRingsViewModel {
         let cal = Calendar.current
         switch ring {
         case .fitness:
-            return closedRings(on: date, appVM: appVM, nutritionVM: nutritionVM).contains(.fitness) ? 1 : 0
+            if closedRings(on: date, appVM: appVM, nutritionVM: nutritionVM).contains(.fitness) { return 1 }
+            let steps = stepsForDate(date, appVM: appVM)
+            return min(Double(steps) / Double(Self.moveStepsGoal), 1.0)
         case .meals:
             let count = nutritionVM.mealsForDate(date).count
             return min(Double(count) / 1.0, 1.0)

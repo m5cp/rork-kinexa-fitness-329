@@ -13,7 +13,6 @@ struct UpgradeView: View {
     private let proFeatures: [(icon: String, title: String, desc: String)] = [
         ("fork.knife", "20 Food Scans / Day", "Up from 5 on free"),
         ("figure.strengthtraining.traditional", "15 AI Workouts / Day", "Up from 3 on free"),
-        ("sparkles", "50 Coach Messages / Day", "Up from 5 on free"),
         ("calendar.badge.plus", "Full Plan Builder", "Weights, cardio & functional fitness"),
         ("chart.line.uptrend.xyaxis", "Advanced Progress", "Trends, PR history & exports"),
         ("square.and.arrow.up.fill", "PDF & Calendar Export", "Share plans and schedules")
