@@ -205,18 +205,73 @@ private struct TabBarGlassBackground: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 26.0, *) {
             content
-                .glassEffect(.regular, in: .capsule)
-                .shadow(color: .black.opacity(0.12), radius: 18, y: 8)
+                .background {
+                    Capsule()
+                        .fill(.ultraThinMaterial.opacity(0.55))
+                        .overlay {
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.white.opacity(0.22),
+                                            Color.white.opacity(0.04)
+                                        ],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .blendMode(.plusLighter)
+                        }
+                        .overlay {
+                            Capsule()
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.white.opacity(0.55),
+                                            Color.white.opacity(0.1)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.8
+                                )
+                        }
+                }
+                .shadow(color: .black.opacity(0.10), radius: 20, y: 10)
         } else {
             content
                 .background {
                     Capsule()
-                        .fill(.ultraThinMaterial)
+                        .fill(.ultraThinMaterial.opacity(0.6))
                         .overlay {
-                            Capsule().stroke(KinexaTheme.border.opacity(0.6), lineWidth: 0.5)
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.white.opacity(0.18),
+                                            Color.white.opacity(0.02)
+                                        ],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                        }
+                        .overlay {
+                            Capsule()
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.white.opacity(0.5),
+                                            Color.white.opacity(0.08)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.7
+                                )
                         }
                 }
-                .shadow(color: .black.opacity(0.12), radius: 18, y: 8)
+                .shadow(color: .black.opacity(0.10), radius: 20, y: 10)
         }
     }
 }

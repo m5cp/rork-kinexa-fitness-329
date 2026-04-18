@@ -1390,7 +1390,7 @@ struct HomeView: View {
             }
 
             quickActionTile(
-                title: "Log Food",
+                title: "Log Meals",
                 icon: "fork.knife",
                 colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")]
             ) {
