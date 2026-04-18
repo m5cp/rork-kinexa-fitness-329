@@ -12,6 +12,27 @@ struct PressScaleButtonStyle: ButtonStyle {
 }
 
 extension View {
+    @ViewBuilder
+    func liquidGlass(in shape: some Shape = Capsule(), tint: Color? = nil, prominent: Bool = false) -> some View {
+        if #available(iOS 26.0, *) {
+            if prominent, let tint {
+                self.glassEffect(.regular.tint(tint).interactive(), in: shape)
+            } else if let tint {
+                self.glassEffect(.regular.tint(tint.opacity(0.35)).interactive(), in: shape)
+            } else {
+                self.glassEffect(.regular.interactive(), in: shape)
+            }
+        } else {
+            self.background {
+                shape.fill(.ultraThinMaterial)
+                    .overlay { shape.fill((tint ?? .clear).opacity(prominent ? 0.85 : 0.18)) }
+                    .overlay { shape.stroke(.white.opacity(0.18), lineWidth: 0.5) }
+            }
+        }
+    }
+}
+
+extension View {
     func premiumCardStyle() -> some View {
         self
             .background(KinexaTheme.card)

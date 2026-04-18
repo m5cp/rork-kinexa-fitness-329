@@ -1,26 +1,31 @@
-# Don't count failed AI requests against the user
+# Add Liquid Glass styling to tab bar and buttons
 
-## The issue
+## What will change
 
-Right now the meal scan already plays it safe — if the AI call fails, no scan is deducted. But the **Coach chat does the opposite**: it counts the message *before* the AI responds, so when the network drops or the model errors out (like the "I couldn't reach the coach right now" screenshot), the user still loses 1 of their 5 daily messages.
+**Tab bar**
 
-## How the fix protects the user
+- Replace the current solid white tab bar with a floating, translucent Liquid Glass bar
+- Rounded pill/capsule shape that hovers above content instead of a hard rectangular dock locked to the bottom edge
+- Soft blur that lets the screen content subtly show through
+- The selected tab gets a gentle tinted glass highlight; other tabs stay clear
+- Smooth springy bounce when switching tabs (kept from current behavior)
+- Coach chat floating button restyled as a circular liquid glass bubble that sits next to / above the bar
 
-**Coach chat**
-- Only count a message after the coach actually replies successfully.
-- If the request fails (network error, AI service down, timeout, empty reply), the message is free — the daily counter stays exactly where it was.
-- The "I couldn't reach the coach right now" message still appears so the user knows what happened, but their quota is untouched.
+**Buttons across the app**
 
-**Meal scan & photo analysis**
-- Already correct — confirm and keep that behavior. No token or daily scan is consumed unless the AI returns a real result.
+- Primary action buttons (Generate, Save, Continue, Start, etc.) get a prominent liquid glass look with a soft tinted glow
+- Secondary buttons (icon-only buttons in headers, toolbar items, quick actions) get a clear glass capsule/circle treatment
+- Tappable cards keep their existing card style (glass is for navigation/controls, not content) but gain a subtle press-in liquid response
+- All glass buttons get the interactive shimmer effect — they react to touch with a fluid highlight
 
-**Bonus tokens (paid)**
-- Same rule applied across the board: a purchased token is *only* spent on a successful AI response. Any internal/AI/network failure is on us, not the user.
+**Fallback for older devices**
 
-**What the user sees on a failure**
-- A small, friendly inline note ("Didn't go through — that one's on us, try again") instead of silently losing a credit.
-- The remaining count visible in the header (e.g. "4 of 5 messages left today") will not tick down on errors.
+- On iOS 18, buttons and the tab bar fall back to the current ultra-thin material look so nothing breaks
+- Liquid Glass only activates on iOS 26+
 
-## Principle going forward
+## What stays the same
 
-Every AI-powered feature in the app follows one rule: **charge on success, never on failure**. Increment counters and deduct tokens *after* the AI returns valid content — never before the call, and never inside an error path.
+- Tab order, icons, labels, and navigation behavior
+- All existing screens, colors, and content layouts
+- The coach chat button still floats in the same spot, just restyled
+

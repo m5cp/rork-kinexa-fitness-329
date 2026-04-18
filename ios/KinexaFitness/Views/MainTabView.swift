@@ -39,8 +39,8 @@ struct MainTabView: View {
     @State private var showCoachChat: Bool = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack(alignment: .bottomTrailing) {
+        ZStack(alignment: .bottom) {
+            Group {
                 NavigationStack(path: $homePath) {
                     HomeView()
                 }
@@ -70,14 +70,16 @@ struct MainTabView: View {
                 }
                 .opacity(selectedTab == .profile ? 1 : 0)
                 .zIndex(selectedTab == .profile ? 1 : 0)
-
-                coachFloatingButton
-                    .padding(.trailing, 16)
-                    .padding(.bottom, 12)
-                    .zIndex(100)
             }
+            .safeAreaPadding(.bottom, 72)
 
-            customTabBar
+            HStack(alignment: .bottom, spacing: 10) {
+                customTabBar
+                coachFloatingButton
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 4)
+            .zIndex(100)
         }
         .background(KinexaTheme.background.ignoresSafeArea())
         .instantRecapOverlay(recap: Binding(
@@ -92,76 +94,126 @@ struct MainTabView: View {
         }
     }
 
+    @ViewBuilder
     private var coachFloatingButton: some View {
-        Button {
-            showCoachChat = true
-        } label: {
-            ZStack {
-                Circle()
-                    .fill(KinexaTheme.heroGradient)
-                    .frame(width: 54, height: 54)
-                    .shadow(color: KinexaTheme.accent.opacity(0.35), radius: 12, y: 6)
-                    .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
-
+        if #available(iOS 26.0, *) {
+            Button {
+                showCoachChat = true
+            } label: {
                 Image(systemName: "sparkles")
                     .font(.title3.weight(.bold))
                     .foregroundStyle(.white)
+                    .frame(width: 56, height: 56)
             }
+            .glassEffect(.regular.tint(KinexaTheme.accent).interactive(), in: .circle)
+            .shadow(color: KinexaTheme.accent.opacity(0.35), radius: 12, y: 6)
+            .buttonStyle(PressScaleButtonStyle())
+            .accessibilityLabel("Coach chat")
+            .sensoryFeedback(.impact(weight: .medium), trigger: showCoachChat)
+        } else {
+            Button {
+                showCoachChat = true
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(KinexaTheme.heroGradient)
+                        .frame(width: 56, height: 56)
+                        .shadow(color: KinexaTheme.accent.opacity(0.35), radius: 12, y: 6)
+                        .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
+
+                    Image(systemName: "sparkles")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(.white)
+                }
+            }
+            .buttonStyle(PressScaleButtonStyle())
+            .accessibilityLabel("Coach chat")
+            .sensoryFeedback(.impact(weight: .medium), trigger: showCoachChat)
         }
-        .buttonStyle(PressScaleButtonStyle())
-        .accessibilityLabel("Coach chat")
-        .sensoryFeedback(.impact(weight: .medium), trigger: showCoachChat)
     }
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     private var customTabBar: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 2) {
             ForEach(AppTab.allCases, id: \.rawValue) { tab in
-                Button {
-                    if selectedTab == tab {
-                        switch tab {
-                        case .home: homePath = NavigationPath()
-                        case .workouts: workoutsPath = NavigationPath()
-                        case .nutrition: nutritionPath = NavigationPath()
-                        case .progress: progressPath = NavigationPath()
-                        case .profile: profilePath = NavigationPath()
-                        }
-                    } else {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            selectedTab = tab
-                        }
-                    }
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: tab.icon)
-                            .font(.system(size: horizontalSizeClass == .regular ? 22 : 18, weight: selectedTab == tab ? .bold : .regular))
-                            .symbolEffect(.bounce, value: selectedTab == tab)
-                        Text(tab.title)
-                            .font(.system(size: horizontalSizeClass == .regular ? 12 : 10, weight: selectedTab == tab ? .bold : .medium))
-                    }
-                    .foregroundStyle(selectedTab == tab ? KinexaTheme.accent : KinexaTheme.tertiaryText)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 44)
-                    .padding(.top, 10)
-                    .padding(.bottom, 2)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(tab.title)
-                .accessibilityAddTraits(selectedTab == tab ? .isSelected : [])
+                tabButton(for: tab)
             }
         }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 6)
         .frame(maxWidth: horizontalSizeClass == .regular ? 600 : .infinity)
-        .frame(maxWidth: .infinity)
-        .safeAreaPadding(.bottom)
-        .background {
-            KinexaTheme.background
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(KinexaTheme.border)
-                        .frame(height: 0.5)
+        .modifier(TabBarGlassBackground())
+    }
+
+    @ViewBuilder
+    private func tabButton(for tab: AppTab) -> some View {
+        let isSelected = selectedTab == tab
+        Button {
+            if isSelected {
+                switch tab {
+                case .home: homePath = NavigationPath()
+                case .workouts: workoutsPath = NavigationPath()
+                case .nutrition: nutritionPath = NavigationPath()
+                case .progress: progressPath = NavigationPath()
+                case .profile: profilePath = NavigationPath()
                 }
-                .ignoresSafeArea(edges: .bottom)
+            } else {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                    selectedTab = tab
+                }
+            }
+        } label: {
+            VStack(spacing: 2) {
+                Image(systemName: tab.icon)
+                    .font(.system(size: 18, weight: isSelected ? .bold : .regular))
+                    .symbolEffect(.bounce, value: isSelected)
+                Text(tab.title)
+                    .font(.system(size: 10, weight: isSelected ? .bold : .medium))
+            }
+            .foregroundStyle(isSelected ? KinexaTheme.accent : KinexaTheme.tertiaryText)
+            .frame(maxWidth: .infinity)
+            .frame(height: 48)
+            .background {
+                if isSelected {
+                    TabSelectionPill()
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(tab.title)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+private struct TabSelectionPill: View {
+    var body: some View {
+        if #available(iOS 26.0, *) {
+            Capsule()
+                .fill(KinexaTheme.accent.opacity(0.14))
+        } else {
+            Capsule()
+                .fill(KinexaTheme.accent.opacity(0.12))
+        }
+    }
+}
+
+private struct TabBarGlassBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content
+                .glassEffect(.regular, in: .capsule)
+                .shadow(color: .black.opacity(0.12), radius: 18, y: 8)
+        } else {
+            content
+                .background {
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .overlay {
+                            Capsule().stroke(KinexaTheme.border.opacity(0.6), lineWidth: 0.5)
+                        }
+                }
+                .shadow(color: .black.opacity(0.12), radius: 18, y: 8)
         }
     }
 }
