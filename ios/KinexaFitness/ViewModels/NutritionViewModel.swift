@@ -13,6 +13,7 @@ final class NutritionViewModel {
     var waterEntries: [WaterEntry] = []
     var waterGoal: WaterGoal = .default
     var favorites: [FavoriteFoodItem] = []
+    var mealTemplates: [MealTemplate] = []
     var loggingStreak: Int = 0
 
     private let gemini = GeminiService()
@@ -198,6 +199,69 @@ final class NutritionViewModel {
         addFoodsToFavorites(meal.foods)
         persistData()
         calculateStreak()
+    }
+
+    // MARK: - Repeat Meals & Templates
+
+    var yesterdaysMeals: [MealEntry] {
+        let calendar = Calendar.current
+        guard let yesterday = calendar.date(byAdding: .day, value: -1, to: calendar.startOfDay(for: .now)) else { return [] }
+        return meals.filter { calendar.isDate($0.date, inSameDayAs: yesterday) }
+            .sorted { $0.date < $1.date }
+    }
+
+    func repeatMeal(_ meal: MealEntry, on date: Date? = nil, multiplier: Double = 1.0) {
+        let targetDate = date ?? (Calendar.current.isDateInToday(selectedDate) ? .now : selectedDate)
+        let scaledFoods: [FoodItem] = meal.foods.map { multiplier == 1.0 ? FoodItem(name: $0.name, quantity: $0.quantity, nutrition: $0.nutrition, barcode: $0.barcode, source: $0.source) : $0.scaled(by: multiplier) }
+        let copy = MealEntry(
+            date: targetDate,
+            mealType: meal.mealType,
+            foods: scaledFoods,
+            notes: meal.notes
+        )
+        addMeal(copy)
+    }
+
+    func repeatYesterday() {
+        let y = yesterdaysMeals
+        guard !y.isEmpty else { return }
+        let now = Date()
+        for meal in y {
+            repeatMeal(meal, on: now)
+        }
+    }
+
+    func saveMealAsTemplate(_ meal: MealEntry, title: String) {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        let template = MealTemplate(
+            title: trimmed,
+            mealType: meal.mealType,
+            foods: meal.foods.map { FoodItem(name: $0.name, quantity: $0.quantity, nutrition: $0.nutrition, barcode: $0.barcode, source: $0.source) }
+        )
+        mealTemplates.insert(template, at: 0)
+        persistData()
+    }
+
+    func applyTemplate(_ template: MealTemplate, mealType: MealType? = nil, multiplier: Double = 1.0) {
+        let foods: [FoodItem] = template.foods.map { multiplier == 1.0 ? FoodItem(name: $0.name, quantity: $0.quantity, nutrition: $0.nutrition, barcode: $0.barcode, source: $0.source) : $0.scaled(by: multiplier) }
+        let meal = MealEntry(
+            date: Calendar.current.isDateInToday(selectedDate) ? .now : selectedDate,
+            mealType: mealType ?? template.mealType,
+            foods: foods
+        )
+        addMeal(meal)
+
+        if let idx = mealTemplates.firstIndex(where: { $0.id == template.id }) {
+            mealTemplates[idx].lastUsed = .now
+            mealTemplates[idx].timesUsed += 1
+            persistData()
+        }
+    }
+
+    func deleteTemplate(id: UUID) {
+        mealTemplates.removeAll { $0.id == id }
+        persistData()
     }
 
     func deleteMeal(id: UUID) {
@@ -428,6 +492,7 @@ final class NutritionViewModel {
         LocalStore.save(waterEntries, forKey: "nutritionWater")
         LocalStore.save(waterGoal, forKey: "nutritionWaterGoal")
         LocalStore.save(favorites, forKey: "nutritionFavorites")
+        LocalStore.save(mealTemplates, forKey: "nutritionMealTemplates")
     }
 
     private func loadData() {
@@ -437,5 +502,6 @@ final class NutritionViewModel {
         waterEntries = LocalStore.load([WaterEntry].self, forKey: "nutritionWater", fallback: [])
         waterGoal = LocalStore.load(WaterGoal.self, forKey: "nutritionWaterGoal", fallback: .default)
         favorites = LocalStore.load([FavoriteFoodItem].self, forKey: "nutritionFavorites", fallback: [])
+        mealTemplates = LocalStore.load([MealTemplate].self, forKey: "nutritionMealTemplates", fallback: [])
     }
 }

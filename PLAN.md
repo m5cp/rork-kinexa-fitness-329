@@ -1,31 +1,29 @@
-# Add a full history calendar for Reflection Rings
+# Add Repeat Meals & Meal Templates to Nutrition
 
-Yes — this is totally doable. We'll build an Apple Fitness–style history view for your Reflection Rings so you can scroll back through every past day and tap in to see details.
+Your nutrition section already has AI photo scan (camera + gallery), confirmation before saving, editable results, and calorie/protein/carbs/fat/alcohol tracking. I'll keep all of that untouched and layer on the missing pieces.
 
-**What you'll get**
+**What's new**
 
-- A new "History" button on the Reflection Rings detail screen (next to the existing 7-day strip).
-- A full-screen scrollable month-by-month calendar showing every day since you started using the app.
-- Each day shows the 4 concentric rings (Fitness, Meals, Mood, Water) filled based on what you logged that day.
-- Today's date is highlighted; future days appear dimmed.
-- Tap any day to open a detail sheet showing:
-  - The rings for that day with % closed for each
-  - A list of workouts you did that day (completed workouts, quick starts, cardio)
-  - Meals you logged (with calories/macros)
-  - Your mood check-in with any note
-  - Water intake vs goal
-  - Points earned that day and whether you hit the bonus
+- **Repeat Yesterday's Meal** — one-tap button at the top of the Log Meal sheet that brings back yesterday's meals with their macros preloaded, ready to confirm or tweak.
+- **Log Again from history** — every past meal in the meal detail view gets a "Log Again to Today" action that copies it into today's log instantly.
+- **Frequent & Recent Foods row** — a quick-tap strip at the top of the Log Meal sheet showing your most-used and most-recent foods for one-tap logging (already partly exists; I'll surface it more prominently).
+- **Meal Templates** — save any logged meal as a named template (e.g. "High Protein Breakfast", "Recovery Shake", "Weekend Drinks"). Templates live in a new "Templates" section inside the Log Meal sheet and can be applied with one tap.
+- **Serving size adjuster** — when repeating a food or template, a simple slider (0.5x / 1x / 1.5x / 2x / custom) scales the macros before saving.
 
-**How it looks**
+**Design & behavior**
 
-- Dark background matching the rest of the app, with the signature red/orange/purple/blue ring colors.
-- Month headers ("April 2026") separate each section as you scroll.
-- 7-column grid (Mon–Sun) with small stacked rings in each cell — similar to your reference screenshots.
-- Smooth scrolling that auto-jumps to today when you open it.
-- Streak indicator pinned at the top showing current "all-rings-closed" streak.
+- Clean, minimal cards matching the existing green Nutrition look — no new dashboards.
+- Repeat / template actions take 1–2 taps max.
+- Nothing saves until you confirm; duplicate-tap protection on save buttons.
+- All preloaded values stay editable, including alcohol.
+- Existing manual, barcode, AI text, USDA, and AI photo scan flows are left exactly as they are.
+- Scanned / repeated items flow into the same daily log and totals you already have — no parallel tracker.
 
-**Where it lives**
+**Screens touched**
 
-- Opens from the Reflection Rings detail screen via a new "History" button.
-- Replaces the current 7-day-only history card with a "View all history →" link for deeper browsing.
+- **Log Meal sheet** — adds "Repeat Yesterday", "Templates" row, and a more prominent Recent/Frequent strip.
+- **Meal detail sheet** — adds "Log Again to Today" and "Save as Template" buttons.
+- **New Templates picker sheet** — shows saved templates with macros; tap to apply, swipe to delete.
+- **New Serving Adjuster sheet** — quick serving multiplier before confirming a repeat/template.
 
+No data migration needed — new fields (template id, last used, times repeated) are optional and won't affect your existing meals.

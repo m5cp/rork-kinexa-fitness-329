@@ -10,6 +10,9 @@ struct MealDetailSheet: View {
     @State private var isAnalyzing: Bool = false
     @State private var showDeleteConfirm: Bool = false
     @State private var showUpgrade: Bool = false
+    @State private var showSaveTemplate: Bool = false
+    @State private var showServingAdjuster: Bool = false
+    @State private var logAgainToast: String?
 
     var body: some View {
         NavigationStack {
@@ -20,6 +23,7 @@ struct MealDetailSheet: View {
                         mealPhotoCard
                     }
                     nutritionSummaryCard
+                    repeatActionsRow
                     foodItemsList
                     if store.isPremium && nutritionVM.isGeminiConfigured { aiAnalysisSection }
                     if !meal.notes.isEmpty { notesCard }
@@ -40,6 +44,46 @@ struct MealDetailSheet: View {
             }
             .sheet(isPresented: $showUpgrade) {
                 UpgradeView()
+            }
+            .sheet(isPresented: $showSaveTemplate) {
+                SaveTemplateSheet(meal: meal) { title in
+                    nutritionVM.saveMealAsTemplate(meal, title: title)
+                    showToast("Saved as \"\(title)\"")
+                }
+            }
+            .sheet(isPresented: $showServingAdjuster) {
+                ServingAdjusterSheet(
+                    title: meal.foods.map(\.name).joined(separator: ", "),
+                    foods: meal.foods,
+                    defaultMealType: meal.mealType
+                ) { multiplier, mealType in
+                    let copy = MealEntry(
+                        date: .now,
+                        mealType: mealType,
+                        foods: meal.foods.map { multiplier == 1.0 ? FoodItem(name: $0.name, quantity: $0.quantity, nutrition: $0.nutrition, barcode: $0.barcode, source: $0.source) : $0.scaled(by: multiplier) },
+                        notes: meal.notes
+                    )
+                    nutritionVM.addMeal(copy)
+                    dismiss()
+                }
+            }
+            .overlay(alignment: .bottom) {
+                if let toast = logAgainToast {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(KinexaTheme.success)
+                        Text(toast)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .shadow(color: .black.opacity(0.3), radius: 12, y: 4)
+                    .padding(.bottom, 20)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
             .alert("Delete Meal", isPresented: $showDeleteConfirm) {
                 Button("Delete", role: .destructive) {
@@ -369,6 +413,83 @@ struct MealDetailSheet: View {
         .overlay {
             RoundedRectangle(cornerRadius: 14)
                 .stroke(KinexaTheme.border)
+        }
+    }
+
+    private var repeatActionsRow: some View {
+        HStack(spacing: 10) {
+            Button {
+                let copy = MealEntry(
+                    date: .now,
+                    mealType: meal.mealType,
+                    foods: meal.foods.map { FoodItem(name: $0.name, quantity: $0.quantity, nutrition: $0.nutrition, barcode: $0.barcode, source: $0.source) },
+                    notes: meal.notes
+                )
+                nutritionVM.addMeal(copy)
+                showToast("Logged to today")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    dismiss()
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.subheadline.weight(.bold))
+                    Text("Log Again")
+                        .font(.subheadline.weight(.bold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 48)
+                .background(
+                    LinearGradient(
+                        colors: [Color(hex: "#22C55E"), Color(hex: "#16A34A")],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .clipShape(.rect(cornerRadius: 14))
+            }
+            .buttonStyle(PressScaleButtonStyle())
+
+            Button {
+                showServingAdjuster = true
+            } label: {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(KinexaTheme.accent)
+                    .frame(width: 48, height: 48)
+                    .background(KinexaTheme.accent.opacity(0.12))
+                    .clipShape(.rect(cornerRadius: 14))
+            }
+            .buttonStyle(PressScaleButtonStyle())
+            .accessibilityLabel("Adjust serving")
+
+            Button {
+                showSaveTemplate = true
+            } label: {
+                Image(systemName: "square.stack.3d.up.fill")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(Color(hex: "#F59E0B"))
+                    .frame(width: 48, height: 48)
+                    .background(Color(hex: "#F59E0B").opacity(0.12))
+                    .clipShape(.rect(cornerRadius: 14))
+            }
+            .buttonStyle(PressScaleButtonStyle())
+            .accessibilityLabel("Save as template")
+        }
+    }
+
+    private func showToast(_ message: String) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            logAgainToast = message
+        }
+        Task {
+            try? await Task.sleep(for: .seconds(1.5))
+            await MainActor.run {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    logAgainToast = nil
+                }
+            }
         }
     }
 

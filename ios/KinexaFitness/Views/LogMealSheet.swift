@@ -22,12 +22,15 @@ struct LogMealSheet: View {
     @State private var showUpgrade: Bool = false
     @State private var showTokenStore: Bool = false
     @State private var quickLogToast: String?
+    @State private var showTemplates: Bool = false
+    @State private var isRepeatingYesterday: Bool = false
 
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
                     mealTypeSelector
+                    quickRepeatRow
                     heroCardsGrid
                     if activeMode != nil { activeInputSection }
                     if isEstimating { estimatingView }
@@ -90,6 +93,163 @@ struct LogMealSheet: View {
         }
         .sheet(isPresented: $showTokenStore) {
             TokenStoreView()
+        }
+        .sheet(isPresented: $showTemplates) {
+            MealTemplatesSheet(nutritionVM: nutritionVM, initialMealType: selectedMealType) {
+                showQuickLogToast("Template logged")
+                dismiss()
+            }
+        }
+    }
+
+    // MARK: - Quick Repeat Row
+
+    private var quickRepeatRow: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 10) {
+                Button {
+                    guard !isRepeatingYesterday else { return }
+                    guard !nutritionVM.yesterdaysMeals.isEmpty else { return }
+                    isRepeatingYesterday = true
+                    nutritionVM.repeatYesterday()
+                    showQuickLogToast("Yesterday's meals logged")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { dismiss() }
+                } label: {
+                    HStack(spacing: 10) {
+                        ZStack {
+                            Circle()
+                                .fill(.white.opacity(0.22))
+                                .frame(width: 34, height: 34)
+                            Image(systemName: "arrow.uturn.backward")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Repeat Yesterday")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(.white)
+                            Text(yesterdaySubtitle)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.8))
+                                .lineLimit(1)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        LinearGradient(
+                            colors: nutritionVM.yesterdaysMeals.isEmpty
+                            ? [Color(hex: "#94A3B8"), Color(hex: "#64748B")]
+                            : [Color(hex: "#0EA5E9"), Color(hex: "#0369A1")],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .clipShape(.rect(cornerRadius: 14))
+                    .opacity(nutritionVM.yesterdaysMeals.isEmpty ? 0.55 : 1)
+                }
+                .buttonStyle(PressScaleButtonStyle())
+                .disabled(nutritionVM.yesterdaysMeals.isEmpty || isRepeatingYesterday)
+
+                Button {
+                    showTemplates = true
+                } label: {
+                    HStack(spacing: 10) {
+                        ZStack {
+                            Circle()
+                                .fill(.white.opacity(0.22))
+                                .frame(width: 34, height: 34)
+                            Image(systemName: "square.stack.3d.up.fill")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Templates")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(.white)
+                            Text(templatesSubtitle)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.8))
+                                .lineLimit(1)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .clipShape(.rect(cornerRadius: 14))
+                }
+                .buttonStyle(PressScaleButtonStyle())
+            }
+
+            if !nutritionVM.recentFoods.isEmpty {
+                recentFoodsStrip
+            }
+        }
+    }
+
+    private var yesterdaySubtitle: String {
+        let meals = nutritionVM.yesterdaysMeals
+        if meals.isEmpty { return "No meals logged yesterday" }
+        let cals = meals.map(\.totalNutrition.calories).reduce(0, +)
+        return "\(meals.count) meal\(meals.count == 1 ? "" : "s") · \(cals) cal"
+    }
+
+    private var templatesSubtitle: String {
+        let count = nutritionVM.mealTemplates.count
+        if count == 0 { return "Save meals for one-tap logs" }
+        return "\(count) saved · tap to log"
+    }
+
+    private var recentFoodsStrip: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Recent & Frequent")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.secondaryText)
+                Spacer()
+            }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(nutritionVM.recentFoods) { fav in
+                        Button {
+                            nutritionVM.quickLogFavorite(fav, mealType: selectedMealType)
+                            showQuickLogToast(fav.name)
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundStyle(KinexaTheme.accent)
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(fav.name)
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundStyle(KinexaTheme.primaryText)
+                                        .lineLimit(1)
+                                    Text("\(fav.nutrition.calories) cal")
+                                        .font(.system(size: 9, weight: .semibold))
+                                        .foregroundStyle(KinexaTheme.tertiaryText)
+                                }
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(KinexaTheme.card)
+                            .clipShape(.rect(cornerRadius: 12))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 12).stroke(KinexaTheme.border)
+                            }
+                        }
+                        .buttonStyle(PressScaleButtonStyle())
+                    }
+                }
+            }
+            .contentMargins(.horizontal, 0)
         }
     }
 
