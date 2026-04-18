@@ -62,6 +62,305 @@ enum MovementGuideLibrary {
     )
 
     private static let entries: [Entry] = [
+        // SPECIFIC VARIATIONS (must come before generic patterns like "squat", "lunge", "push-up")
+        Entry(patterns: ["jump squat", "squat jump"], guide: MovementGuide(
+            whatIsIt: "An explosive bodyweight squat where you jump off the floor on each rep.",
+            howTo: [
+                "Start in an athletic stance, feet shoulder-width apart.",
+                "Drop into a quarter or half squat, then explode straight up.",
+                "Land softly with bent knees and immediately flow into the next rep."
+            ],
+            alternatives: ["Bodyweight squat", "Box jump", "Broad jump"]
+        )),
+        Entry(patterns: ["jumping lunge", "split jump"], guide: MovementGuide(
+            whatIsIt: "An explosive lunge variation where you switch legs in the air each rep.",
+            howTo: [
+                "Start in a split stance, back knee low, front knee over ankle.",
+                "Drive up explosively and switch legs mid-air.",
+                "Land softly in the opposite split stance and repeat."
+            ],
+            alternatives: ["Reverse lunge", "Walking lunge", "Bulgarian split squat"]
+        )),
+        Entry(patterns: ["pistol squat"], guide: MovementGuide(
+            whatIsIt: "A single-leg squat to full depth with the other leg extended in front.",
+            howTo: [
+                "Balance on one foot with the other leg extended forward.",
+                "Lower slowly until hamstring meets calf, arms out for balance.",
+                "Drive through the heel to stand tall without letting the heel lift."
+            ],
+            alternatives: ["Box pistol squat", "Bulgarian split squat", "Goblet squat"]
+        )),
+        Entry(patterns: ["handstand push", "hspu"], guide: MovementGuide(
+            whatIsIt: "A vertical push-up performed upside down against a wall.",
+            howTo: [
+                "Kick up to a handstand with heels resting against a wall.",
+                "Lower under control until the top of your head lightly touches the floor.",
+                "Press back up to a locked-out handstand."
+            ],
+            alternatives: ["Pike push-up", "Dumbbell shoulder press", "Seated press"]
+        )),
+        Entry(patterns: ["plank up-down", "plank up down", "up down plank"], guide: MovementGuide(
+            whatIsIt: "A plank that alternates between forearms and hands.",
+            howTo: [
+                "Start in a forearm plank, body in a straight line.",
+                "Press up one arm at a time onto your hands into a high plank.",
+                "Lower back down one arm at a time — keep hips square throughout."
+            ],
+            alternatives: ["Plank", "Push-up", "Shoulder tap"]
+        )),
+        Entry(patterns: ["plank jack"], guide: MovementGuide(
+            whatIsIt: "A plank with jumping-jack legs for core and cardio.",
+            howTo: [
+                "Start in a high plank, body tight and hips level.",
+                "Jump both feet wide, then jump them back together.",
+                "Keep the upper body still — only the legs move."
+            ],
+            alternatives: ["Mountain climber", "Plank", "Jumping jack"]
+        )),
+        Entry(patterns: ["hanging knee raise", "knee raise"], guide: MovementGuide(
+            whatIsIt: "A hanging core movement that trains the lower abs and hip flexors.",
+            howTo: [
+                "Hang from a pull-up bar with arms straight and shoulders engaged.",
+                "Raise your knees toward your chest while avoiding swinging.",
+                "Lower under control back to a full hang."
+            ],
+            alternatives: ["Lying knee raise", "Hanging leg raise", "Captain's chair knee raise"]
+        )),
+        Entry(patterns: ["hanging leg raise", "toes to bar", "t2b"], guide: MovementGuide(
+            whatIsIt: "A hanging core movement where straight legs rise toward the bar.",
+            howTo: [
+                "Hang from a pull-up bar with shoulders engaged and core braced.",
+                "Keep legs straight and raise your feet toward the bar.",
+                "Lower under control — resist the urge to swing."
+            ],
+            alternatives: ["Hanging knee raise", "Lying leg raise", "V-up"]
+        )),
+        Entry(patterns: ["dumbbell snatch", "db snatch"], guide: MovementGuide(
+            whatIsIt: "An explosive full-body lift from floor to overhead with one dumbbell.",
+            howTo: [
+                "Stand over the dumbbell, feet hip-width, hinge to grip it with one hand.",
+                "Drive through the floor and pull the dumbbell up close to the body.",
+                "Punch it overhead to a locked-out arm, then lower with control."
+            ],
+            alternatives: ["Kettlebell snatch", "Dumbbell high pull", "Dumbbell push press"]
+        )),
+        Entry(patterns: ["wall ball"], guide: MovementGuide(
+            whatIsIt: "A squat-to-throw movement with a medicine ball against a wall.",
+            howTo: [
+                "Hold the medicine ball at your chest and squat to full depth.",
+                "Drive up explosively and throw the ball to a target on the wall.",
+                "Catch the ball on its way down and flow straight into the next squat."
+            ],
+            alternatives: ["Goblet squat + press", "Thruster", "Squat to overhead press"]
+        )),
+        Entry(patterns: ["medicine ball slam", "med ball slam", "ball slam"], guide: MovementGuide(
+            whatIsIt: "An explosive overhead-to-floor slam with a medicine ball.",
+            howTo: [
+                "Stand tall holding a slam ball overhead with arms extended.",
+                "Throw the ball down hard into the floor, hinging at the hips.",
+                "Pick it up with a hinge and reset for the next rep."
+            ],
+            alternatives: ["Battle rope slam", "Kettlebell swing", "Overhead throw"]
+        )),
+        Entry(patterns: ["tire flip"], guide: MovementGuide(
+            whatIsIt: "A full-body power lift flipping a heavy tire end over end.",
+            howTo: [
+                "Squat down with chest against the tire, gripping under the edge.",
+                "Drive up with the legs and press the tire forward as it passes the hips.",
+                "Push it over the top with the arms and reset on the far side."
+            ],
+            alternatives: ["Deadlift", "Sandbag clean", "Sled push"]
+        )),
+        Entry(patterns: ["battle rope"], guide: MovementGuide(
+            whatIsIt: "High-intensity conditioning alternating waves or slams with heavy ropes.",
+            howTo: [
+                "Stand in an athletic stance, grip one rope in each hand.",
+                "Brace the core and drive quick alternating waves with the arms.",
+                "Keep hips steady and breathe rhythmically through the effort."
+            ],
+            alternatives: ["Medicine ball slam", "Kettlebell swing", "Jump rope"]
+        )),
+        Entry(patterns: ["rope climb"], guide: MovementGuide(
+            whatIsIt: "Climbing a hanging rope using a leg wrap and arm pulls.",
+            howTo: [
+                "Jump to grab the rope high, wrap a foot around it, and clamp with the other foot.",
+                "Stand tall on the clamp, reach higher, and repeat the wrap.",
+                "Descend slowly by controlling the grip — never free-fall."
+            ],
+            alternatives: ["Pull-up", "Lat pulldown", "Inverted row"]
+        )),
+        Entry(patterns: ["ring row", "inverted row"], guide: MovementGuide(
+            whatIsIt: "A horizontal bodyweight pull using rings or a bar.",
+            howTo: [
+                "Hang under the rings or bar with body in a straight line, heels on the floor.",
+                "Pull your chest to the handles, squeezing the shoulder blades.",
+                "Lower under control to a full arm extension."
+            ],
+            alternatives: ["Pull-up", "Dumbbell row", "TRX row"]
+        )),
+        Entry(patterns: ["ring dip"], guide: MovementGuide(
+            whatIsIt: "A bodyweight dip on gymnastic rings for extra stability challenge.",
+            howTo: [
+                "Support yourself on rings with arms locked and rings turned out.",
+                "Lower with control until shoulders dip below the elbows.",
+                "Press back up to lockout, keeping the rings close to your body."
+            ],
+            alternatives: ["Bar dip", "Bench dip", "Push-up"]
+        )),
+        Entry(patterns: ["l-sit", "l sit"], guide: MovementGuide(
+            whatIsIt: "A gymnastic core hold with legs extended parallel to the floor.",
+            howTo: [
+                "Sit on the floor or parallettes with hands pressed down beside hips.",
+                "Press the floor down and lift hips and legs until they're parallel.",
+                "Hold with straight legs and pointed toes — breathe steadily."
+            ],
+            alternatives: ["Tuck L-sit", "Hollow hold", "Hanging leg raise"]
+        )),
+        Entry(patterns: ["inch worm", "inchworm"], guide: MovementGuide(
+            whatIsIt: "A warm-up movement that walks the hands from toe-touch to plank and back.",
+            howTo: [
+                "From standing, hinge and place hands on the floor.",
+                "Walk your hands out to a plank, pause, then walk feet toward hands.",
+                "Stand tall and repeat."
+            ],
+            alternatives: ["World's greatest stretch", "Downward dog flow", "Bear crawl"]
+        )),
+        Entry(patterns: ["v-up", "v up"], guide: MovementGuide(
+            whatIsIt: "A core movement that lifts arms and legs to meet in a V shape.",
+            howTo: [
+                "Lie flat on your back, arms overhead, legs straight.",
+                "Simultaneously lift legs and torso, reaching hands toward feet.",
+                "Lower under control without letting the lower back arch."
+            ],
+            alternatives: ["Sit-up", "Hollow hold", "Leg raise"]
+        )),
+        Entry(patterns: ["bicycle crunch"], guide: MovementGuide(
+            whatIsIt: "A rotational core movement mimicking a pedaling motion.",
+            howTo: [
+                "Lie on your back, hands behind the head, knees bent up.",
+                "Bring one elbow to the opposite knee while extending the other leg.",
+                "Alternate sides in a smooth pedaling rhythm."
+            ],
+            alternatives: ["Russian twist", "Sit-up", "Mountain climber"]
+        )),
+        Entry(patterns: ["superman"], guide: MovementGuide(
+            whatIsIt: "A prone back-extension movement that trains the posterior chain.",
+            howTo: [
+                "Lie face down, arms extended overhead.",
+                "Lift arms, chest, and legs off the floor, squeezing the glutes and back.",
+                "Lower under control and repeat."
+            ],
+            alternatives: ["Bird dog", "Back extension", "Glute bridge"]
+        )),
+        Entry(patterns: ["russian twist"], guide: MovementGuide(
+            whatIsIt: "A rotational core movement performed in a seated V-sit position.",
+            howTo: [
+                "Sit with knees bent, heels down or lifted, torso leaned back.",
+                "Rotate the torso side to side, tapping hands or a weight beside your hip.",
+                "Keep the chest up and breathe steadily."
+            ],
+            alternatives: ["Bicycle crunch", "Woodchopper", "Side plank rotation"]
+        )),
+        Entry(patterns: ["sit-up", "sit up", "situp"], guide: MovementGuide(
+            whatIsIt: "A classic core movement that lifts the torso from the floor.",
+            howTo: [
+                "Lie on your back with knees bent and feet flat.",
+                "Curl up, bringing your chest toward your knees.",
+                "Lower with control — don't slam back down."
+            ],
+            alternatives: ["Crunch", "V-up", "Dead bug"]
+        )),
+        Entry(patterns: ["mountain climber"], guide: MovementGuide(
+            whatIsIt: "A plank-based cardio movement driving knees to the chest.",
+            howTo: [
+                "Start in a high plank, shoulders over wrists, body straight.",
+                "Drive one knee toward your chest, then quickly switch legs.",
+                "Keep hips level and move at a steady quick pace."
+            ],
+            alternatives: ["Plank jack", "High knees", "Burpee"]
+        )),
+        Entry(patterns: ["jumping jack", "jumping-jack"], guide: MovementGuide(
+            whatIsIt: "A classic warm-up and conditioning movement with arms and legs moving together.",
+            howTo: [
+                "Start standing, feet together, arms at sides.",
+                "Jump feet wide while raising arms overhead.",
+                "Jump back to start and repeat at a steady pace."
+            ],
+            alternatives: ["Plank jack", "Skater hop", "Seal jack"]
+        )),
+        Entry(patterns: ["jump rope", "jumping rope", "skip rope"], guide: MovementGuide(
+            whatIsIt: "Rope skipping for coordination, calves, and conditioning.",
+            howTo: [
+                "Hold handles at hip level, elbows close to sides.",
+                "Rotate the rope with wrists — not big arm swings.",
+                "Jump just high enough to clear the rope and land softly."
+            ],
+            alternatives: ["High knees", "Calf raise", "Jumping jack"]
+        )),
+        Entry(patterns: ["high knee"], guide: MovementGuide(
+            whatIsIt: "A running-in-place movement driving knees up to hip height.",
+            howTo: [
+                "Stand tall and run in place, pumping arms.",
+                "Drive each knee up to at least hip level.",
+                "Stay on the balls of the feet and keep the core tight."
+            ],
+            alternatives: ["Jumping jack", "Butt kicks", "Mountain climber"]
+        )),
+        Entry(patterns: ["march in place", "marching"], guide: MovementGuide(
+            whatIsIt: "A low-impact warm-up driving knees up while standing in place.",
+            howTo: [
+                "Stand tall with arms swinging naturally.",
+                "Lift one knee to hip height, then the other, at a steady pace.",
+                "Keep the core engaged and breathe easily."
+            ],
+            alternatives: ["High knees", "Easy walk", "Step-ups"]
+        )),
+        Entry(patterns: ["broad jump"], guide: MovementGuide(
+            whatIsIt: "A horizontal jump for leg power and athletic drive.",
+            howTo: [
+                "Start in an athletic stance, arms back, hips loaded.",
+                "Swing arms forward and jump as far forward as possible.",
+                "Land softly in a quarter squat, reset, and repeat."
+            ],
+            alternatives: ["Jump squat", "Box jump", "Skater hop"]
+        )),
+        Entry(patterns: ["skater hop", "skater jump"], guide: MovementGuide(
+            whatIsIt: "A lateral bounding movement training single-leg power and balance.",
+            howTo: [
+                "Stand on one leg, slightly bent.",
+                "Hop laterally to the other foot, landing softly with bent knee.",
+                "Pause briefly for balance, then hop back the other way."
+            ],
+            alternatives: ["Lateral lunge", "Side shuffle", "Broad jump"]
+        )),
+        Entry(patterns: ["lateral shuffle", "side shuffle"], guide: MovementGuide(
+            whatIsIt: "A sideways shuffle for agility and lateral conditioning.",
+            howTo: [
+                "Set an athletic stance with hips low and feet wide.",
+                "Push off the outside foot to move sideways — don't cross feet.",
+                "Stay low and keep chest up throughout."
+            ],
+            alternatives: ["Lateral band walk", "Shuffle", "Skater hop"]
+        )),
+        Entry(patterns: ["sled drag", "sled pull"], guide: MovementGuide(
+            whatIsIt: "Backward or forward dragging of a loaded sled for leg conditioning.",
+            howTo: [
+                "Attach straps or handles to the sled with a strong stance.",
+                "Lean slightly against the resistance and drive with the legs.",
+                "Take steady steps — don't let the sled dictate your pace."
+            ],
+            alternatives: ["Sled push", "Farmer carry", "Heavy backpack walk"]
+        )),
+        Entry(patterns: ["crab walk"], guide: MovementGuide(
+            whatIsIt: "A reverse tabletop walk for shoulder and posterior chain strength.",
+            howTo: [
+                "Sit with hands behind you, fingers toward feet, knees bent.",
+                "Lift hips to a tabletop position and walk on hands and feet.",
+                "Keep hips lifted and chest open throughout."
+            ],
+            alternatives: ["Bear crawl", "Glute bridge", "Reverse plank"]
+        )),
+
         // Running / Cardio terms
         Entry(patterns: ["sprint"], guide: MovementGuide(
             whatIsIt: "Short, near-maximal efforts to build speed and power.",

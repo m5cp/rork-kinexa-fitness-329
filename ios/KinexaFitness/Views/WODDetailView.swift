@@ -16,6 +16,7 @@ struct WODDetailView: View {
     @State private var calendarService = CalendarExportService()
     @State private var showExportAlert: Bool = false
     @State private var exportAlertMessage: String = ""
+    @State private var guideMovementName: String?
 
     let initialTemplate: WODTemplate?
 
@@ -58,6 +59,16 @@ struct WODDetailView: View {
             }
             .sheet(isPresented: $showCalendarSync) {
                 calendarSyncSheet
+            }
+            .sheet(item: Binding(
+                get: { guideMovementName.map { MovementGuideItem(name: $0) } },
+                set: { guideMovementName = $0?.name }
+            )) { item in
+                ExerciseGuideSheet(
+                    exerciseName: item.name,
+                    accent: Color(hex: "#F59E0B"),
+                    muscleTag: "Functional"
+                )
             }
             .alert("Calendar", isPresented: $showExportAlert) {
                 Button("OK") {}
@@ -251,46 +262,55 @@ struct WODDetailView: View {
                 .padding(.leading, 4)
 
             ForEach(template.movements) { movement in
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(KinexaTheme.accent.opacity(0.3))
-                        .frame(width: 8, height: 8)
+                Button {
+                    guideMovementName = movement.name
+                } label: {
+                    HStack(spacing: 12) {
+                        Circle()
+                            .fill(KinexaTheme.accent.opacity(0.3))
+                            .frame(width: 8, height: 8)
 
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(movement.name)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(KinexaTheme.primaryText)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(movement.name)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(KinexaTheme.primaryText)
 
-                        HStack(spacing: 8) {
-                            if let reps = movement.reps {
-                                Text(reps)
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(KinexaTheme.accent)
-                            }
-                            if let dur = movement.duration {
-                                Text(dur)
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(KinexaTheme.accent)
-                            }
-                            if let notes = movement.notes, !notes.isEmpty {
-                                Text(notes)
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(KinexaTheme.tertiaryText)
+                            HStack(spacing: 8) {
+                                if let reps = movement.reps {
+                                    Text(reps)
+                                        .font(.caption.weight(.medium))
+                                        .foregroundStyle(KinexaTheme.accent)
+                                }
+                                if let dur = movement.duration {
+                                    Text(dur)
+                                        .font(.caption.weight(.medium))
+                                        .foregroundStyle(KinexaTheme.accent)
+                                }
+                                if let notes = movement.notes, !notes.isEmpty {
+                                    Text(notes)
+                                        .font(.caption.weight(.medium))
+                                        .foregroundStyle(KinexaTheme.tertiaryText)
+                                }
                             }
                         }
-                    }
 
-                    Spacer()
+                        Spacer()
+
+                        Image(systemName: "info.circle")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.accent.opacity(0.7))
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(KinexaTheme.card)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(KinexaTheme.border)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .elevatedCardShadow()
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(KinexaTheme.card)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(KinexaTheme.border)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-                .elevatedCardShadow()
+                .buttonStyle(PressScaleButtonStyle())
             }
 
             if let notes = template.notes, !notes.isEmpty {
@@ -506,8 +526,9 @@ struct WODDetailView: View {
         wodTemplate = template
         workout = WODService.convertToWorkoutDay(template)
     }
+}
 
-
-
-
+struct MovementGuideItem: Identifiable {
+    let id = UUID()
+    let name: String
 }

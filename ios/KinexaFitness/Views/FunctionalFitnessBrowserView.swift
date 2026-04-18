@@ -12,6 +12,7 @@ struct FunctionalFitnessBrowserView: View {
     @State private var searchExerciseWorkoutIndex: Int?
     @State private var setAsTodayTrigger: Bool = false
     @State private var localWorkouts: [WODTemplate]
+    @State private var guideMovementName: String?
 
     init(onAddExercise: @escaping (ManualRoutineExercise) -> Void) {
         self.onAddExercise = onAddExercise
@@ -77,6 +78,16 @@ struct FunctionalFitnessBrowserView: View {
                         localWorkouts[idx].movements.append(movement)
                     }
                 }
+            }
+            .sheet(item: Binding(
+                get: { guideMovementName.map { MovementGuideItem(name: $0) } },
+                set: { guideMovementName = $0?.name }
+            )) { item in
+                ExerciseGuideSheet(
+                    exerciseName: item.name,
+                    accent: Color(hex: "#F59E0B"),
+                    muscleTag: "Functional"
+                )
             }
         }
     }
@@ -253,9 +264,19 @@ struct FunctionalFitnessBrowserView: View {
                                     .fill((gradient.first ?? .orange).opacity(0.5))
                                     .frame(width: 6, height: 6)
 
-                                Text(movement.name)
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(KinexaTheme.primaryText)
+                                Button {
+                                    guideMovementName = movement.name
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Text(movement.name)
+                                            .font(.caption.weight(.medium))
+                                            .foregroundStyle(KinexaTheme.primaryText)
+                                        Image(systemName: "info.circle")
+                                            .font(.caption2.weight(.semibold))
+                                            .foregroundStyle((gradient.first ?? .orange).opacity(0.8))
+                                    }
+                                }
+                                .buttonStyle(.plain)
 
                                 Spacer(minLength: 0)
 
