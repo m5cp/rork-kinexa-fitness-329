@@ -896,6 +896,7 @@ struct WODPlanSheet: View {
 
     private func intensityColor(_ grade: IntensityGrade) -> Color {
         switch grade {
+        case .basic: return Color(hex: "#10B981")
         case .low: return .green
         case .moderate: return Color(hex: "#F59E0B")
         case .high: return .orange

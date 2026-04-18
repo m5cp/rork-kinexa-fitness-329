@@ -34,6 +34,10 @@ struct FunctionalFitnessBrowserView: View {
         localWorkouts.filter { $0.intensityGrade == .low }
     }
 
+    private var basicWorkouts: [WODTemplate] {
+        localWorkouts.filter { $0.intensityGrade == .basic }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -98,6 +102,14 @@ struct FunctionalFitnessBrowserView: View {
 
     private var intensityHeroCards: some View {
         VStack(spacing: 14) {
+            if !basicWorkouts.isEmpty {
+                intensityHeroCard(
+                    grade: .basic,
+                    gradient: [Color(hex: "#10B981"), Color(hex: "#059669")],
+                    workouts: basicWorkouts
+                )
+            }
+
             if !lowWorkouts.isEmpty {
                 intensityHeroCard(
                     grade: .low,
@@ -408,6 +420,7 @@ struct FunctionalFitnessBrowserView: View {
 
     private func intensityGradient(_ grade: IntensityGrade) -> [Color] {
         switch grade {
+        case .basic: return [Color(hex: "#10B981"), Color(hex: "#059669")]
         case .low: return [Color(hex: "#22C55E"), Color(hex: "#16A34A")]
         case .moderate: return [Color(hex: "#F59E0B"), Color(hex: "#D97706")]
         case .high: return [Color(hex: "#EA580C"), Color(hex: "#C2410C")]

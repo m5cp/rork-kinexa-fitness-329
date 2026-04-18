@@ -5,6 +5,23 @@ enum FunctionalFitnessLibrary {
     static let functionalFitnessWorkouts: [WODTemplate] = [
 
         WODTemplate(
+            title: "Foundation 20",
+            category: .bodyweight,
+            format: .circuit,
+            durationMinutes: 20,
+            equipment: .none,
+            movements: [
+                WODMovement(name: "Air Squat", reps: "3x10"),
+                WODMovement(name: "Wall Push-Up", reps: "3x10"),
+                WODMovement(name: "Glute Bridge", reps: "3x12"),
+                WODMovement(name: "March in Place", reps: "3x45s")
+            ],
+            workoutDescription: "A gentle starter bodyweight circuit. Perfect first step — simple movements, generous rest, no equipment needed.",
+            intensityGrade: .basic,
+            trainingSplit: .fullBody
+        ),
+
+        WODTemplate(
             title: "The Apex Circuit",
             category: .crossfit,
             format: .circuit,

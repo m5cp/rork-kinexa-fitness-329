@@ -71,6 +71,7 @@ nonisolated struct WODMovement: Codable, Identifiable, Hashable, Sendable {
 }
 
 nonisolated enum IntensityGrade: String, Codable, CaseIterable, Sendable {
+    case basic = "Basic"
     case low = "Low"
     case moderate = "Moderate"
     case high = "High"

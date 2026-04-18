@@ -18,6 +18,7 @@ struct LogMealSheet: View {
     @State private var capturedPhotoData: Data?
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var activeMode: MealInputMode?
+    @State private var navPath: [MealInputMode] = []
     @State private var showManualEntry: Bool = false
     @State private var showUpgrade: Bool = false
     @State private var showTokenStore: Bool = false
@@ -26,13 +27,12 @@ struct LogMealSheet: View {
     @State private var isRepeatingYesterday: Bool = false
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navPath) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
                     mealTypeSelector
                     quickRepeatRow
                     heroCardsGrid
-                    if activeMode != nil { activeInputSection }
                     if isEstimating { estimatingView }
                     if hasEstimated && !estimatedFoods.isEmpty { estimatedFoodsSection }
                     if let error = errorMessage { errorView(error) }
@@ -45,6 +45,9 @@ struct LogMealSheet: View {
             .background(KinexaTheme.background.ignoresSafeArea())
             .navigationTitle("Log Meal")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: MealInputMode.self) { mode in
+                destinationView(for: mode)
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -140,14 +143,15 @@ struct LogMealSheet: View {
                     .background(
                         LinearGradient(
                             colors: nutritionVM.yesterdaysMeals.isEmpty
-                            ? [Color(hex: "#94A3B8"), Color(hex: "#64748B")]
+                            ? [Color(hex: "#6366F1"), Color(hex: "#4338CA")]
                             : [Color(hex: "#0EA5E9"), Color(hex: "#0369A1")],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
                     .clipShape(.rect(cornerRadius: 14))
-                    .opacity(nutritionVM.yesterdaysMeals.isEmpty ? 0.55 : 1)
+                    .shadow(color: (nutritionVM.yesterdaysMeals.isEmpty ? Color(hex: "#6366F1") : Color(hex: "#0EA5E9")).opacity(0.25), radius: 10, y: 5)
+                    .opacity(nutritionVM.yesterdaysMeals.isEmpty ? 0.85 : 1)
                 }
                 .buttonStyle(PressScaleButtonStyle())
                 .disabled(nutritionVM.yesterdaysMeals.isEmpty || isRepeatingYesterday)
@@ -185,6 +189,7 @@ struct LogMealSheet: View {
                         )
                     )
                     .clipShape(.rect(cornerRadius: 14))
+                    .shadow(color: Color(hex: "#F59E0B").opacity(0.25), radius: 10, y: 5)
                 }
                 .buttonStyle(PressScaleButtonStyle())
             }
@@ -374,26 +379,23 @@ struct LogMealSheet: View {
     }
 
     private var aiBadgeText: String? {
-        let scan = FoodScanUsageTracker.shared
+        let scan = AIUsageTracker.shared
         if scan.hasReachedLimit { return nil }
-        return "\(scan.remainingToday) left"
+        return "\(scan.totalRemaining) left"
     }
 
     private var scanUsageCaption: String {
-        let scan = FoodScanUsageTracker.shared
-        return "\(scan.scansUsedToday) / \(scan.dailyLimit) AI scans used today"
+        let scan = AIUsageTracker.shared
+        return "\(scan.dailyUsageCount) / \(scan.dailyLimit) AI scans used today"
     }
 
     private func heroCard(icon: String, title: String, subtitle: String, gradient: [Color], badge: String?, mode: MealInputMode) -> some View {
-        let isActive = activeMode == mode
         return Button {
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                if isActive {
-                    activeMode = nil
-                } else {
-                    activeMode = mode
-                    errorMessage = nil
-                }
+            errorMessage = nil
+            if mode == .manual {
+                showManualEntry = true
+            } else {
+                navPath.append(mode)
             }
         } label: {
             VStack(alignment: .leading, spacing: 10) {
@@ -433,33 +435,56 @@ struct LogMealSheet: View {
                 LinearGradient(colors: gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
             )
             .clipShape(.rect(cornerRadius: 18))
-            .overlay {
-                if isActive {
-                    RoundedRectangle(cornerRadius: 18)
-                        .stroke(.white.opacity(0.4), lineWidth: 2)
-                }
-            }
+            .shadow(color: (gradient.first ?? .clear).opacity(0.30), radius: 12, y: 6)
+            .shadow(color: .black.opacity(0.06), radius: 4, y: 2)
         }
         .buttonStyle(PressScaleButtonStyle())
     }
 
-    // MARK: - Active Input Section
-
     @ViewBuilder
-    private var activeInputSection: some View {
-        switch activeMode {
-        case .photo:
-            photoInputSection
-        case .barcode:
-            barcodeInputSection
-        case .text:
-            foodInputSection
-        case .favorites:
-            favoritesSection
-        case .database:
-            usdaSearchSection
-        case .manual, .none:
-            EmptyView()
+    private func destinationView(for mode: MealInputMode) -> some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 20) {
+                switch mode {
+                case .photo: photoInputSection
+                case .barcode: barcodeInputSection
+                case .text: foodInputSection
+                case .favorites: favoritesSection
+                case .database: usdaSearchSection
+                case .manual: EmptyView()
+                }
+                if isEstimating { estimatingView }
+                if hasEstimated && !estimatedFoods.isEmpty { estimatedFoodsSection }
+                if let error = errorMessage { errorView(error) }
+                if hasEstimated && !estimatedFoods.isEmpty { notesSection }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .padding(.bottom, 40)
+        }
+        .background(KinexaTheme.background.ignoresSafeArea())
+        .navigationTitle(modeTitle(mode))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") {
+                    saveMeal()
+                }
+                .font(.headline.weight(.bold))
+                .foregroundStyle(estimatedFoods.isEmpty ? KinexaTheme.tertiaryText : KinexaTheme.success)
+                .disabled(estimatedFoods.isEmpty)
+            }
+        }
+    }
+
+    private func modeTitle(_ mode: MealInputMode) -> String {
+        switch mode {
+        case .photo: return "Scan Food"
+        case .barcode: return "Scan Barcode"
+        case .text: return "AI Describe"
+        case .favorites: return "Favorites"
+        case .database: return "USDA Search"
+        case .manual: return "Manual Entry"
         }
     }
 
@@ -492,7 +517,7 @@ struct LogMealSheet: View {
                     }
             }
 
-            if FoodScanUsageTracker.shared.hasReachedLimit {
+            if AIUsageTracker.shared.hasReachedLimit {
                 foodScanLimitBanner
             } else {
                 HStack(spacing: 12) {
@@ -613,7 +638,7 @@ struct LogMealSheet: View {
 
     private var foodInputSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if FoodScanUsageTracker.shared.hasReachedLimit {
+            if AIUsageTracker.shared.hasReachedLimit {
                 foodScanLimitBanner
             } else {
                 TextField("e.g. grilled chicken breast with rice and steamed broccoli", text: $foodDescription, axis: .vertical)
@@ -1143,7 +1168,7 @@ struct LogMealSheet: View {
                     Text("Daily AI scans used up")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(KinexaTheme.primaryText)
-                    Text("You've used all \(FoodScanUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow.")
+                    Text("You've used all \(AIUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow.")
                         .font(.system(size: 11))
                         .foregroundStyle(KinexaTheme.tertiaryText)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1158,7 +1183,6 @@ struct LogMealSheet: View {
 
             VStack(spacing: 8) {
                 fallbackRow(icon: "pencil.line", title: "Enter Manually", tint: Color(hex: "#F59E0B")) {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { activeMode = .manual }
                     showManualEntry = true
                 }
                 fallbackRow(icon: "arrow.uturn.backward", title: "Repeat Yesterday's Meals", tint: Color(hex: "#0EA5E9"), disabled: nutritionVM.yesterdaysMeals.isEmpty) {
@@ -1168,14 +1192,14 @@ struct LogMealSheet: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { dismiss() }
                 }
                 fallbackRow(icon: "barcode.viewfinder", title: "Scan a Barcode", tint: Color(hex: "#3B82F6")) {
-                    showBarcode = true
+                    if !navPath.contains(.barcode) { navPath.append(.barcode) }
                 }
                 fallbackRow(icon: "magnifyingglass", title: "Search USDA Database", tint: Color(hex: "#0EA5E9")) {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { activeMode = .database }
+                    if !navPath.contains(.database) { navPath.append(.database) }
                 }
                 if !nutritionVM.favorites.isEmpty {
                     fallbackRow(icon: "star.fill", title: "Pick a Favorite", tint: Color(hex: "#F59E0B")) {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { activeMode = .favorites }
+                        if !navPath.contains(.favorites) { navPath.append(.favorites) }
                     }
                 }
             }
@@ -1324,8 +1348,8 @@ struct LogMealSheet: View {
     private func estimateFromText() async {
         let description = foodDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !description.isEmpty else { return }
-        guard !FoodScanUsageTracker.shared.hasReachedLimit else {
-            errorMessage = "You've used all \(FoodScanUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
+        guard !AIUsageTracker.shared.hasReachedLimit else {
+            errorMessage = "You've used all \(AIUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
             return
         }
 
@@ -1335,7 +1359,7 @@ struct LogMealSheet: View {
         do {
             estimatedFoods = try await nutritionVM.estimateFoodFromText(description)
             hasEstimated = true
-            FoodScanUsageTracker.shared.recordScan()
+            AIUsageTracker.shared.recordUsage()
         } catch {
             errorMessage = "Could not estimate nutrition. Please try again or check your connection."
         }
@@ -1344,8 +1368,8 @@ struct LogMealSheet: View {
     }
 
     private func analyzePhoto(_ data: Data) async {
-        guard !FoodScanUsageTracker.shared.hasReachedLimit else {
-            errorMessage = "You've used all \(FoodScanUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
+        guard !AIUsageTracker.shared.hasReachedLimit else {
+            errorMessage = "You've used all \(AIUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
             return
         }
 
@@ -1355,7 +1379,7 @@ struct LogMealSheet: View {
         do {
             estimatedFoods = try await nutritionVM.estimateFoodFromImage(data)
             hasEstimated = true
-            FoodScanUsageTracker.shared.recordScan()
+            AIUsageTracker.shared.recordUsage()
         } catch {
             errorMessage = "Could not analyze photo. Please try again or use text description."
         }
@@ -1405,6 +1429,8 @@ struct LogMealSheet: View {
         dismiss()
     }
 }
+
+extension MealInputMode: Hashable {}
 
 nonisolated enum MealInputMode: Sendable {
     case text

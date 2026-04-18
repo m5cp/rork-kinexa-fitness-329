@@ -1399,6 +1399,8 @@ struct HomeView: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 16).stroke(KinexaTheme.border)
             }
+            .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
+            .shadow(color: (colors.first ?? .clear).opacity(0.12), radius: 14, y: 6)
         }
         .buttonStyle(PressScaleButtonStyle())
     }

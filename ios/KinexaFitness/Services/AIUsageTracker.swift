@@ -5,30 +5,25 @@ import Observation
 final class AIUsageTracker {
     static let shared = AIUsageTracker()
 
-    private let subscriberDailyLimit = 15
-    private let freeLifetimeLimit = 3
-    private let storageKey = "ai_usage_tracker"
+    static let freeDailyLimit: Int = 5
+    static let premiumDailyLimit: Int = 15
+
+    private let storageKey = "ai_usage_tracker_v2"
     private let tokenStorageKey = "ai_bonus_tokens"
-    private let lifetimeUsageKey = "ai_lifetime_usage"
 
     private var usageDate: String = ""
-    private var dailyUsageCount: Int = 0
+    private(set) var dailyUsageCount: Int = 0
     private(set) var bonusTokens: Int = 0
-    private(set) var lifetimeUsageCount: Int = 0
 
     var isPremium: Bool = false
 
     var dailyLimit: Int {
-        isPremium ? subscriberDailyLimit : freeLifetimeLimit
+        isPremium ? Self.premiumDailyLimit : Self.freeDailyLimit
     }
 
     var remainingToday: Int {
-        if isPremium {
-            refreshIfNewDay()
-            return max(0, subscriberDailyLimit - dailyUsageCount)
-        } else {
-            return max(0, freeLifetimeLimit - lifetimeUsageCount)
-        }
+        refreshIfNewDay()
+        return max(0, dailyLimit - dailyUsageCount)
     }
 
     var totalRemaining: Int {
@@ -36,59 +31,35 @@ final class AIUsageTracker {
     }
 
     var hasReachedLimit: Bool {
-        if isPremium {
-            refreshIfNewDay()
-            return dailyUsageCount >= subscriberDailyLimit && bonusTokens <= 0
-        } else {
-            return lifetimeUsageCount >= freeLifetimeLimit && bonusTokens <= 0
-        }
+        refreshIfNewDay()
+        return dailyUsageCount >= dailyLimit && bonusTokens <= 0
     }
 
     var isDailyLimitReached: Bool {
-        if isPremium {
-            refreshIfNewDay()
-            return dailyUsageCount >= subscriberDailyLimit
-        } else {
-            return lifetimeUsageCount >= freeLifetimeLimit
-        }
+        refreshIfNewDay()
+        return dailyUsageCount >= dailyLimit
     }
 
     var isUsingBonusTokens: Bool {
         isDailyLimitReached && bonusTokens > 0
     }
 
-    var hasFreeTrialRemaining: Bool {
-        !isPremium && lifetimeUsageCount < freeLifetimeLimit
-    }
-
-    var freeTrialUsed: Bool {
-        !isPremium && lifetimeUsageCount >= freeLifetimeLimit
-    }
+    var hasFreeTrialRemaining: Bool { !isPremium && remainingToday > 0 }
+    var freeTrialUsed: Bool { !isPremium && remainingToday <= 0 }
 
     private init() {
         loadDailyUsage()
         loadTokens()
-        loadLifetimeUsage()
     }
 
     func recordUsage() {
-        if isPremium {
-            refreshIfNewDay()
-            if dailyUsageCount < subscriberDailyLimit {
-                dailyUsageCount += 1
-                saveDailyUsage()
-            } else if bonusTokens > 0 {
-                bonusTokens -= 1
-                saveTokens()
-            }
-        } else {
-            if lifetimeUsageCount < freeLifetimeLimit {
-                lifetimeUsageCount += 1
-                saveLifetimeUsage()
-            } else if bonusTokens > 0 {
-                bonusTokens -= 1
-                saveTokens()
-            }
+        refreshIfNewDay()
+        if dailyUsageCount < dailyLimit {
+            dailyUsageCount += 1
+            saveDailyUsage()
+        } else if bonusTokens > 0 {
+            bonusTokens -= 1
+            saveTokens()
         }
     }
 
@@ -117,7 +88,9 @@ final class AIUsageTracker {
 
     private func todayString() -> String {
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = .current
         return formatter.string(from: .now)
     }
 
@@ -129,9 +102,13 @@ final class AIUsageTracker {
     private func loadDailyUsage() {
         guard let data = UserDefaults.standard.dictionary(forKey: storageKey),
               let date = data["date"] as? String,
-              let count = data["count"] as? Int else { return }
+              let count = data["count"] as? Int else {
+            usageDate = todayString()
+            dailyUsageCount = 0
+            return
+        }
         usageDate = date
-        dailyUsageCount = count
+        dailyUsageCount = max(0, count)
         refreshIfNewDay()
     }
 
@@ -141,13 +118,5 @@ final class AIUsageTracker {
 
     private func loadTokens() {
         bonusTokens = UserDefaults.standard.integer(forKey: tokenStorageKey)
-    }
-
-    private func saveLifetimeUsage() {
-        UserDefaults.standard.set(lifetimeUsageCount, forKey: lifetimeUsageKey)
-    }
-
-    private func loadLifetimeUsage() {
-        lifetimeUsageCount = UserDefaults.standard.integer(forKey: lifetimeUsageKey)
     }
 }

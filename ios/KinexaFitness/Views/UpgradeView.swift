@@ -11,12 +11,12 @@ struct UpgradeView: View {
     @State private var purchaseTrigger: Bool = false
 
     private let proFeatures: [(icon: String, title: String, desc: String)] = [
-        ("bolt.shield.fill", "Advanced PT Plans", "Full plan generation & customization"),
-        ("chart.line.uptrend.xyaxis", "AI Insights", "On-device intelligence for smarter training"),
-        ("fork.knife", "Full Nutrition Suite", "AI food scanning & macro insights"),
-        ("person.3.fill", "Unit PT Builder", "Build & share group workouts"),
-        ("doc.text.fill", "PDF & Calendar Export", "Export plans, scores & schedules"),
-        ("square.and.arrow.up.fill", "Share Cards & QR", "Share progress & import workouts")
+        ("dumbbell.fill", "Expanded Workout Library", "Full weights, cardio & functional fitness"),
+        ("calendar.badge.plus", "Custom Plan Generator", "Build 4 / 8 / 12-week training plans"),
+        ("chart.line.uptrend.xyaxis", "Advanced Progress Tracking", "Trends, PR history & calendar view"),
+        ("fork.knife", "Full Nutrition Suite", "15 AI food scans/day & macro insights"),
+        ("sparkles", "AI Insights", "On-device intelligence for smarter training"),
+        ("square.and.arrow.up.fill", "PDF & Calendar Export", "Export plans, schedules & share cards")
     ]
 
     var body: some View {
@@ -114,7 +114,7 @@ struct UpgradeView: View {
                     .font(.title.weight(.bold))
                     .foregroundStyle(KinexaTheme.primaryText)
 
-                Text("Train smarter. Eat better. Perform at your best.")
+                Text("Plan smarter. Track everything. Reach your goals.")
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(KinexaTheme.secondaryText)
                     .multilineTextAlignment(.center)
