@@ -328,7 +328,7 @@ final class NutritionViewModel {
 
         let result = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiFoodEstimate.self)
 
-        return result.foods.map { item in
+        let aiFoods = result.foods.map { item in
             FoodItem(
                 name: item.name,
                 quantity: item.quantity,
@@ -344,6 +344,7 @@ final class NutritionViewModel {
                 source: .aiText
             )
         }
+        return await USDAFoodService.shared.verifyFoods(aiFoods)
     }
 
     func estimateFoodFromImage(_ imageData: Data) async throws -> [FoodItem] {
@@ -360,7 +361,7 @@ final class NutritionViewModel {
             type: GeminiFoodEstimate.self
         )
 
-        return result.foods.map { item in
+        let aiFoods = result.foods.map { item in
             FoodItem(
                 name: item.name,
                 quantity: item.quantity,
@@ -376,6 +377,7 @@ final class NutritionViewModel {
                 source: .aiPhoto
             )
         }
+        return await USDAFoodService.shared.verifyFoods(aiFoods)
     }
 
     func lookupBarcode(_ code: String) async throws -> FoodItem {
