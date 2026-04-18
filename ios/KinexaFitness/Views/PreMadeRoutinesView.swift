@@ -372,11 +372,28 @@ struct PreMadeRoutineDetailSheet: View {
                 KinexaTheme.background.ignoresSafeArea()
 
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
+                    LazyVStack(alignment: .leading, spacing: 16) {
                         routineHeader
 
                         ForEach(Array(editableDays.enumerated()), id: \.element.id) { dayIdx, day in
-                            dayCard(day, dayIndex: dayIdx)
+                            EditableDayCardView(
+                                day: day,
+                                dayIndex: dayIdx,
+                                onSwap: { exIdx, focus in
+                                    swapTarget = SwapTarget(
+                                        dayIndex: dayIdx,
+                                        exerciseIndex: exIdx,
+                                        bodyPart: inferBodyPart(from: focus)
+                                    )
+                                },
+                                onRemove: { exIdx in
+                                    editableDays[dayIdx].exercises.remove(at: exIdx)
+                                    hasEdits = true
+                                },
+                                onAddMore: {
+                                    addTargetDayIndex = dayIdx
+                                }
+                            )
                         }
                     }
                     .padding(.horizontal, 20)
@@ -478,105 +495,6 @@ struct PreMadeRoutineDetailSheet: View {
             .clipShape(Capsule())
     }
 
-    private func dayCard(_ day: EditableDay, dayIndex: Int) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(day.dayName)
-                    .font(.caption.weight(.heavy))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-                Text("—")
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-                Text(day.focus)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color(hex: "#6366F1"))
-            }
-
-            VStack(spacing: 8) {
-                ForEach(Array(day.exercises.enumerated()), id: \.element.id) { exIdx, exercise in
-                    exerciseRow(exercise, dayIndex: dayIndex, exerciseIndex: exIdx, focus: day.focus)
-                }
-
-                Button {
-                    addTargetDayIndex = dayIndex
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.caption)
-                        Text("Add More")
-                            .font(.caption.weight(.semibold))
-                        Spacer(minLength: 0)
-                    }
-                    .foregroundStyle(KinexaTheme.accent)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(KinexaTheme.accent.opacity(0.06))
-                    .clipShape(.rect(cornerRadius: 10))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 10)
-                            .strokeBorder(KinexaTheme.accent.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
-                    }
-                }
-                .buttonStyle(PressScaleButtonStyle())
-            }
-        }
-        .padding(14)
-        .background(KinexaTheme.card)
-        .clipShape(.rect(cornerRadius: 14))
-        .elevatedCardShadow()
-        .overlay {
-            RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
-        }
-    }
-
-    private func exerciseRow(_ exercise: ManualRoutineExercise, dayIndex: Int, exerciseIndex: Int, focus: String) -> some View {
-        HStack(spacing: 10) {
-            Circle()
-                .fill(Color(hex: "#6366F1").opacity(0.5))
-                .frame(width: 6, height: 6)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(exercise.name)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(KinexaTheme.primaryText)
-                    .lineLimit(1)
-                Text("\(exercise.sets)×\(exercise.reps)")
-                    .font(.caption2.weight(.medium))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-            }
-
-            Spacer(minLength: 0)
-
-            Button {
-                swapTarget = SwapTarget(
-                    dayIndex: dayIndex,
-                    exerciseIndex: exerciseIndex,
-                    bodyPart: inferBodyPart(from: focus)
-                )
-            } label: {
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.caption)
-                    .foregroundStyle(KinexaTheme.accent)
-                    .padding(7)
-                    .background(KinexaTheme.accent.opacity(0.12))
-                    .clipShape(Circle())
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                editableDays[dayIndex].exercises.remove(at: exerciseIndex)
-                hasEdits = true
-            } label: {
-                Image(systemName: "minus.circle.fill")
-                    .font(.caption)
-                    .foregroundStyle(.red.opacity(0.7))
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 4)
-    }
-
     private func inferBodyPart(from focus: String) -> WeightBodyPart? {
         let f = focus.lowercased()
         if f.contains("chest") { return .chest }
@@ -632,6 +550,114 @@ struct PreMadeRoutineDetailSheet: View {
         saved.append(copy)
         LocalStore.save(saved, forKey: "manualRoutines")
         appVM.activateManualRoutine(copy)
+    }
+}
+
+// MARK: - Editable Day Card (extracted for performance)
+
+private struct EditableDayCardView: View {
+    let day: PreMadeRoutineDetailSheet.EditableDay
+    let dayIndex: Int
+    let onSwap: (Int, String) -> Void
+    let onRemove: (Int) -> Void
+    let onAddMore: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(day.dayName)
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+                Text("—")
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+                Text(day.focus)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color(hex: "#6366F1"))
+            }
+
+            VStack(spacing: 8) {
+                ForEach(Array(day.exercises.enumerated()), id: \.element.id) { exIdx, exercise in
+                    EditableExerciseRow(
+                        exercise: exercise,
+                        onSwap: { onSwap(exIdx, day.focus) },
+                        onRemove: { onRemove(exIdx) }
+                    )
+                }
+
+                Button(action: onAddMore) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.caption)
+                        Text("Add More")
+                            .font(.caption.weight(.semibold))
+                        Spacer(minLength: 0)
+                    }
+                    .foregroundStyle(KinexaTheme.accent)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(KinexaTheme.accent.opacity(0.06))
+                    .clipShape(.rect(cornerRadius: 10))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 10)
+                            .strokeBorder(KinexaTheme.accent.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                    }
+                }
+                .buttonStyle(PressScaleButtonStyle())
+            }
+        }
+        .padding(14)
+        .background(KinexaTheme.card)
+        .clipShape(.rect(cornerRadius: 14))
+        .elevatedCardShadow()
+        .overlay {
+            RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
+        }
+    }
+}
+
+private struct EditableExerciseRow: View {
+    let exercise: ManualRoutineExercise
+    let onSwap: () -> Void
+    let onRemove: () -> Void
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Circle()
+                .fill(Color(hex: "#6366F1").opacity(0.5))
+                .frame(width: 6, height: 6)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(exercise.name)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(KinexaTheme.primaryText)
+                    .lineLimit(1)
+                Text("\(exercise.sets)×\(exercise.reps)")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+
+            Spacer(minLength: 0)
+
+            Button(action: onSwap) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.caption)
+                    .foregroundStyle(KinexaTheme.accent)
+                    .padding(7)
+                    .background(KinexaTheme.accent.opacity(0.12))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+
+            Button(action: onRemove) {
+                Image(systemName: "minus.circle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.red.opacity(0.7))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 4)
     }
 }
 

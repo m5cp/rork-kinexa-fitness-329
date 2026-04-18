@@ -28,7 +28,7 @@ extension View {
     }
 
     func elevatedCardShadow() -> some View {
-        self.shadow(color: KinexaTheme.cardShadow, radius: 12, y: 5)
+        self.shadow(color: KinexaTheme.cardShadow, radius: 4, y: 2)
     }
 
     func adaptiveWidth() -> some View {
