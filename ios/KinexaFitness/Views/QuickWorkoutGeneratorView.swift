@@ -36,6 +36,8 @@ struct QuickWorkoutGeneratorView: View {
     @State private var generateTrigger: Bool = false
     @State private var logTrigger: Bool = false
     @State private var didLog: Bool = false
+    @State private var expandedMovementId: UUID?
+    @State private var cardioGuideExpanded: Bool = false
 
     private let durations: [Int] = [15, 30, 45, 60]
 
@@ -269,31 +271,114 @@ struct QuickWorkoutGeneratorView: View {
                     .padding(.leading, 4)
 
                 ForEach(template.movements) { movement in
-                    HStack(spacing: 12) {
-                        Circle()
-                            .fill((selectedType.gradient.first ?? KinexaTheme.accent).opacity(0.3))
-                            .frame(width: 8, height: 8)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(movement.name)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(KinexaTheme.primaryText)
-                            HStack(spacing: 8) {
-                                if let reps = movement.reps {
-                                    Text(reps).font(.caption.weight(.medium)).foregroundStyle(selectedType.gradient.first ?? KinexaTheme.accent)
-                                }
-                                if let dur = movement.duration {
-                                    Text(dur).font(.caption.weight(.medium)).foregroundStyle(selectedType.gradient.first ?? KinexaTheme.accent)
-                                }
+                    movementRow(movement)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func movementRow(_ movement: WODMovement) -> some View {
+        let isExpanded = expandedMovementId == movement.id
+        let accent = selectedType.gradient.first ?? KinexaTheme.accent
+        let guide = MovementGuideLibrary.guide(for: movement.name)
+
+        VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                    expandedMovementId = isExpanded ? nil : movement.id
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    Circle()
+                        .fill(accent.opacity(0.3))
+                        .frame(width: 8, height: 8)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(movement.name)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                            .multilineTextAlignment(.leading)
+                        HStack(spacing: 8) {
+                            if let reps = movement.reps {
+                                Text(reps).font(.caption.weight(.medium)).foregroundStyle(accent)
+                            }
+                            if let dur = movement.duration {
+                                Text(dur).font(.caption.weight(.medium)).foregroundStyle(accent)
                             }
                         }
-                        Spacer()
                     }
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.down")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                guideDetails(guide, accent: accent)
                     .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(KinexaTheme.card)
-                    .clipShape(.rect(cornerRadius: 12))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12).stroke(KinexaTheme.border)
+                    .padding(.bottom, 12)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .background(KinexaTheme.card)
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12).stroke(KinexaTheme.border)
+        }
+    }
+
+    private func guideDetails(_ guide: MovementGuide, accent: Color) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Divider().overlay(KinexaTheme.border)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("WHAT IT IS")
+                    .font(.caption2.weight(.heavy))
+                    .tracking(1.0)
+                    .foregroundStyle(accent)
+                Text(guide.whatIsIt)
+                    .font(.caption)
+                    .foregroundStyle(KinexaTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("HOW TO DO IT")
+                    .font(.caption2.weight(.heavy))
+                    .tracking(1.0)
+                    .foregroundStyle(accent)
+                ForEach(Array(guide.howTo.enumerated()), id: \.offset) { idx, step in
+                    HStack(alignment: .top, spacing: 8) {
+                        Text("\(idx + 1).")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(accent)
+                        Text(step)
+                            .font(.caption)
+                            .foregroundStyle(KinexaTheme.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("ALTERNATIVES")
+                    .font(.caption2.weight(.heavy))
+                    .tracking(1.0)
+                    .foregroundStyle(accent)
+                ForEach(guide.alternatives, id: \.self) { alt in
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "arrow.triangle.swap")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(accent)
+                        Text(alt)
+                            .font(.caption)
+                            .foregroundStyle(KinexaTheme.secondaryText)
                     }
                 }
             }
@@ -347,6 +432,45 @@ struct QuickWorkoutGeneratorView: View {
                 )
             }
             .clipShape(.rect(cornerRadius: 20))
+
+            let guide = CardioGuideLibrary.guide(for: cardio)
+            let accent = selectedType.gradient.first ?? KinexaTheme.accent
+            VStack(alignment: .leading, spacing: 0) {
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        cardioGuideExpanded.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "book.fill")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(accent)
+                        Text("How to do this workout")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                            .rotationEffect(.degrees(cardioGuideExpanded ? 180 : 0))
+                    }
+                    .padding(14)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                if cardioGuideExpanded {
+                    guideDetails(guide, accent: accent)
+                        .padding(.horizontal, 14)
+                        .padding(.bottom, 14)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+            }
+            .background(KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 14))
+            .overlay {
+                RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
+            }
         }
     }
 
@@ -443,8 +567,13 @@ struct QuickWorkoutGeneratorView: View {
             generatedTemplate = bestTemplate(from: FreeWeightLibrary.freeWeightWorkouts)
         case .cardio:
             generatedTemplate = nil
-            generatedCardio = CardioLibrary.allWorkouts.randomElement()
+            let pool = CardioLibrary.running + CardioLibrary.cycling + CardioLibrary.classWorkouts + CardioLibrary.lowImpact + CardioLibrary.outdoor
+            let currentId = generatedCardio?.id
+            let filtered = pool.filter { $0.id != currentId }
+            generatedCardio = filtered.randomElement() ?? pool.randomElement()
         }
+        expandedMovementId = nil
+        cardioGuideExpanded = false
     }
 
     private func bestTemplate(from pool: [WODTemplate]) -> WODTemplate? {

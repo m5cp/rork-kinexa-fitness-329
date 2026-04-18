@@ -7,6 +7,7 @@ struct CardioByTypeView: View {
     @State private var searchText: String = ""
     @State private var selectedCategory: CardioCategory?
     @State private var addedTrigger: Bool = false
+    @State private var detailWorkout: CardioWorkoutDefinition?
 
     var body: some View {
         NavigationStack {
@@ -60,6 +61,23 @@ struct CardioByTypeView: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .presentationBackground(KinexaTheme.background)
+        .sheet(item: $detailWorkout) { workout in
+            CardioWorkoutDetailSheet(
+                workout: workout,
+                onAdd: { w in
+                    addedTrigger.toggle()
+                    let exercise = ManualRoutineExercise(
+                        name: w.name,
+                        category: w.category.rawValue,
+                        sets: 1,
+                        reps: "30 min",
+                        sourceType: .cardio
+                    )
+                    onAddExercise(exercise)
+                },
+                onLog: nil
+            )
+        }
     }
 
     private var disclaimerBanner: some View {
@@ -198,27 +216,21 @@ struct CardioByTypeView: View {
                         Divider().overlay(KinexaTheme.border)
                     }
                     Button {
-                        addedTrigger.toggle()
-                        let exercise = ManualRoutineExercise(
-                            name: workout.name,
-                            category: workout.category.rawValue,
-                            sets: 1,
-                            reps: "30 min",
-                            sourceType: .cardio
-                        )
-                        onAddExercise(exercise)
+                        detailWorkout = workout
                     } label: {
                         HStack(spacing: 12) {
                             Text(workout.name)
                                 .font(.subheadline.weight(.medium))
                                 .foregroundStyle(KinexaTheme.primaryText)
-                                .lineLimit(1)
-
-                            Spacer(minLength: 0)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
 
                             Text(workout.difficultyLevel)
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundStyle(difficultyColor(workout.difficultyLevel))
+                                .layoutPriority(1)
 
                             Image(systemName: "chevron.right")
                                 .font(.caption2.weight(.bold))
@@ -226,6 +238,7 @@ struct CardioByTypeView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
@@ -242,15 +255,7 @@ struct CardioByTypeView: View {
 
     private func workoutRow(_ workout: CardioWorkoutDefinition) -> some View {
         Button {
-            addedTrigger.toggle()
-            let exercise = ManualRoutineExercise(
-                name: workout.name,
-                category: workout.category.rawValue,
-                sets: 1,
-                reps: "30 min",
-                sourceType: .cardio
-            )
-            onAddExercise(exercise)
+            detailWorkout = workout
         } label: {
             HStack(spacing: 14) {
                 Image(systemName: workout.icon)
@@ -264,22 +269,26 @@ struct CardioByTypeView: View {
                     Text(workout.name)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(KinexaTheme.primaryText)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Text(workout.description)
                         .font(.caption2)
                         .foregroundStyle(KinexaTheme.tertiaryText)
-                        .lineLimit(1)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
                 }
-
-                Spacer(minLength: 0)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text(workout.difficultyLevel)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(difficultyColor(workout.difficultyLevel))
+                    .layoutPriority(1)
 
-                Image(systemName: "plus.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(Color(hex: workout.category.gradientHex.0))
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
             }
             .padding(14)
             .background(KinexaTheme.card)
@@ -288,6 +297,7 @@ struct CardioByTypeView: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border)
             }
+            .contentShape(Rectangle())
         }
         .buttonStyle(PressScaleButtonStyle())
     }
