@@ -1,63 +1,39 @@
-# Add lightweight 4-screen onboarding to Kinexa Fitness
+# Fix onboarding layout and make the paywall the final step
 
-## Overview
-Replace the existing long 5-step onboarding with a fast, fully-skippable 4-screen flow that gets users into the app in under 30 seconds. Keeps all existing nutrition, workouts, and RevenueCat logic untouched.
+**What's wrong right now**
 
-## Features
-- Shows only on first launch — afterward goes straight into the app.
-- Every screen has a **Skip** button in the top-right that drops the user into the app immediately.
-- Stores the user's goal and tracking preference so other parts of the app can use them later.
-- If the user skips, sensible defaults are set (Stay Consistent + Calories + Protein).
-- No personal body data, no gender, no forced steps.
-- After onboarding, the user lands on the Home tab with a gentle nudge to log their first meal or start a workout.
+- Text and buttons are bleeding off the right edge of the screen.
+- The Kinexa logo appears on the first onboarding screen — you don't want it there.
+- The last onboarding screen currently offers "Log Meal / Start Workout" — you want it to be the subscription screen instead.
 
-## Screens
+**Fixes**
 
-**Screen 1 — Hook**
-- Title: "Train hard. Fuel smarter. Stay consistent."
-- Subtitle: "Track workouts, log meals, and stay on track without overthinking it."
-- Primary button: **Get Started**
-- Top-right: **Skip**
+- **Screen 1 (Hook)** — Remove the Kinexa logo. Replace it with a clean icon-based hero (e.g. a subtle SF Symbol badge) with the headline "Train hard. Fuel smarter. Stay consistent." and the Get Started button.
+- **Layout** — Rewrite the onboarding so nothing overflows: titles auto-shrink to fit, proper horizontal padding, content scales to the device width. Works on every iPhone size.
+- **Screen 2 (Goal)** — Same 4 options (Lose Fat, Build Muscle, Improve Performance, Stay Consistent), tappable cards that fit the screen.
+- **Screen 3 (Tracking Style)** — Same 3 options, properly sized.
+- **Screen 4 (Subscription)** — This becomes the final step:
+  - Headline: "Unlock Kinexa Pro"
+  - Short list of Pro benefits
+  - **Monthly** and **Annual** options side-by-side, with prices pulled live from App Store / RevenueCat (never hardcoded). Shows free trial text only if Apple returns one.
+  - Big primary button: "Start Free Trial" / "Subscribe" (text adapts to what Apple returns).
+  - Below the buttons: a clearly visible "**Continue with Free**" link that drops them into the app.
+  - Restore Purchases link + legal links.
+  - If prices fail to load, the Continue Free link is still shown so the user is never blocked.
 
-**Screen 2 — Goal**
-- Question: "What are you focused on right now?"
-- Options as tappable cards: Lose Fat · Build Muscle · Improve Performance · Stay Consistent
-- Light haptic on tap, selection auto-advances
-- Top-right: **Skip**
+**Paywall enforcement (Pro gating)**
 
-**Screen 3 — Tracking Style**
-- Question: "How do you want to track meals?"
-- Options: Calories Only · Calories + Protein (default) · Full Macros
-- Top-right: **Skip**
+- Every Pro feature (AI meal scans beyond free limit, AI workout generation beyond free limit, Coach messages beyond free limit, Full Plan Builder, Advanced Progress, PDF/Calendar Export) checks `isPremium` before running.
+- If a non-subscriber taps a Pro feature, the subscription sheet appears. Free trial users and paid subscribers pass through normally.
+- Free users keep their existing free allowances — nothing new gets blocked that wasn't already, we just make sure nothing Pro slips through.
 
-**Screen 4 — Instant Value**
-- Title: "You're ready to start."
-- Subtitle: "Log your first meal or start your first workout."
-- Two primary buttons: **Log Meal** · **Start Workout**
-- Secondary: **Explore App**
+**Skip behavior**
 
-## Design
-- Dark Kinexa theme, matching the rest of the app (same background, accent gradient, typography).
-- Large bold title, soft secondary subtitle, generous spacing.
-- Slim progress bar across the top of screens 2–3 only.
-- Option cards use rounded corners, subtle borders, and a glowing accent outline when selected.
-- Smooth spring transitions between screens.
-- Bottom CTA buttons use the existing hero gradient for consistency.
+- A small "Skip" in the top-right of every screen still works and sends the user straight into the app as a free user.
+- Defaults if skipped: goal = Stay Consistent, tracking = Calories + Protein.
 
-## Soft Paywall
-- The existing upgrade screen stays as-is and is **not** shown during onboarding.
-- It only appears after a value moment (meal scan, AI feature use) — unchanged from current behavior.
-- Already loads dynamic RevenueCat pricing, has Restore Purchases, and a close button.
+**After onboarding**
 
-## Skip & Data Behavior
-- Skipping from any screen immediately enters the app.
-- Defaults applied if skipped mid-flow: goal = Stay Consistent, tracking = Calories + Protein.
-- Onboarding completion flag saved locally so it never shows again.
-- Partial selections are preserved if the user skips mid-flow.
+- Land on Home tab. First-meal hint shown as before.
+- Onboarding never shows again (stored locally).
 
-## Post-Onboarding
-- User lands on the Home tab.
-- A subtle one-time highlight card suggests "Log your first meal" or "Start a workout".
-
-## What stays untouched
-- Nutrition tracking, workout tracking, navigation, liquid-glass tab bar, floating chat button, RevenueCat integration, splash screen, and all existing views remain exactly as they are.
