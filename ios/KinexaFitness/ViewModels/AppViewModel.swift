@@ -587,7 +587,7 @@ final class AppViewModel {
                 return
             }
         }
-        regenerateFunctionalWOD()
+        todayFunctionalWOD = nil
     }
 
     func regenerateFunctionalWOD() {
