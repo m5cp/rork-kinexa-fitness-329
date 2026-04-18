@@ -3,7 +3,6 @@ import SwiftUI
 struct RootView: View {
     @Environment(AppViewModel.self) private var vm
     @AppStorage("hasSeenSplash") private var hasSeenSplash: Bool = false
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     @State private var showSplash: Bool
 
     init() {
@@ -14,12 +13,6 @@ struct RootView: View {
         ZStack {
             MainTabView()
                 .background(KinexaTheme.background.ignoresSafeArea())
-
-            if !hasCompletedOnboarding {
-                OnboardingView()
-                    .transition(.opacity)
-                    .zIndex(1)
-            }
 
             if showSplash {
                 SplashView {
