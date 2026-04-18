@@ -73,13 +73,16 @@ struct MainTabView: View {
             }
             .safeAreaPadding(.bottom, 72)
 
-            HStack(alignment: .bottom, spacing: 10) {
-                customTabBar
-                coachFloatingButton
-            }
-            .padding(.horizontal, 12)
-            .padding(.bottom, 4)
-            .zIndex(100)
+            customTabBar
+                .padding(.horizontal, 12)
+                .padding(.bottom, 4)
+                .zIndex(100)
+
+            coachFloatingButton
+                .padding(.trailing, 16)
+                .padding(.bottom, 88)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .zIndex(101)
         }
         .background(KinexaTheme.background.ignoresSafeArea())
         .instantRecapOverlay(recap: Binding(

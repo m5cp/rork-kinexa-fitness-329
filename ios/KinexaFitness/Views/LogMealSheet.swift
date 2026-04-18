@@ -131,6 +131,8 @@ struct LogMealSheet: View {
                             Text("Repeat Yesterday")
                                 .font(.subheadline.weight(.bold))
                                 .foregroundStyle(.white)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
                             Text(yesterdaySubtitle)
                                 .font(.system(size: 10, weight: .medium))
                                 .foregroundStyle(.white.opacity(0.8))
@@ -139,7 +141,7 @@ struct LogMealSheet: View {
                         Spacer(minLength: 0)
                     }
                     .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                     .background(
                         LinearGradient(
                             colors: nutritionVM.yesterdaysMeals.isEmpty
@@ -172,6 +174,8 @@ struct LogMealSheet: View {
                             Text("Templates")
                                 .font(.subheadline.weight(.bold))
                                 .foregroundStyle(.white)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
                             Text(templatesSubtitle)
                                 .font(.system(size: 10, weight: .medium))
                                 .foregroundStyle(.white.opacity(0.8))
@@ -180,7 +184,7 @@ struct LogMealSheet: View {
                         Spacer(minLength: 0)
                     }
                     .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                     .background(
                         LinearGradient(
                             colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")],
