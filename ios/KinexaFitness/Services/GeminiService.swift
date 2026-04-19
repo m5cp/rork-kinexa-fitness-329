@@ -79,6 +79,22 @@ nonisolated enum GeminiError: Error, Sendable {
     case decodingError(String)
     case noContent
     case emptyResult
+
+    var debugDescription: String {
+        switch self {
+        case .missingAPIKey: return "missingAPIKey"
+        case .invalidURL: return "invalidURL"
+        case .networkError(let s): return "networkError: \(s)"
+        case .decodingError(let s): return "decodingError: \(s)"
+        case .noContent: return "noContent"
+        case .emptyResult: return "emptyResult"
+        }
+    }
+}
+
+nonisolated enum GeminiModel {
+    static let current = "gemini-2.5-flash"
+    static let fallback = "gemini-2.0-flash"
 }
 
 nonisolated enum GeminiJSONParser {
@@ -204,7 +220,7 @@ final class GeminiService {
     func generateText(prompt: String, systemPrompt: String? = nil, temperature: Double = 0.7, maxTokens: Int = 2048) async throws -> String {
         guard !apiKey.isEmpty else { throw GeminiError.missingAPIKey }
 
-        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"
+        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/\(GeminiModel.current):generateContent?key=\(apiKey)"
         guard let url = URL(string: urlString) else { throw GeminiError.invalidURL }
 
         let contents = [GeminiContent(parts: [GeminiPart(text: prompt)], role: "user")]
@@ -238,7 +254,7 @@ final class GeminiService {
     func generateJSONWithImage<T: Decodable & Sendable>(prompt: String, imageData: Data, mimeType: String? = nil, systemPrompt: String? = nil, type: T.Type) async throws -> T {
         guard !apiKey.isEmpty else { throw GeminiError.missingAPIKey }
 
-        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"
+        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/\(GeminiModel.current):generateContent?key=\(apiKey)"
         guard let url = URL(string: urlString) else { throw GeminiError.invalidURL }
 
         let detectedMime = mimeType ?? ImageMIMEDetector.detect(imageData)
@@ -285,7 +301,7 @@ final class GeminiService {
     func generateJSON<T: Decodable & Sendable>(prompt: String, systemPrompt: String? = nil, type: T.Type) async throws -> T {
         guard !apiKey.isEmpty else { throw GeminiError.missingAPIKey }
 
-        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"
+        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/\(GeminiModel.current):generateContent?key=\(apiKey)"
         guard let url = URL(string: urlString) else { throw GeminiError.invalidURL }
 
         let contents = [GeminiContent(parts: [GeminiPart(text: prompt)], role: "user")]
