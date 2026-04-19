@@ -25,6 +25,7 @@ struct LogMealSheet: View {
     @State private var quickLogToast: String?
     @State private var showTemplates: Bool = false
     @State private var isRepeatingYesterday: Bool = false
+    @State private var servingMultipliers: [UUID: Double] = [:]
 
     var body: some View {
         NavigationStack(path: $navPath) {
@@ -1086,72 +1087,13 @@ struct LogMealSheet: View {
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(KinexaTheme.secondaryText)
                 Spacer()
-                let totalCal = estimatedFoods.map(\.nutrition.calories).reduce(0, +)
-                Text("\(totalCal) cal total")
+                Text("\(totalScaledCalories) cal total")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(KinexaTheme.success)
             }
 
             ForEach(estimatedFoods) { food in
-                VStack(spacing: 10) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(food.name)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(KinexaTheme.primaryText)
-                            Text(food.quantity)
-                                .font(.caption)
-                                .foregroundStyle(KinexaTheme.tertiaryText)
-                        }
-                        Spacer()
-                        HStack(spacing: 6) {
-                            Text("\(food.nutrition.calories) cal")
-                                .font(.subheadline.weight(.bold))
-                                .foregroundStyle(KinexaTheme.primaryText)
-
-                            Button {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    nutritionVM.toggleFavorite(food)
-                                }
-                            } label: {
-                                Image(systemName: nutritionVM.isFavorite(food.name) ? "star.fill" : "star")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(Color(hex: "#F59E0B"))
-                                    .frame(width: 30, height: 30)
-                                    .background(Color(hex: "#F59E0B").opacity(nutritionVM.isFavorite(food.name) ? 0.2 : 0.08))
-                                    .clipShape(Circle())
-                            }
-                            .buttonStyle(PressScaleButtonStyle())
-
-                            Button {
-                                estimatedFoods.removeAll { $0.id == food.id }
-                                if estimatedFoods.isEmpty { hasEstimated = false }
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(KinexaTheme.tertiaryText)
-                            }
-                        }
-                    }
-
-                    HStack(spacing: 12) {
-                        macroTag("P", value: food.nutrition.protein, color: Color(hex: "#3B82F6"))
-                        macroTag("C", value: food.nutrition.carbs, color: Color(hex: "#F59E0B"))
-                        macroTag("F", value: food.nutrition.fat, color: Color(hex: "#EC4899"))
-                        if food.nutrition.alcohol > 0 {
-                            macroTag("A", value: food.nutrition.alcohol, color: Color(hex: "#A855F7"))
-                        }
-                        Spacer()
-                    }
-                }
-                .padding(14)
-                .background(KinexaTheme.card)
-                .clipShape(.rect(cornerRadius: 14))
-                .elevatedCardShadow()
-                .overlay {
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(KinexaTheme.border)
-                }
+                estimatedFoodCard(food)
             }
 
             Button {
@@ -1164,6 +1106,183 @@ struct LogMealSheet: View {
                 .font(.caption.weight(.bold))
                 .foregroundStyle(KinexaTheme.accent)
             }
+
+            Button {
+                saveMeal()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.subheadline.weight(.bold))
+                    Text("Log This Meal")
+                        .font(.subheadline.weight(.bold))
+                    Spacer()
+                    Text("\(totalScaledCalories) cal")
+                        .font(.caption.weight(.heavy))
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 16)
+                .frame(maxWidth: .infinity)
+                .frame(height: 54)
+                .background(
+                    LinearGradient(
+                        colors: [KinexaTheme.accent, Color(hex: "#2E7D52")],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .clipShape(.rect(cornerRadius: 14))
+                .shadow(color: KinexaTheme.accent.opacity(0.3), radius: 10, y: 4)
+            }
+            .buttonStyle(PressScaleButtonStyle())
+            .padding(.top, 4)
+        }
+    }
+
+    private var totalScaledCalories: Int {
+        estimatedFoods.reduce(0) { $0 + scaledNutrition($1).calories }
+    }
+
+    private func servings(for food: FoodItem) -> Double {
+        servingMultipliers[food.id] ?? 1.0
+    }
+
+    private func scaledNutrition(_ food: FoodItem) -> NutritionInfo {
+        let m = servings(for: food)
+        return NutritionInfo(
+            calories: Int((Double(food.nutrition.calories) * m).rounded()),
+            protein: food.nutrition.protein * m,
+            carbs: food.nutrition.carbs * m,
+            fat: food.nutrition.fat * m,
+            fiber: food.nutrition.fiber * m,
+            sugar: food.nutrition.sugar * m,
+            alcohol: food.nutrition.alcohol * m
+        )
+    }
+
+    private func adjustServings(_ food: FoodItem, by delta: Double) {
+        let current = servings(for: food)
+        let next = max(0.25, min(10.0, (current + delta)))
+        let rounded = (next * 4).rounded() / 4
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            servingMultipliers[food.id] = rounded
+        }
+    }
+
+    private func servingsLabel(_ value: Double) -> String {
+        if abs(value - value.rounded()) < 0.01 {
+            return "\(Int(value))"
+        }
+        return String(format: "%.2g", value)
+    }
+
+    @ViewBuilder
+    private func estimatedFoodCard(_ food: FoodItem) -> some View {
+        let scaled = scaledNutrition(food)
+        let servingsValue = servings(for: food)
+
+        VStack(spacing: 12) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(food.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text(food.quantity)
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                Spacer()
+                HStack(spacing: 6) {
+                    Text("\(scaled.calories) cal")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                        .contentTransition(.numericText())
+
+                    Button {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            nutritionVM.toggleFavorite(food)
+                        }
+                    } label: {
+                        Image(systemName: nutritionVM.isFavorite(food.name) ? "star.fill" : "star")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color(hex: "#F59E0B"))
+                            .frame(width: 30, height: 30)
+                            .background(Color(hex: "#F59E0B").opacity(nutritionVM.isFavorite(food.name) ? 0.2 : 0.08))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(PressScaleButtonStyle())
+
+                    Button {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            estimatedFoods.removeAll { $0.id == food.id }
+                            servingMultipliers.removeValue(forKey: food.id)
+                            if estimatedFoods.isEmpty { hasEstimated = false }
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(KinexaTheme.tertiaryText)
+                    }
+                }
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    adjustServings(food, by: -0.5)
+                } label: {
+                    Image(systemName: "minus")
+                        .font(.system(size: 13, weight: .heavy))
+                        .foregroundStyle(servingsValue <= 0.25 ? KinexaTheme.tertiaryText : KinexaTheme.accent)
+                        .frame(width: 34, height: 34)
+                        .background(KinexaTheme.cardSoft)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(PressScaleButtonStyle())
+                .disabled(servingsValue <= 0.25)
+
+                VStack(spacing: 1) {
+                    Text("\(servingsLabel(servingsValue))×")
+                        .font(.subheadline.weight(.heavy))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                        .contentTransition(.numericText())
+                    Text(servingsValue == 1.0 ? "serving" : "servings")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                .frame(minWidth: 70)
+
+                Button {
+                    adjustServings(food, by: 0.5)
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 13, weight: .heavy))
+                        .foregroundStyle(KinexaTheme.accent)
+                        .frame(width: 34, height: 34)
+                        .background(KinexaTheme.accent.opacity(0.12))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(PressScaleButtonStyle())
+                .disabled(servingsValue >= 10.0)
+
+                Spacer(minLength: 0)
+
+                HStack(spacing: 6) {
+                    macroTag("P", value: scaled.protein, color: Color(hex: "#3B82F6"))
+                    macroTag("C", value: scaled.carbs, color: Color(hex: "#F59E0B"))
+                    macroTag("F", value: scaled.fat, color: Color(hex: "#EC4899"))
+                    if scaled.alcohol > 0 {
+                        macroTag("A", value: scaled.alcohol, color: Color(hex: "#A855F7"))
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .background(KinexaTheme.card)
+        .clipShape(.rect(cornerRadius: 14))
+        .elevatedCardShadow()
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(KinexaTheme.border)
         }
     }
 
@@ -1523,9 +1642,18 @@ struct LogMealSheet: View {
 
     private func saveMeal() {
         guard !estimatedFoods.isEmpty else { return }
+        let scaledFoods: [FoodItem] = estimatedFoods.map { food in
+            let m = servings(for: food)
+            guard m != 1.0 else { return food }
+            var updated = food
+            updated.nutrition = scaledNutrition(food)
+            let label = servingsLabel(m)
+            updated.quantity = "\(label)× \(food.quantity)"
+            return updated
+        }
         let meal = MealEntry(
             mealType: selectedMealType,
-            foods: estimatedFoods,
+            foods: scaledFoods,
             notes: notes,
             photoData: capturedPhotoData
         )
