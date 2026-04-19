@@ -17,9 +17,10 @@ final class NutritionViewModel {
     var loggingStreak: Int = 0
 
     private let gemini = GeminiService()
+    private let groq = GroqService()
     private let barcodeService = BarcodeLookupService()
 
-    var isGeminiConfigured: Bool { gemini.isConfigured }
+    var isGeminiConfigured: Bool { groq.isConfigured || gemini.isConfigured }
     var isProfileConfigured: Bool { profile.isConfigured }
 
     init() {
@@ -326,7 +327,12 @@ final class NutritionViewModel {
 
         let systemPrompt = "You are a nutrition expert. Provide accurate, realistic nutritional estimates. Always return valid JSON matching the requested format. For alcoholic drinks, estimate alcohol content in grams."
 
-        let result = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiFoodEstimate.self)
+        let result: GeminiFoodEstimate
+        if groq.isConfigured {
+            result = try await groq.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiFoodEstimate.self)
+        } else {
+            result = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiFoodEstimate.self)
+        }
 
         guard !result.foods.isEmpty else { throw GeminiError.emptyResult }
 
