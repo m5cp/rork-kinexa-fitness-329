@@ -1470,8 +1470,18 @@ struct LogMealSheet: View {
         switch error {
         case .missingAPIKey:
             return "AI is not configured — missing Gemini API key."
-        case .invalidURL, .networkError:
-            return "AI request failed. Check your connection and try again."
+        case .invalidURL:
+            return "AI request failed. Please try again."
+        case .networkError(let msg):
+            return "AI request failed: \(msg)"
+        case .httpError(let status, let msg):
+            if status == 401 || status == 403 {
+                return "AI key is invalid or unauthorized. Please check your Gemini API key."
+            }
+            if status == 429 {
+                return "AI quota reached. Please try again later."
+            }
+            return "AI error (\(status)): \(msg)"
         case .decodingError:
             return "AI response couldn't be read. Please try again."
         case .noContent, .emptyResult:

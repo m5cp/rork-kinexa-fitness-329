@@ -76,6 +76,7 @@ nonisolated enum GeminiError: Error, Sendable {
     case missingAPIKey
     case invalidURL
     case networkError(String)
+    case httpError(status: Int, message: String)
     case decodingError(String)
     case noContent
     case emptyResult
@@ -85,6 +86,7 @@ nonisolated enum GeminiError: Error, Sendable {
         case .missingAPIKey: return "missingAPIKey"
         case .invalidURL: return "invalidURL"
         case .networkError(let s): return "networkError: \(s)"
+        case .httpError(let status, let message): return "httpError \(status): \(message)"
         case .decodingError(let s): return "decodingError: \(s)"
         case .noContent: return "noContent"
         case .emptyResult: return "emptyResult"
@@ -93,8 +95,11 @@ nonisolated enum GeminiError: Error, Sendable {
 }
 
 nonisolated enum GeminiModel {
-    static let current = "gemini-2.5-flash"
-    static let fallback = "gemini-2.0-flash"
+    static let candidates: [String] = [
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash"
+    ]
 }
 
 nonisolated enum GeminiJSONParser {
@@ -217,46 +222,72 @@ final class GeminiService {
         !apiKey.isEmpty
     }
 
-    func generateText(prompt: String, systemPrompt: String? = nil, temperature: Double = 0.7, maxTokens: Int = 2048) async throws -> String {
+    private func performRequest(body: GeminiRequest) async throws -> GeminiResponse {
         guard !apiKey.isEmpty else { throw GeminiError.missingAPIKey }
+        let encoded = try JSONEncoder().encode(body)
 
-        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/\(GeminiModel.current):generateContent?key=\(apiKey)"
-        guard let url = URL(string: urlString) else { throw GeminiError.invalidURL }
+        var lastError: GeminiError = .noContent
+        for model in GeminiModel.candidates {
+            let urlString = "https://generativelanguage.googleapis.com/v1beta/models/\(model):generateContent?key=\(apiKey)"
+            guard let url = URL(string: urlString) else {
+                lastError = .invalidURL
+                continue
+            }
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = encoded
+            request.timeoutInterval = 30
 
+            do {
+                let (data, response) = try await URLSession.shared.data(for: request)
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    lastError = .networkError("Invalid response")
+                    continue
+                }
+                if (200...299).contains(httpResponse.statusCode) {
+                    return try JSONDecoder().decode(GeminiResponse.self, from: data)
+                }
+                let bodyText = String(data: data, encoding: .utf8) ?? ""
+                let shortMessage = Self.extractErrorMessage(from: bodyText) ?? bodyText
+                lastError = .httpError(status: httpResponse.statusCode, message: shortMessage)
+                // Retry next model only on model-not-found / bad-request style errors
+                if httpResponse.statusCode == 404 || httpResponse.statusCode == 400 {
+                    continue
+                }
+                throw lastError
+            } catch let error as GeminiError {
+                throw error
+            } catch {
+                lastError = .networkError(error.localizedDescription)
+                continue
+            }
+        }
+        throw lastError
+    }
+
+    private static func extractErrorMessage(from body: String) -> String? {
+        guard let data = body.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let err = obj["error"] as? [String: Any],
+              let msg = err["message"] as? String else { return nil }
+        return msg
+    }
+
+    func generateText(prompt: String, systemPrompt: String? = nil, temperature: Double = 0.7, maxTokens: Int = 2048) async throws -> String {
         let contents = [GeminiContent(parts: [GeminiPart(text: prompt)], role: "user")]
         let config = GeminiGenerationConfig(temperature: temperature, maxOutputTokens: maxTokens)
         let systemInstruction = systemPrompt.map { GeminiContent(parts: [GeminiPart(text: $0)]) }
-
         let requestBody = GeminiRequest(contents: contents, generationConfig: config, systemInstruction: systemInstruction)
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(requestBody)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-            let body = String(data: data, encoding: .utf8) ?? ""
-            throw GeminiError.networkError("Status \(statusCode): \(body)")
-        }
-
-        let geminiResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)
-
+        let geminiResponse = try await performRequest(body: requestBody)
         guard let text = geminiResponse.candidates?.first?.content?.parts.first?.text else {
             throw GeminiError.noContent
         }
-
         return text
     }
 
     func generateJSONWithImage<T: Decodable & Sendable>(prompt: String, imageData: Data, mimeType: String? = nil, systemPrompt: String? = nil, type: T.Type) async throws -> T {
-        guard !apiKey.isEmpty else { throw GeminiError.missingAPIKey }
-
-        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/\(GeminiModel.current):generateContent?key=\(apiKey)"
-        guard let url = URL(string: urlString) else { throw GeminiError.invalidURL }
-
         let detectedMime = mimeType ?? ImageMIMEDetector.detect(imageData)
         let base64Image = imageData.base64EncodedString()
         let contents = [GeminiContent(parts: [
@@ -265,31 +296,13 @@ final class GeminiService {
         ], role: "user")]
         let config = GeminiGenerationConfig(temperature: 0.4, maxOutputTokens: 4096, responseMimeType: "application/json")
         let systemInstruction = systemPrompt.map { GeminiContent(parts: [GeminiPart(text: $0)]) }
-
         let requestBody = GeminiRequest(contents: contents, generationConfig: config, systemInstruction: systemInstruction)
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(requestBody)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-            let body = String(data: data, encoding: .utf8) ?? ""
-            throw GeminiError.networkError("Status \(statusCode): \(body)")
-        }
-
-        let geminiResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)
-
+        let geminiResponse = try await performRequest(body: requestBody)
         let jsonText = (geminiResponse.candidates?.first?.content?.parts ?? [])
             .compactMap { $0.text }
             .joined()
-
-        guard !jsonText.isEmpty else {
-            throw GeminiError.noContent
-        }
+        guard !jsonText.isEmpty else { throw GeminiError.noContent }
 
         do {
             return try GeminiJSONParser.decode(T.self, from: jsonText)
@@ -299,39 +312,16 @@ final class GeminiService {
     }
 
     func generateJSON<T: Decodable & Sendable>(prompt: String, systemPrompt: String? = nil, type: T.Type) async throws -> T {
-        guard !apiKey.isEmpty else { throw GeminiError.missingAPIKey }
-
-        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/\(GeminiModel.current):generateContent?key=\(apiKey)"
-        guard let url = URL(string: urlString) else { throw GeminiError.invalidURL }
-
         let contents = [GeminiContent(parts: [GeminiPart(text: prompt)], role: "user")]
         let config = GeminiGenerationConfig(temperature: 0.4, maxOutputTokens: 4096, responseMimeType: "application/json")
         let systemInstruction = systemPrompt.map { GeminiContent(parts: [GeminiPart(text: $0)]) }
-
         let requestBody = GeminiRequest(contents: contents, generationConfig: config, systemInstruction: systemInstruction)
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(requestBody)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-            let body = String(data: data, encoding: .utf8) ?? ""
-            throw GeminiError.networkError("Status \(statusCode): \(body)")
-        }
-
-        let geminiResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)
-
+        let geminiResponse = try await performRequest(body: requestBody)
         let jsonText = (geminiResponse.candidates?.first?.content?.parts ?? [])
             .compactMap { $0.text }
             .joined()
-
-        guard !jsonText.isEmpty else {
-            throw GeminiError.noContent
-        }
+        guard !jsonText.isEmpty else { throw GeminiError.noContent }
 
         do {
             return try GeminiJSONParser.decode(T.self, from: jsonText)
