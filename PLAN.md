@@ -1,43 +1,29 @@
-# Calmer meal search + clearer AI meal entry screens
+# Add Gemini diagnostic button to Scan screen
 
-## Food Search (USDA)
+## What I'll add
 
-- Don't start searching until you've typed at least **3 characters**
-- Slower, calmer debounce (~600ms) so it doesn't fire on every keystroke
-- Show only **~8 results** instead of a long list
-- Rank results so clean, generic foods appear above noisy branded items (branded items still show when clearly relevant)
-- Cancel stale searches when the query changes — no flicker or overlap
-- Cleaner empty / loading / no-match states:
-  - "Start typing to search meals"
-  - "Searching meals…"
-  - "No matches found"
+A small **"Run Gemini Diagnostic"** button on the Scan screen that helps us pinpoint exactly why Gemini isn't working — without needing TestFlight.
 
-## AI Describe Screen
+## What it does
 
-- Bigger, more obvious meal description box with a friendlier placeholder
-- Helper text: *"Describe your meal in plain language and I'll estimate the calories and macros."*
-- Clear primary button "Estimate with AI" — disabled when the box is empty
-- Loading state while estimating; friendly error if it fails
-- Prevent duplicate requests from repeat taps
-- Subtle "2 of 5 AI scans used today" indicator stays visible
+When tapped, it runs three checks in order and shows the results right on screen:
 
-## Scan Meal Screen
+1. **Key check** — Confirms the Gemini API key is present (shows ✅ or ❌, plus the key length so we know it's not empty/truncated).
+2. **Text-only ping** — Sends a tiny "say hi" request to `gemini-2.5-flash` and shows the raw HTTP status code and response body.
+3. **Vision ping** — Sends a 1×1 pixel image to the same model and shows the raw status + response.
 
-- Two clearly separated options: **Take Photo** and **Choose from Gallery**
-- Short explainer: AI identifies the items and estimates nutrition
-- Loading state during analysis; friendly error if the image can't be read
-- Subtle daily scan usage indicator
+From the three results we'll instantly know:
+- ❌ on step 1 → the key isn't being read
+- ❌ on step 2 → auth or model issue (bad key, wrong model name, billing)
+- ✅ step 2 but ❌ step 3 → vision-specific problem (image format, region, quota)
+- ✅ all three → Gemini works and the bug is elsewhere in our scan flow
 
-## Confirmation / Save
+## Design
 
-- Always land on a clean review screen after AI returns
-- Edit values before saving
-- Save button only active when there's usable data
-- No blank success screens or broken-looking empty states
+- Button placed discreetly at the bottom of the Scan screen (not in the main flow).
+- Tapping opens a sheet that streams results live as each check completes, with color-coded status icons and a copyable raw-response block for each step.
+- Clean, monospaced output so HTTP errors are easy to read.
 
-## What stays the same
+## Shipping to TestFlight
 
-- USDA search remains
-- Meal logging, saving, barcode, manual entry, favorites all unchanged
-- Overall visual style and navigation unchanged
-
+The entire button and diagnostic sheet will be wrapped so it **only appears in development builds** — testers and App Store users will never see it. When we're ready to ship, nothing needs to be removed manually; it's automatically hidden in release builds.

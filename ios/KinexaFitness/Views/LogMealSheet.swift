@@ -24,6 +24,9 @@ struct LogMealSheet: View {
     @State private var showTokenStore: Bool = false
     @State private var quickLogToast: String?
     @State private var showTemplates: Bool = false
+    #if DEBUG
+    @State private var showGeminiDiagnostic: Bool = false
+    #endif
     @State private var isRepeatingYesterday: Bool = false
     @State private var servingMultipliers: [UUID: Double] = [:]
 
@@ -609,6 +612,30 @@ struct LogMealSheet: View {
                     .foregroundStyle(KinexaTheme.tertiaryText)
                     .frame(maxWidth: .infinity)
             }
+
+            #if DEBUG
+            Button {
+                showGeminiDiagnostic = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "stethoscope")
+                    Text("Run Gemini Diagnostic")
+                }
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.orange)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .background(Color.orange.opacity(0.1))
+                .clipShape(.rect(cornerRadius: 8))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.orange.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [4]))
+                }
+            }
+            .sheet(isPresented: $showGeminiDiagnostic) {
+                GeminiDiagnosticSheet()
+            }
+            #endif
         }
         .padding(16)
         .background(KinexaTheme.card)
