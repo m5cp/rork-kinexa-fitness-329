@@ -328,6 +328,8 @@ final class NutritionViewModel {
 
         let result = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiFoodEstimate.self)
 
+        guard !result.foods.isEmpty else { throw GeminiError.emptyResult }
+
         let aiFoods = result.foods.map { item in
             FoodItem(
                 name: item.name,
@@ -360,6 +362,8 @@ final class NutritionViewModel {
             systemPrompt: systemPrompt,
             type: GeminiFoodEstimate.self
         )
+
+        guard !result.foods.isEmpty else { throw GeminiError.emptyResult }
 
         let aiFoods = result.foods.map { item in
             FoodItem(

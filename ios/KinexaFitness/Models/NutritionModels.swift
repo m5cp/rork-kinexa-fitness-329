@@ -125,6 +125,29 @@ nonisolated struct GeminiFoodItem: Codable, Sendable {
     let fiber: Double
     let sugar: Double
     let alcohol: Double?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = (try? c.decode(String.self, forKey: .name)) ?? "Unknown food"
+        self.quantity = (try? c.decode(String.self, forKey: .quantity)) ?? "1 serving"
+        if let i = try? c.decode(Int.self, forKey: .calories) {
+            self.calories = i
+        } else if let d = try? c.decode(Double.self, forKey: .calories) {
+            self.calories = Int(d.rounded())
+        } else {
+            self.calories = 0
+        }
+        self.protein = (try? c.decode(Double.self, forKey: .protein)) ?? 0
+        self.carbs = (try? c.decode(Double.self, forKey: .carbs)) ?? 0
+        self.fat = (try? c.decode(Double.self, forKey: .fat)) ?? 0
+        self.fiber = (try? c.decode(Double.self, forKey: .fiber)) ?? 0
+        self.sugar = (try? c.decode(Double.self, forKey: .sugar)) ?? 0
+        self.alcohol = try? c.decode(Double.self, forKey: .alcohol)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name, quantity, calories, protein, carbs, fat, fiber, sugar, alcohol
+    }
 }
 
 nonisolated struct BarcodeProduct: Codable, Sendable {

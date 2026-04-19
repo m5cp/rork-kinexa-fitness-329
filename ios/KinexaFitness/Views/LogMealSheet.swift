@@ -1359,6 +1359,7 @@ struct LogMealSheet: View {
     // MARK: - Actions
 
     private func estimateFromText() async {
+        guard !isEstimating else { return }
         let description = foodDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !description.isEmpty else { return }
         guard !AIUsageTracker.shared.hasReachedLimit else {
@@ -1373,14 +1374,17 @@ struct LogMealSheet: View {
             estimatedFoods = try await nutritionVM.estimateFoodFromText(description)
             hasEstimated = true
             AIUsageTracker.shared.recordUsage()
+        } catch let error as GeminiError {
+            errorMessage = Self.friendlyMessage(for: error, isImage: false)
         } catch {
-            errorMessage = "Could not estimate nutrition. Please try again or check your connection."
+            errorMessage = "AI request failed. Check your connection and try again."
         }
 
         isEstimating = false
     }
 
     private func analyzePhoto(_ data: Data) async {
+        guard !isEstimating else { return }
         guard !AIUsageTracker.shared.hasReachedLimit else {
             errorMessage = "You've used all \(AIUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
             return
@@ -1393,11 +1397,28 @@ struct LogMealSheet: View {
             estimatedFoods = try await nutritionVM.estimateFoodFromImage(data)
             hasEstimated = true
             AIUsageTracker.shared.recordUsage()
+        } catch let error as GeminiError {
+            errorMessage = Self.friendlyMessage(for: error, isImage: true)
         } catch {
-            errorMessage = "Could not analyze photo. Please try again or use text description."
+            errorMessage = "Could not analyze this image. Try a clearer, well-lit photo."
         }
 
         isEstimating = false
+    }
+
+    private static func friendlyMessage(for error: GeminiError, isImage: Bool) -> String {
+        switch error {
+        case .missingAPIKey:
+            return "AI is not configured — missing Gemini API key."
+        case .invalidURL, .networkError:
+            return "AI request failed. Check your connection and try again."
+        case .decodingError:
+            return "AI response couldn't be read. Please try again."
+        case .noContent, .emptyResult:
+            return isImage
+                ? "Could not analyze this image. Try a clearer, well-lit photo."
+                : "AI didn't return any usable food data. Try rewording your description."
+        }
     }
 
     private func loadAndAnalyzePhoto(_ item: PhotosPickerItem) async {

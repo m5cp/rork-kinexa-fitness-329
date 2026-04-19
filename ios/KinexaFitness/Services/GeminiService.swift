@@ -78,6 +78,115 @@ nonisolated enum GeminiError: Error, Sendable {
     case networkError(String)
     case decodingError(String)
     case noContent
+    case emptyResult
+}
+
+nonisolated enum GeminiJSONParser {
+    static func decode<T: Decodable>(_ type: T.Type, from text: String) throws -> T {
+        let decoder = JSONDecoder()
+
+        if let data = text.data(using: .utf8),
+           let result = try? decoder.decode(T.self, from: data) {
+            return result
+        }
+
+        let stripped = stripCodeFences(text).trimmingCharacters(in: .whitespacesAndNewlines)
+        if let data = stripped.data(using: .utf8),
+           let result = try? decoder.decode(T.self, from: data) {
+            return result
+        }
+
+        if let extracted = extractFirstJSONObject(from: stripped),
+           let data = extracted.data(using: .utf8),
+           let result = try? decoder.decode(T.self, from: data) {
+            return result
+        }
+
+        // Last try — throw the real decoder error for diagnostics
+        let data = (stripped.data(using: .utf8)) ?? Data()
+        return try decoder.decode(T.self, from: data)
+    }
+
+    private static func stripCodeFences(_ text: String) -> String {
+        var s = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if s.hasPrefix("```") {
+            if let firstNewline = s.firstIndex(of: "\n") {
+                s = String(s[s.index(after: firstNewline)...])
+            } else {
+                s = String(s.dropFirst(3))
+            }
+        }
+        if s.hasSuffix("```") {
+            s = String(s.dropLast(3))
+        }
+        return s.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func extractFirstJSONObject(from text: String) -> String? {
+        guard let start = text.firstIndex(where: { $0 == "{" || $0 == "[" }) else { return nil }
+        let openChar = text[start]
+        let closeChar: Character = openChar == "{" ? "}" : "]"
+
+        var depth = 0
+        var inString = false
+        var escape = false
+        var i = start
+        while i < text.endIndex {
+            let c = text[i]
+            if escape {
+                escape = false
+            } else if c == "\\" && inString {
+                escape = true
+            } else if c == "\"" {
+                inString.toggle()
+            } else if !inString {
+                if c == openChar {
+                    depth += 1
+                } else if c == closeChar {
+                    depth -= 1
+                    if depth == 0 {
+                        return String(text[start...i])
+                    }
+                }
+            }
+            i = text.index(after: i)
+        }
+        return nil
+    }
+}
+
+nonisolated enum ImageMIMEDetector {
+    static func detect(_ data: Data) -> String {
+        guard data.count >= 12 else { return "image/jpeg" }
+        let bytes = [UInt8](data.prefix(12))
+
+        // PNG: 89 50 4E 47 0D 0A 1A 0A
+        if bytes[0] == 0x89, bytes[1] == 0x50, bytes[2] == 0x4E, bytes[3] == 0x47 {
+            return "image/png"
+        }
+        // JPEG: FF D8 FF
+        if bytes[0] == 0xFF, bytes[1] == 0xD8, bytes[2] == 0xFF {
+            return "image/jpeg"
+        }
+        // GIF
+        if bytes[0] == 0x47, bytes[1] == 0x49, bytes[2] == 0x46 {
+            return "image/gif"
+        }
+        // WebP: RIFF....WEBP
+        if bytes[0] == 0x52, bytes[1] == 0x49, bytes[2] == 0x46, bytes[3] == 0x46,
+           bytes[8] == 0x57, bytes[9] == 0x45, bytes[10] == 0x42, bytes[11] == 0x50 {
+            return "image/webp"
+        }
+        // HEIC/HEIF: bytes 4..7 = "ftyp", bytes 8..11 brand
+        if bytes[4] == 0x66, bytes[5] == 0x74, bytes[6] == 0x79, bytes[7] == 0x70 {
+            let brand = String(bytes: bytes[8..<12], encoding: .ascii) ?? ""
+            if brand.hasPrefix("heic") || brand.hasPrefix("heix") || brand.hasPrefix("hevc") ||
+               brand.hasPrefix("mif1") || brand.hasPrefix("msf1") || brand.hasPrefix("heim") || brand.hasPrefix("heis") {
+                return "image/heic"
+            }
+        }
+        return "image/jpeg"
+    }
 }
 
 @Observable
@@ -126,15 +235,16 @@ final class GeminiService {
         return text
     }
 
-    func generateJSONWithImage<T: Decodable & Sendable>(prompt: String, imageData: Data, mimeType: String = "image/jpeg", systemPrompt: String? = nil, type: T.Type) async throws -> T {
+    func generateJSONWithImage<T: Decodable & Sendable>(prompt: String, imageData: Data, mimeType: String? = nil, systemPrompt: String? = nil, type: T.Type) async throws -> T {
         guard !apiKey.isEmpty else { throw GeminiError.missingAPIKey }
 
         let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(apiKey)"
         guard let url = URL(string: urlString) else { throw GeminiError.invalidURL }
 
+        let detectedMime = mimeType ?? ImageMIMEDetector.detect(imageData)
         let base64Image = imageData.base64EncodedString()
         let contents = [GeminiContent(parts: [
-            GeminiPart(mimeType: mimeType, data: base64Image),
+            GeminiPart(mimeType: detectedMime, data: base64Image),
             GeminiPart(text: prompt)
         ], role: "user")]
         let config = GeminiGenerationConfig(temperature: 0.4, maxOutputTokens: 4096, responseMimeType: "application/json")
@@ -157,15 +267,19 @@ final class GeminiService {
 
         let geminiResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)
 
-        guard let jsonText = geminiResponse.candidates?.first?.content?.parts.first?.text else {
+        let jsonText = (geminiResponse.candidates?.first?.content?.parts ?? [])
+            .compactMap { $0.text }
+            .joined()
+
+        guard !jsonText.isEmpty else {
             throw GeminiError.noContent
         }
 
-        guard let jsonData = jsonText.data(using: String.Encoding.utf8) else {
-            throw GeminiError.decodingError("Could not convert response to data")
+        do {
+            return try GeminiJSONParser.decode(T.self, from: jsonText)
+        } catch {
+            throw GeminiError.decodingError("Could not parse AI response")
         }
-
-        return try JSONDecoder().decode(T.self, from: jsonData)
     }
 
     func generateJSON<T: Decodable & Sendable>(prompt: String, systemPrompt: String? = nil, type: T.Type) async throws -> T {
@@ -195,14 +309,18 @@ final class GeminiService {
 
         let geminiResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)
 
-        guard let jsonText = geminiResponse.candidates?.first?.content?.parts.first?.text else {
+        let jsonText = (geminiResponse.candidates?.first?.content?.parts ?? [])
+            .compactMap { $0.text }
+            .joined()
+
+        guard !jsonText.isEmpty else {
             throw GeminiError.noContent
         }
 
-        guard let jsonData = jsonText.data(using: String.Encoding.utf8) else {
-            throw GeminiError.decodingError("Could not convert response to data")
+        do {
+            return try GeminiJSONParser.decode(T.self, from: jsonText)
+        } catch {
+            throw GeminiError.decodingError("Could not parse AI response")
         }
-
-        return try JSONDecoder().decode(T.self, from: jsonData)
     }
 }

@@ -1,14 +1,35 @@
-# Add how-to descriptions for every functional fitness movement
+# Make Gemini AI Describe & Scan Meal more reliable
 
-**The problem**
-In Functional Fitness, you can see the list of movements in each workout, but tapping them does nothing and many moves (Sit-Up, Mountain Climber, Jumping Jack, Russian Twist, Broad Jump, Skater Hop, Hanging Knee Raise, Hanging Leg Raise, Dumbbell Snatch, Jump Squat, March in Place, Jumping Lunge, Plank Up-Down, Sled Drag, Lateral Shuffle, Jumping Rope, etc.) have no written guide behind them.
+Targeted fix to the existing Gemini flow only. No changes to USDA search, barcode, manual entry, or meal logging.
 
-**What will change**
+**What will improve**
 
-- **Every functional movement becomes tappable.** In both the Functional Fitness browser (inside each expanded workout) and the Today's Workout / Workout Detail screen, tapping a movement opens the same clean "Exercise Guide" sheet already used elsewhere in the app. It shows: what the movement is, step-by-step how to do it, form tips, and alternatives.
-- **Visual cue.** A small info chevron is added to each movement row so it's obvious they're tappable.
-- **Fill in the missing guides.** The shared movement library will be expanded so every single movement used in the Functional Fitness library has a dedicated description, including: Sit-Up, Mountain Climber, Jumping Jack, Russian Twist, Broad Jump, Skater Hop, Jump Squat, Jumping Lunge, High Knee Sprint, Plank Jack, Plank Up-Down, Plank Shoulder Tap, Hanging Knee Raise, Hanging Leg Raise, Toes to Bar, Dumbbell Snatch, March in Place, Sled Drag, Lateral Shuffle, Wall Ball, Medicine Ball Slam, Tire Flip, Inch Worm, V-Up, Bicycle Crunch, Superman Hold, Pistol Squat, Handstand Push-Up, Ring Row, Ring Dip, L-Sit Hold, Rope Climb, Battle Ropes, Jumping Rope, Crab Walk.
-- **Feeds the workout generator too.** Since the generator reads the same library, its results will now show correct how-to instructions for every movement instead of falling back to a generic placeholder.
+- AI Describe a meal and Scan Meal photo will succeed far more often, even when the AI response isn't perfectly clean.
+- Clearer on-screen error messages when something genuinely fails, instead of silent failure or a vague message.
+- Photo analysis will correctly handle JPEG, PNG, and HEIC images rather than assuming every image is JPEG.
+- Repeated taps on the Analyze/Estimate button while a request is in flight will no longer fire duplicate requests.
 
-**Result**
-Open any Functional Fitness workout → tap any movement → see exactly what it is, how to do it, tips, and alternatives.
+**Changes under the hood (behavior-level)**
+
+1. **Smarter response reading** — if the AI returns extra text or wraps the JSON in ```json code fences, the app will:
+  - try a direct read first,
+  - then strip code fences and whitespace and try again,
+  - then extract the first `{ ... }` block from the text and try once more,
+  - only show an error if all three attempts fail.
+2. **Correct image type detection** — the app will detect whether the captured/selected photo is PNG, JPEG, or HEIC from the file's signature bytes and tell Gemini the right type. Falls back safely to JPEG if undetectable.
+3. **Clearer errors** on the meal logging screen, mapped from the real cause:
+  - "AI is not configured — missing Gemini API key."
+  - "AI request failed. Check your connection and try again."
+  - "AI response couldn't be read. Please try again."
+  - "AI didn't return any usable food data. Try rewording or retaking the photo."
+  - "Could not analyze this image. Try a clearer, well-lit photo."
+4. **No duplicate requests** — the Estimate / Analyze action is ignored while one is already running.
+5. **Graceful partial results** — if Gemini returns some foods with missing fields, the app fills safe defaults (0) so the user can review and edit before saving. The existing review/confirm step before saving is preserved.
+
+**What stays the same**
+
+- All current screens, buttons, and navigation.
+- USDA search, barcode scanner, manual entry, meal logging.
+- The review-before-save confirmation flow (no auto-save).
+- The daily AI insight and per-meal AI analysis features continue to work as today but also benefit from the smarter response reading.
+
