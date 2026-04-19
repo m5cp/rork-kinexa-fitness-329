@@ -324,7 +324,7 @@ final class NutritionViewModel {
         Food description: \(description)
         """
 
-        let systemPrompt = "You are a nutrition expert. Provide accurate nutritional estimates based on USDA data. Always return valid JSON matching the requested format. All nutritional values should be realistic. For alcoholic drinks, estimate alcohol content in grams."
+        let systemPrompt = "You are a nutrition expert. Provide accurate, realistic nutritional estimates. Always return valid JSON matching the requested format. For alcoholic drinks, estimate alcohol content in grams."
 
         let result = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiFoodEstimate.self)
 
@@ -354,7 +354,7 @@ final class NutritionViewModel {
         Analyze this food photo and estimate the nutritional information for each visible food item. Return a JSON object with a "foods" array. Each food item should have: name (string), quantity (string like "1 cup", "200g"), calories (int), protein (double), carbs (double), fat (double), fiber (double), sugar (double), alcohol (double, grams of alcohol - use 0 for non-alcoholic items). Be realistic with portion sizes based on what you see in the image.
         """
 
-        let systemPrompt = "You are an expert food recognition and nutrition AI. Analyze food photos to identify each item and provide accurate USDA-based nutritional estimates. Estimate portion sizes visually. Always return valid JSON. For drinks that appear alcoholic, estimate alcohol content in grams."
+        let systemPrompt = "You are an expert food recognition and nutrition AI. Analyze food photos to identify each item and provide accurate nutritional estimates. Estimate portion sizes visually. Always return valid JSON. For drinks that appear alcoholic, estimate alcohol content in grams."
 
         let result = try await gemini.generateJSONWithImage(
             prompt: prompt,

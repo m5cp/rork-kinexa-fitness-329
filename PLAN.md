@@ -1,35 +1,35 @@
-# Make Gemini AI Describe & Scan Meal more reliable
+# Strengthen AI nutrition verification and remove all USDA branding
 
-Targeted fix to the existing Gemini flow only. No changes to USDA search, barcode, manual entry, or meal logging.
+The AI meal flow already quietly cross-checks Gemini estimates against the nutrition database behind the scenes. This plan tightens that verification and strips every visible mention of "USDA" so the app no longer implies any affiliation.
 
-**What will improve**
+**How the AI flow will behave**
 
-- AI Describe a meal and Scan Meal photo will succeed far more often, even when the AI response isn't perfectly clean.
-- Clearer on-screen error messages when something genuinely fails, instead of silent failure or a vague message.
-- Photo analysis will correctly handle JPEG, PNG, and HEIC images rather than assuming every image is JPEG.
-- Repeated taps on the Analyze/Estimate button while a request is in flight will no longer fire duplicate requests.
+- When you Describe a meal with AI or Scan a meal photo, the AI identifies the items and produces a first estimate.
+- The app then silently looks up each item in the nutrition database and, when a confident match is found, replaces the macros with the more accurate values.
+- If a lookup is slow, missing, or returns nothing usable, the AI estimate is kept so you always see a result.
+- One bad lookup never blocks the rest — each item is verified independently.
+- The review screen looks exactly the same for every item (no source labels, badges, or technical details). You can still edit any value before saving.
 
-**Changes under the hood (behavior-level)**
+**Reliability improvements**
 
-1. **Smarter response reading** — if the AI returns extra text or wraps the JSON in ```json code fences, the app will:
-  - try a direct read first,
-  - then strip code fences and whitespace and try again,
-  - then extract the first `{ ... }` block from the text and try once more,
-  - only show an error if all three attempts fail.
-2. **Correct image type detection** — the app will detect whether the captured/selected photo is PNG, JPEG, or HEIC from the file's signature bytes and tell Gemini the right type. Falls back safely to JPEG if undetectable.
-3. **Clearer errors** on the meal logging screen, mapped from the real cause:
-  - "AI is not configured — missing Gemini API key."
-  - "AI request failed. Check your connection and try again."
-  - "AI response couldn't be read. Please try again."
-  - "AI didn't return any usable food data. Try rewording or retaking the photo."
-  - "Could not analyze this image. Try a clearer, well-lit photo."
-4. **No duplicate requests** — the Estimate / Analyze action is ignored while one is already running.
-5. **Graceful partial results** — if Gemini returns some foods with missing fields, the app fills safe defaults (0) so the user can review and edit before saving. The existing review/confirm step before saving is preserved.
+- Verification has a short time limit per item so the confirm screen never stalls.
+- Duplicate taps while verifying are ignored.
+- If the network is down, the flow falls back cleanly to the AI estimate.
+- Existing manual entry, barcode scanning, food search, favorites, and meal logging stay exactly as they are.
+
+**Removing USDA references across the app**
+
+- Remove the "Food Data Source" screen in Profile that credits USDA.
+- Remove the "Food Data Source" row from the Profile settings list.
+- Rename the in-app food search from anything USDA-flavored to a neutral "Food Search" / "Nutrition Database" everywhere it appears.
+- Replace the "Verified nutrition database" empty-state copy with neutral wording (e.g. "Search our nutrition database").
+- Remove the USDA mention from the Privacy / Legal screen's third-party services section.
+- Remove USDA wording from internal AI prompts so Gemini is no longer told to base estimates on USDA data.
+- Keep the underlying lookup service working — only the user-visible branding changes.
 
 **What stays the same**
 
-- All current screens, buttons, and navigation.
-- USDA search, barcode scanner, manual entry, meal logging.
-- The review-before-save confirmation flow (no auto-save).
-- The daily AI insight and per-meal AI analysis features continue to work as today but also benefit from the smarter response reading.
+- Save flow, confirmation screen, and editing behavior are unchanged.
+- Daily AI scan limits, token store, and subscription gating are untouched.
+- Barcode scanning via Open Food Facts is unchanged.
 

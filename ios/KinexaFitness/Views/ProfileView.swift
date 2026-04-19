@@ -46,7 +46,6 @@ struct ProfileView: View {
                     notificationsSection
                     appControlsSection
                     supportSection
-                    referencesSection
                     legalSection
                     footer
                 }
@@ -657,19 +656,6 @@ struct ProfileView: View {
         }
         .sheet(isPresented: $showSupportSheet) {
             SupportSheet()
-        }
-    }
-
-    // MARK: - References
-
-    private var referencesSection: some View {
-        settingsSection(title: "REFERENCES", icon: "text.book.closed") {
-            NavigationLink {
-                FoodDataSourceView()
-            } label: {
-                settingsRow(icon: "fork.knife", title: "Food Data Source", color: KinexaTheme.accent, showChevron: true)
-            }
-            .accessibilityHint("View the nutrition data source credit")
         }
     }
 
