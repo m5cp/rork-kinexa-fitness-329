@@ -1,35 +1,43 @@
-# Strengthen AI nutrition verification and remove all USDA branding
+# Calmer meal search + clearer AI meal entry screens
 
-The AI meal flow already quietly cross-checks Gemini estimates against the nutrition database behind the scenes. This plan tightens that verification and strips every visible mention of "USDA" so the app no longer implies any affiliation.
+## Food Search (USDA)
 
-**How the AI flow will behave**
+- Don't start searching until you've typed at least **3 characters**
+- Slower, calmer debounce (~600ms) so it doesn't fire on every keystroke
+- Show only **~8 results** instead of a long list
+- Rank results so clean, generic foods appear above noisy branded items (branded items still show when clearly relevant)
+- Cancel stale searches when the query changes — no flicker or overlap
+- Cleaner empty / loading / no-match states:
+  - "Start typing to search meals"
+  - "Searching meals…"
+  - "No matches found"
 
-- When you Describe a meal with AI or Scan a meal photo, the AI identifies the items and produces a first estimate.
-- The app then silently looks up each item in the nutrition database and, when a confident match is found, replaces the macros with the more accurate values.
-- If a lookup is slow, missing, or returns nothing usable, the AI estimate is kept so you always see a result.
-- One bad lookup never blocks the rest — each item is verified independently.
-- The review screen looks exactly the same for every item (no source labels, badges, or technical details). You can still edit any value before saving.
+## AI Describe Screen
 
-**Reliability improvements**
+- Bigger, more obvious meal description box with a friendlier placeholder
+- Helper text: *"Describe your meal in plain language and I'll estimate the calories and macros."*
+- Clear primary button "Estimate with AI" — disabled when the box is empty
+- Loading state while estimating; friendly error if it fails
+- Prevent duplicate requests from repeat taps
+- Subtle "2 of 5 AI scans used today" indicator stays visible
 
-- Verification has a short time limit per item so the confirm screen never stalls.
-- Duplicate taps while verifying are ignored.
-- If the network is down, the flow falls back cleanly to the AI estimate.
-- Existing manual entry, barcode scanning, food search, favorites, and meal logging stay exactly as they are.
+## Scan Meal Screen
 
-**Removing USDA references across the app**
+- Two clearly separated options: **Take Photo** and **Choose from Gallery**
+- Short explainer: AI identifies the items and estimates nutrition
+- Loading state during analysis; friendly error if the image can't be read
+- Subtle daily scan usage indicator
 
-- Remove the "Food Data Source" screen in Profile that credits USDA.
-- Remove the "Food Data Source" row from the Profile settings list.
-- Rename the in-app food search from anything USDA-flavored to a neutral "Food Search" / "Nutrition Database" everywhere it appears.
-- Replace the "Verified nutrition database" empty-state copy with neutral wording (e.g. "Search our nutrition database").
-- Remove the USDA mention from the Privacy / Legal screen's third-party services section.
-- Remove USDA wording from internal AI prompts so Gemini is no longer told to base estimates on USDA data.
-- Keep the underlying lookup service working — only the user-visible branding changes.
+## Confirmation / Save
 
-**What stays the same**
+- Always land on a clean review screen after AI returns
+- Edit values before saving
+- Save button only active when there's usable data
+- No blank success screens or broken-looking empty states
 
-- Save flow, confirmation screen, and editing behavior are unchanged.
-- Daily AI scan limits, token store, and subscription gating are untouched.
-- Barcode scanning via Open Food Facts is unchanged.
+## What stays the same
+
+- USDA search remains
+- Meal logging, saving, barcode, manual entry, favorites all unchanged
+- Overall visual style and navigation unchanged
 

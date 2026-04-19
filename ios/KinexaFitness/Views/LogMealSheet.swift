@@ -526,56 +526,82 @@ struct LogMealSheet: View {
             if AIUsageTracker.shared.hasReachedLimit {
                 foodScanLimitBanner
             } else {
-                HStack(spacing: 12) {
-                    Button {
-                        showCamera = true
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "camera.fill")
-                                .font(.subheadline.weight(.bold))
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Scan a meal")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("AI identifies the items on your plate and estimates the nutrition for you.")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Button {
+                    guard !isEstimating else { return }
+                    showCamera = true
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "camera.fill")
+                            .font(.subheadline.weight(.bold))
+                        VStack(alignment: .leading, spacing: 1) {
                             Text("Take Photo")
                                 .font(.subheadline.weight(.bold))
+                            Text("Use the camera")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.8))
                         }
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: "#22C55E"), Color(hex: "#16A34A")],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .clipShape(.rect(cornerRadius: 14))
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.white.opacity(0.8))
                     }
-                    .buttonStyle(PressScaleButtonStyle())
-
-                    PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "photo.on.rectangle")
-                                .font(.subheadline.weight(.bold))
-                            Text("Gallery")
-                                .font(.subheadline.weight(.bold))
-                        }
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#22C55E"), Color(hex: "#16A34A")],
+                            startPoint: .leading,
+                            endPoint: .trailing
                         )
-                        .clipShape(.rect(cornerRadius: 14))
-                    }
-                    .buttonStyle(PressScaleButtonStyle())
+                    )
+                    .clipShape(.rect(cornerRadius: 14))
                 }
+                .buttonStyle(PressScaleButtonStyle())
+                .disabled(isEstimating)
 
-                Text("AI identifies every item and estimates nutrition automatically")
-                    .font(.system(size: 10))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-                    .multilineTextAlignment(.center)
+                PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "photo.on.rectangle")
+                            .font(.subheadline.weight(.bold))
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("Choose from Gallery")
+                                .font(.subheadline.weight(.bold))
+                            Text("Pick a recent photo")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.8))
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(.rect(cornerRadius: 14))
+                }
+                .buttonStyle(PressScaleButtonStyle())
+                .disabled(isEstimating)
 
                 Text(scanUsageCaption)
                     .font(.system(size: 10, weight: .semibold))
@@ -649,30 +675,51 @@ struct LogMealSheet: View {
             if AIUsageTracker.shared.hasReachedLimit {
                 foodScanLimitBanner
             } else {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Describe your meal")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("Describe your meal in plain language and I\u{2019}ll estimate the calories and macros.")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
                 TextField("e.g. grilled chicken breast with rice and steamed broccoli", text: $foodDescription, axis: .vertical)
                     .font(.subheadline)
                     .foregroundStyle(KinexaTheme.primaryText)
-                    .lineLimit(3...6)
-                    .padding(14)
+                    .lineLimit(4...8)
+                    .padding(16)
+                    .frame(minHeight: 120, alignment: .topLeading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .background(KinexaTheme.cardSoft)
                     .clipShape(.rect(cornerRadius: 14))
                     .overlay {
                         RoundedRectangle(cornerRadius: 14)
-                            .stroke(KinexaTheme.border)
+                            .stroke(Color(hex: "#6366F1").opacity(0.35), lineWidth: 1.5)
                     }
+                    .disabled(isEstimating)
 
+                let isEmpty = foodDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 Button {
+                    guard !isEstimating, !isEmpty else { return }
                     Task { await estimateFromText() }
                 } label: {
                     HStack(spacing: 8) {
-                        Image(systemName: "sparkles")
-                            .font(.subheadline.weight(.bold))
-                        Text(hasEstimated ? "Re-estimate" : "Estimate with AI")
-                            .font(.subheadline.weight(.bold))
+                        if isEstimating {
+                            ProgressView().tint(.white)
+                            Text("Estimating\u{2026}")
+                                .font(.subheadline.weight(.bold))
+                        } else {
+                            Image(systemName: "sparkles")
+                                .font(.subheadline.weight(.bold))
+                            Text(hasEstimated ? "Re-estimate with AI" : "Estimate with AI")
+                                .font(.subheadline.weight(.bold))
+                        }
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 48)
+                    .frame(height: 52)
                     .background(
                         LinearGradient(
                             colors: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
@@ -681,16 +728,10 @@ struct LogMealSheet: View {
                         )
                     )
                     .clipShape(.rect(cornerRadius: 14))
-                    .opacity(foodDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1)
+                    .opacity((isEmpty || isEstimating) ? 0.5 : 1)
                 }
                 .buttonStyle(PressScaleButtonStyle())
-                .disabled(foodDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isEstimating)
-
-                Text("AI will estimate calories and macros from your description")
-                    .font(.system(size: 10))
-                    .foregroundStyle(KinexaTheme.tertiaryText)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
+                .disabled(isEmpty || isEstimating)
 
                 Text(scanUsageCaption)
                     .font(.system(size: 10, weight: .semibold))
@@ -721,7 +762,7 @@ struct LogMealSheet: View {
                 Image(systemName: "magnifyingglass")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(Color(hex: "#0EA5E9"))
-                TextField("Search foods (e.g. banana, greek yogurt)", text: $usdaQuery)
+                TextField("Search meals (e.g. banana, greek yogurt)", text: $usdaQuery)
                     .font(.subheadline)
                     .foregroundStyle(KinexaTheme.primaryText)
                     .autocorrectionDisabled()
@@ -746,30 +787,46 @@ struct LogMealSheet: View {
             }
             .onChange(of: usdaQuery) { _, newValue in
                 usdaSearchTask?.cancel()
-                guard newValue.trimmingCharacters(in: .whitespaces).count >= 2 else {
+                let trimmed = newValue.trimmingCharacters(in: .whitespaces)
+                guard trimmed.count >= 3 else {
                     usdaResults = []
+                    usdaSearching = false
                     return
                 }
                 usdaSearchTask = Task {
-                    try? await Task.sleep(for: .milliseconds(350))
+                    try? await Task.sleep(for: .milliseconds(600))
                     if Task.isCancelled { return }
-                    await performUSDASearch(newValue)
+                    await performUSDASearch(trimmed)
                 }
             }
 
             if usdaSearching {
                 HStack(spacing: 8) {
                     ProgressView().tint(Color(hex: "#0EA5E9"))
-                    Text("Searching foods...")
+                    Text("Searching meals\u{2026}")
                         .font(.caption)
                         .foregroundStyle(KinexaTheme.tertiaryText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
+            } else if !usdaQuery.isEmpty && usdaQuery.trimmingCharacters(in: .whitespaces).count < 3 {
+                VStack(spacing: 6) {
+                    Image(systemName: "character.cursor.ibeam")
+                        .font(.system(size: 28))
+                        .foregroundStyle(Color(hex: "#0EA5E9").opacity(0.5))
+                    Text("Keep typing\u{2026}")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(KinexaTheme.secondaryText)
+                    Text("Type at least 3 letters to search meals.")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 18)
             } else if usdaResults.isEmpty && !usdaQuery.isEmpty {
-                Text("No results. Try a different search term.")
-                    .font(.caption)
-                    .foregroundStyle(KinexaTheme.tertiaryText)
+                Text("No matches found")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(KinexaTheme.secondaryText)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
             } else if usdaResults.isEmpty {
@@ -777,10 +834,10 @@ struct LogMealSheet: View {
                     Image(systemName: "fork.knife.circle")
                         .font(.system(size: 36))
                         .foregroundStyle(Color(hex: "#0EA5E9").opacity(0.5))
-                    Text("Nutrition Database")
+                    Text("Start typing to search meals")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(KinexaTheme.secondaryText)
-                    Text("Search thousands of foods with accurate macros — no AI estimates.")
+                    Text("Search thousands of foods with accurate macros.")
                         .font(.caption)
                         .foregroundStyle(KinexaTheme.tertiaryText)
                         .multilineTextAlignment(.center)
@@ -853,22 +910,25 @@ struct LogMealSheet: View {
     }
 
     private func runUSDASearch() {
+        let trimmed = usdaQuery.trimmingCharacters(in: .whitespaces)
+        guard trimmed.count >= 3 else { return }
         usdaSearchTask?.cancel()
-        usdaSearchTask = Task { await performUSDASearch(usdaQuery) }
+        usdaSearchTask = Task { await performUSDASearch(trimmed) }
     }
 
     private func performUSDASearch(_ query: String) async {
         usdaSearching = true
-        defer { usdaSearching = false }
         do {
-            let results = try await USDAFoodService.shared.search(query: query)
+            let results = try await USDAFoodService.shared.search(query: query, limit: 8)
             if !Task.isCancelled {
                 usdaResults = results
+                usdaSearching = false
             }
         } catch {
             if !Task.isCancelled {
                 usdaResults = []
-                errorMessage = "Could not search food database. Check your connection."
+                usdaSearching = false
+                errorMessage = "Could not search meals. Check your connection."
             }
         }
     }

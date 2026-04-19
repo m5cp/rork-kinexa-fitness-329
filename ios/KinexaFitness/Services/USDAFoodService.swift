@@ -81,7 +81,7 @@ nonisolated final class USDAFoodService: Sendable {
         !Config.EXPO_PUBLIC_USDA_API_KEY.isEmpty
     }
 
-    func search(query: String, pageSize: Int = 25) async throws -> [USDAFood] {
+    func search(query: String, pageSize: Int = 25, limit: Int = 8) async throws -> [USDAFood] {
         let apiKey = Config.EXPO_PUBLIC_USDA_API_KEY
         guard !apiKey.isEmpty else { throw USDAError.missingAPIKey }
 
@@ -93,7 +93,7 @@ nonisolated final class USDAFoodService: Sendable {
             URLQueryItem(name: "api_key", value: apiKey),
             URLQueryItem(name: "query", value: trimmed),
             URLQueryItem(name: "pageSize", value: "\(pageSize)"),
-            URLQueryItem(name: "dataType", value: "Branded,SR Legacy,Survey (FNDDS),Foundation")
+            URLQueryItem(name: "dataType", value: "Foundation,SR Legacy,Survey (FNDDS),Branded")
         ]
 
         guard let url = components?.url else { throw USDAError.invalidURL }
@@ -112,7 +112,39 @@ nonisolated final class USDAFoodService: Sendable {
         }
 
         let decoded = try JSONDecoder().decode(USDASearchResponse.self, from: data)
-        return decoded.foods ?? []
+        let foods = decoded.foods ?? []
+        return Self.rankAndTrim(foods, query: trimmed, limit: limit)
+    }
+
+    private static func rankAndTrim(_ foods: [USDAFood], query: String, limit: Int) -> [USDAFood] {
+        let q = query.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        let qTokens = q.split(separator: " ").map(String.init)
+        let isSimpleQuery = qTokens.count <= 2 && q.count <= 20
+
+        func score(_ food: USDAFood) -> Int {
+            let desc = food.description.lowercased()
+            let brand = (food.brandName ?? food.brandOwner ?? "").lowercased()
+            let isBranded = (food.dataType ?? "").lowercased().contains("branded") || !brand.isEmpty
+            var s = 0
+            if desc == q { s += 1000 }
+            if desc.hasPrefix(q) { s += 500 }
+            if desc.contains(q) { s += 200 }
+            let matched = qTokens.filter { desc.contains($0) }.count
+            s += matched * 80
+            // Prefer generic foods on simple queries
+            if isSimpleQuery && !isBranded { s += 300 }
+            if isSimpleQuery && isBranded { s -= 150 }
+            // Penalize very long branded descriptions (noisy)
+            if isBranded && desc.count > 60 { s -= 50 }
+            // Prefer items with real nutrition data
+            if food.calories > 0 { s += 40 }
+            // Short, clean names score higher
+            s -= min(desc.count / 20, 10)
+            return s
+        }
+
+        let sorted = foods.sorted { score($0) > score($1) }
+        return Array(sorted.prefix(limit))
     }
 
     // MARK: - Silent verification for AI logs
