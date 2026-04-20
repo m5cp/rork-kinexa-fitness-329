@@ -321,6 +321,25 @@ final class AppViewModel {
         )
         showRecap(PerformanceHighlightsService.workoutRecap(title: workout.title, exerciseCount: workout.exercises.count))
         persistAll()
+        saveWorkoutToHealthIfEnabled(title: workout.title, exercises: workout.exercises)
+    }
+
+    private func saveWorkoutToHealthIfEnabled(title: String, exercises: [WorkoutExercise]) {
+        guard UserDefaults.standard.bool(forKey: "healthSyncEnabled") else { return }
+        let totalSeconds = exercises.reduce(0) { sum, ex in
+            let perSet = ex.durationSeconds > 0 ? ex.durationSeconds : 45
+            return sum + max(1, ex.sets) * perSet
+        }
+        let duration = max(300, totalSeconds)
+        let estimatedKcal = Double(duration) / 60.0 * 6.0
+        Task {
+            await HealthKitService.shared.saveWorkout(
+                title: title,
+                start: Date().addingTimeInterval(-TimeInterval(duration)),
+                durationSeconds: duration,
+                estimatedKcal: estimatedKcal
+            )
+        }
     }
 
     func reorderPTDays(from source: IndexSet, to destination: Int) {

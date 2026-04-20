@@ -417,9 +417,12 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Take photos of food to log nutrition, scan barcodes for product lookup, and scan QR codes to import workout plans.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Kinexa Fitness reads your steps, active energy, and workouts so your daily activity stats match the Health app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Kinexa Fitness saves your completed workouts to the Health app so they count toward your activity rings and workout history.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Track distance and pace during outdoor activities like running, biking, and hiking.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Track your daily steps and activity.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose a profile photo, save share cards, or select food photos for nutrition tracking.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -457,9 +460,12 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Take photos of food to log nutrition, scan barcodes for product lookup, and scan QR codes to import workout plans.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Kinexa Fitness reads your steps, active energy, and workouts so your daily activity stats match the Health app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Kinexa Fitness saves your completed workouts to the Health app so they count toward your activity rings and workout history.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Track distance and pace during outdoor activities like running, biking, and hiking.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Track your daily steps and activity.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose a profile photo, save share cards, or select food photos for nutrition tracking.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

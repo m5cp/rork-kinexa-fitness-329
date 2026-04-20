@@ -588,10 +588,16 @@ struct ProfileView: View {
     // MARK: - App Controls
 
     @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
+    @AppStorage("healthSyncEnabled") private var healthSyncEnabled = false
+    @State private var healthToggleTrigger = false
 
     private var appControlsSection: some View {
         settingsSection(title: "APP", icon: "gearshape") {
             appearanceRow
+
+            sectionDivider
+
+            healthSyncRow
 
             sectionDivider
 
@@ -611,6 +617,47 @@ struct ProfileView: View {
             }
             .sensoryFeedback(.warning, trigger: resetAllTrigger)
 
+        }
+    }
+
+    private var healthSyncRow: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color(hex: "#EF4444").opacity(0.15))
+                    .frame(width: 30, height: 30)
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color(hex: "#EF4444"))
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Sync with Apple Health")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(KinexaTheme.primaryText)
+                Text("Save completed workouts to Health")
+                    .font(.caption2)
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+
+            Spacer()
+
+            Toggle("", isOn: $healthSyncEnabled)
+                .labelsHidden()
+                .tint(KinexaTheme.accent)
+        }
+        .frame(minHeight: 44)
+        .sensoryFeedback(.selection, trigger: healthToggleTrigger)
+        .onChange(of: healthSyncEnabled) { _, newValue in
+            healthToggleTrigger.toggle()
+            if newValue {
+                Task {
+                    let granted = await HealthKitService.shared.requestAuthorization()
+                    if !granted {
+                        healthSyncEnabled = false
+                    }
+                }
+            }
         }
     }
 

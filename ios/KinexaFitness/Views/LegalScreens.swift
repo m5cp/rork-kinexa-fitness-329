@@ -296,10 +296,10 @@ enum LegalPages {
 }
 
 enum LegalContent {
-    static let privacyPolicy = ""
-    static let termsOfUse = ""
-    static let disclaimer = ""
-    static let accessibilityStatement = ""
-    static let risks = ""
-    static let eula = ""
+    static let privacyPolicy = "See the Privacy Policy page for full details."
+    static let termsOfUse = "See the Terms of Use page for full details."
+    static let disclaimer = "See the Disclaimer page for full details."
+    static let accessibilityStatement = "See the Accessibility page for full details."
+    static let risks = "See the Risks page for full details."
+    static let eula = "See the EULA page for full details."
 }
