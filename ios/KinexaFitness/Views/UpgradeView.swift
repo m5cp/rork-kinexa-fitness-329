@@ -420,9 +420,9 @@ struct UpgradeView: View {
                 }
             }
 
-            Text("Payment will be charged to your Apple ID account at confirmation of purchase. Subscriptions automatically renew unless cancelled at least 24 hours before the end of the current period. Manage subscriptions in Settings > Apple ID > Subscriptions.")
-                .font(.system(size: 9))
-                .foregroundStyle(KinexaTheme.tertiaryText.opacity(0.6))
+            Text("Payment will be charged to your Apple ID account at confirmation of purchase. Subscriptions automatically renew at the same price and billing period unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. Manage or cancel your subscription in Settings > Apple ID > Subscriptions.")
+                .font(.caption2)
+                .foregroundStyle(KinexaTheme.secondaryText)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 16)
         }
