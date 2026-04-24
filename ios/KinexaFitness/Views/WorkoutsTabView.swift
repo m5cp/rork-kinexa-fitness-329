@@ -225,13 +225,13 @@ struct WorkoutsTabView: View {
                 }
 
                 smallPlanCard(
-                    title: "Import PDF",
-                    subtitle: "Upload your own workout",
-                    icon: "doc.text.fill",
+                    title: "Log Workout",
+                    subtitle: "Record what you did",
+                    icon: "pencil.and.list.clipboard",
                     color: Color(hex: "#0EA5E9")
                 ) {
                     toolTapTrigger.toggle()
-                    showPDFUploadSheet = true
+                    showLogStrengthSheet = true
                 }
             }
         }

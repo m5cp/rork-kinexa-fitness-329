@@ -90,7 +90,7 @@ struct RingGoalsSheet: View {
         case .fitness: return "Close by hitting your step goal or logging a workout"
         case .meals: return "Close by logging this many meals today"
         case .water: return "Close by hitting your daily water goal"
-        case .mood: return "One quick mood check-in per day"
+        case .mood: return "Close by logging your hours of sleep"
         }
     }
 
@@ -104,14 +104,30 @@ struct RingGoalsSheet: View {
         case .water:
             waterGoalControls
         case .mood:
-            VStack(alignment: .leading, spacing: 6) {
-                Text("1 check-in / day")
-                    .font(.title3.weight(.heavy))
+            sleepGoalControls
+        }
+    }
+
+    private var sleepGoalControls: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text("\(ringsVM.goals.sleepHours)")
+                    .font(.system(size: 28, weight: .heavy, design: .rounded))
                     .foregroundStyle(KinexaTheme.primaryText)
-                Text("The Reflect ring closes with a single mood log each day.")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(KinexaTheme.secondaryText)
+                    .contentTransition(.numericText())
+                Text("hrs to close ring")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+                Spacer()
+                Stepper("", value: Binding(
+                    get: { ringsVM.goals.sleepHours },
+                    set: { ringsVM.updateSleepGoal($0) }
+                ), in: RingGoals.sleepRange)
+                .labelsHidden()
             }
+            Text("Range: \(RingGoals.sleepRange.lowerBound)–\(RingGoals.sleepRange.upperBound) hours")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(KinexaTheme.tertiaryText)
         }
     }
 

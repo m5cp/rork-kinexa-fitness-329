@@ -45,8 +45,8 @@ struct RingDayDetailSheet: View {
         nutritionVM.waterForDate(date)
     }
 
-    private var dayMood: MoodEntry? {
-        ringsVM.moodForDate(date)
+    private var daySleep: SleepEntry? {
+        ringsVM.sleepForDate(date)
     }
 
     var body: some View {
@@ -60,7 +60,7 @@ struct RingDayDetailSheet: View {
                     if !dayMeals.isEmpty {
                         mealsSection
                     }
-                    moodSection
+                    sleepSection
                     waterSection
                     pointsCard
                 }
@@ -233,33 +233,28 @@ struct RingDayDetailSheet: View {
         .clipShape(.rect(cornerRadius: 10))
     }
 
-    // MARK: - Mood
+    // MARK: - Sleep
 
-    private var moodSection: some View {
-        sectionCard(title: "Mood", icon: "face.smiling.fill", color: RingType.mood.color) {
-            if let mood = dayMood {
+    private var sleepSection: some View {
+        sectionCard(title: "Rest", icon: "moon.fill", color: RingType.mood.color) {
+            if let sleep = daySleep {
                 HStack(spacing: 14) {
-                    Text(mood.level.emoji)
-                        .font(.system(size: 40))
+                    Text(sleep.hours >= 8 ? "8+" : "\(sleep.hours)")
+                        .font(.system(size: 40, weight: .heavy, design: .rounded))
+                        .foregroundStyle(RingType.mood.color)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(mood.level.label)
+                        Text("\(sleep.hours >= 8 ? "8+" : "\(sleep.hours)") hours of sleep")
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(KinexaTheme.primaryText)
-                        if !mood.note.isEmpty {
-                            Text(mood.note)
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(KinexaTheme.secondaryText)
-                                .lineLimit(3)
-                        } else {
-                            Text("No note")
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(KinexaTheme.tertiaryText)
-                        }
+                        let closed = sleep.hours >= ringsVM.goals.sleepHours
+                        Text(closed ? "Goal met · \(ringsVM.goals.sleepHours)+ hrs" : "\(ringsVM.goals.sleepHours - sleep.hours) hrs short of goal")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(closed ? KinexaTheme.success : KinexaTheme.secondaryText)
                     }
                     Spacer(minLength: 0)
                 }
             } else {
-                Text("No mood check-in logged.")
+                Text("No sleep logged.")
                     .font(.caption.weight(.medium))
                     .foregroundStyle(KinexaTheme.tertiaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)

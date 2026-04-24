@@ -4,7 +4,7 @@ import SwiftUI
 
 @Observable
 final class ReflectionRingsViewModel {
-    var moodEntries: [MoodEntry] = []
+    var sleepEntries: [SleepEntry] = []
     var snapshots: [DailyRingsSnapshot] = []
     var friends: [Friend] = []
     var username: String = ""
@@ -27,19 +27,19 @@ final class ReflectionRingsViewModel {
         }
     }
 
-    // MARK: - Mood
+    // MARK: - Sleep
 
-    func moodForDate(_ date: Date) -> MoodEntry? {
+    func sleepForDate(_ date: Date) -> SleepEntry? {
         let cal = Calendar.current
-        return moodEntries.first { cal.isDate($0.date, inSameDayAs: date) }
+        return sleepEntries.first { cal.isDate($0.date, inSameDayAs: date) }
     }
 
-    var todayMood: MoodEntry? { moodForDate(.now) }
+    var todaySleep: SleepEntry? { sleepForDate(.now) }
 
-    func logMood(_ level: MoodLevel, note: String = "") {
+    func logSleep(hours: Int) {
         let cal = Calendar.current
-        moodEntries.removeAll { cal.isDate($0.date, inSameDayAs: .now) }
-        moodEntries.insert(MoodEntry(level: level, note: note), at: 0)
+        sleepEntries.removeAll { cal.isDate($0.date, inSameDayAs: .now) }
+        sleepEntries.insert(SleepEntry(hours: hours), at: 0)
         persist()
     }
 
@@ -55,6 +55,11 @@ final class ReflectionRingsViewModel {
 
     func updateMealsGoal(_ value: Int) {
         goals.meals = min(max(value, RingGoals.mealsRange.lowerBound), RingGoals.mealsRange.upperBound)
+        persist()
+    }
+
+    func updateSleepGoal(_ value: Int) {
+        goals.sleepHours = min(max(value, RingGoals.sleepRange.lowerBound), RingGoals.sleepRange.upperBound)
         persist()
     }
 
@@ -92,7 +97,7 @@ final class ReflectionRingsViewModel {
         }
 
         // Mood
-        if moodForDate(date) != nil {
+        if let entry = sleepForDate(date), entry.hours >= goals.sleepHours {
             rings.insert(.mood)
         }
 
@@ -116,7 +121,8 @@ final class ReflectionRingsViewModel {
             let count = nutritionVM.mealsForDate(date).count
             return min(Double(count) / Double(mealsGoal), 1.0)
         case .mood:
-            return moodForDate(date) != nil ? 1 : 0
+            guard let entry = sleepForDate(date) else { return 0 }
+            return min(Double(entry.hours) / Double(max(1, goals.sleepHours)), 1.0)
         case .water:
             guard nutritionVM.waterGoal.dailyOunces > 0 else { return 0 }
             return min(nutritionVM.waterForDate(date) / nutritionVM.waterGoal.dailyOunces, 1.0)
@@ -211,7 +217,7 @@ final class ReflectionRingsViewModel {
     // MARK: - Persistence
 
     private func persist() {
-        LocalStore.save(moodEntries, forKey: "reflectionMoodEntries")
+        LocalStore.save(sleepEntries, forKey: "reflectionSleepEntries")
         LocalStore.save(snapshots, forKey: "reflectionSnapshots")
         LocalStore.save(friends, forKey: "reflectionFriends")
         LocalStore.save(goals, forKey: "reflectionRingGoals")
@@ -220,7 +226,7 @@ final class ReflectionRingsViewModel {
     }
 
     private func loadData() {
-        moodEntries = LocalStore.load([MoodEntry].self, forKey: "reflectionMoodEntries", fallback: [])
+        sleepEntries = LocalStore.load([SleepEntry].self, forKey: "reflectionSleepEntries", fallback: [])
         snapshots = LocalStore.load([DailyRingsSnapshot].self, forKey: "reflectionSnapshots", fallback: [])
         friends = LocalStore.load([Friend].self, forKey: "reflectionFriends", fallback: [])
         goals = LocalStore.load(RingGoals.self, forKey: "reflectionRingGoals", fallback: .default)

@@ -123,9 +123,9 @@ struct NutritionGoalSheet: View {
                 .foregroundStyle(KinexaTheme.tertiaryText)
 
             HStack(spacing: 8) {
-                presetButton("Cut", cal: 1800, p: 180, c: 150, f: 60)
+                presetButton("Reduce", cal: 1800, p: 180, c: 150, f: 60)
                 presetButton("Maintain", cal: 2200, p: 150, c: 250, f: 75)
-                presetButton("Bulk", cal: 2800, p: 180, c: 330, f: 85)
+                presetButton("Gain Muscle", cal: 2800, p: 180, c: 330, f: 85)
             }
         }
     }

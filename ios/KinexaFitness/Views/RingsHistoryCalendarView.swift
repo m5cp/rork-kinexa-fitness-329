@@ -23,7 +23,7 @@ struct RingsHistoryCalendarView: View {
         if let d = appVM.cardioSessions.map({ $0.date }).min() { candidates.append(d) }
         if let d = nutritionVM.meals.map({ $0.date }).min() { candidates.append(d) }
         if let d = nutritionVM.waterEntries.map({ $0.date }).min() { candidates.append(d) }
-        if let d = ringsVM.moodEntries.map({ $0.date }).min() { candidates.append(d) }
+        if let d = ringsVM.sleepEntries.map({ $0.date }).min() { candidates.append(d) }
         let earliest = candidates.min() ?? calendar.date(byAdding: .day, value: -30, to: today) ?? today
         return calendar.startOfDay(for: earliest)
     }

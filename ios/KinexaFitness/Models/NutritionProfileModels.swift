@@ -57,6 +57,14 @@ nonisolated enum NutritionGoalType: String, Codable, CaseIterable, Sendable {
     case maintain = "Maintain"
     case bulk = "Bulk"
 
+    var displayLabel: String {
+        switch self {
+        case .cut: return "Reduce"
+        case .maintain: return "Maintain"
+        case .bulk: return "Gain Muscle"
+        }
+    }
+
     var calorieAdjustment: Int {
         switch self {
         case .cut: return -500
@@ -67,9 +75,9 @@ nonisolated enum NutritionGoalType: String, Codable, CaseIterable, Sendable {
 
     var subtitle: String {
         switch self {
-        case .cut: return "Lose fat, preserve muscle"
-        case .maintain: return "Stay at current weight"
-        case .bulk: return "Build muscle, gain strength"
+        case .cut: return "Lose fat, feel lighter"
+        case .maintain: return "Stay strong and steady"
+        case .bulk: return "Build strength and size"
         }
     }
 
@@ -130,6 +138,7 @@ nonisolated struct NutritionProfile: Codable, Sendable {
     var heightCm: Double
     var weightKg: Double
     var activityLevel: ActivityLevel
+    var goalActivityLevel: ActivityLevel
     var goalType: NutritionGoalType
     var heightUnit: HeightUnit
     var weightUnit: WeightUnit
@@ -141,11 +150,50 @@ nonisolated struct NutritionProfile: Codable, Sendable {
         heightCm: 175,
         weightKg: 80,
         activityLevel: .moderatelyActive,
+        goalActivityLevel: .moderatelyActive,
         goalType: .maintain,
         heightUnit: .imperial,
         weightUnit: .lbs,
         isConfigured: false
     )
+
+    init(
+        age: Int,
+        sex: BiologicalSex,
+        heightCm: Double,
+        weightKg: Double,
+        activityLevel: ActivityLevel,
+        goalActivityLevel: ActivityLevel,
+        goalType: NutritionGoalType,
+        heightUnit: HeightUnit,
+        weightUnit: WeightUnit,
+        isConfigured: Bool
+    ) {
+        self.age = age
+        self.sex = sex
+        self.heightCm = heightCm
+        self.weightKg = weightKg
+        self.activityLevel = activityLevel
+        self.goalActivityLevel = goalActivityLevel
+        self.goalType = goalType
+        self.heightUnit = heightUnit
+        self.weightUnit = weightUnit
+        self.isConfigured = isConfigured
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        age = try c.decode(Int.self, forKey: .age)
+        sex = try c.decode(BiologicalSex.self, forKey: .sex)
+        heightCm = try c.decode(Double.self, forKey: .heightCm)
+        weightKg = try c.decode(Double.self, forKey: .weightKg)
+        activityLevel = try c.decode(ActivityLevel.self, forKey: .activityLevel)
+        goalActivityLevel = try c.decodeIfPresent(ActivityLevel.self, forKey: .goalActivityLevel) ?? activityLevel
+        goalType = try c.decode(NutritionGoalType.self, forKey: .goalType)
+        heightUnit = try c.decode(HeightUnit.self, forKey: .heightUnit)
+        weightUnit = try c.decode(WeightUnit.self, forKey: .weightUnit)
+        isConfigured = try c.decode(Bool.self, forKey: .isConfigured)
+    }
 
     var bmr: Double {
         switch sex {

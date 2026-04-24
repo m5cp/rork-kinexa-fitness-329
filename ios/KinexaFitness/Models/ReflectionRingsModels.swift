@@ -13,7 +13,7 @@ nonisolated enum RingType: String, Codable, CaseIterable, Sendable, Identifiable
         switch self {
         case .fitness: return "Move"
         case .meals: return "Nourish"
-        case .mood: return "Reflect"
+        case .mood: return "Rest"
         case .water: return "Hydrate"
         }
     }
@@ -22,7 +22,7 @@ nonisolated enum RingType: String, Codable, CaseIterable, Sendable, Identifiable
         switch self {
         case .fitness: return "figure.run"
         case .meals: return "fork.knife"
-        case .mood: return "face.smiling.fill"
+        case .mood: return "moon.fill"
         case .water: return "drop.fill"
         }
     }
@@ -31,7 +31,7 @@ nonisolated enum RingType: String, Codable, CaseIterable, Sendable, Identifiable
         switch self {
         case .fitness: return "#FF3B30"
         case .meals: return "#FF9500"
-        case .mood: return "#AF52DE"
+        case .mood: return "#5856D6"
         case .water: return "#0A84FF"
         }
     }
@@ -42,7 +42,7 @@ nonisolated enum RingType: String, Codable, CaseIterable, Sendable, Identifiable
         switch self {
         case .fitness: return "A little movement today"
         case .meals: return "Fuel yourself well"
-        case .mood: return "A quiet check-in"
+        case .mood: return "Log your sleep"
         case .water: return "Stay hydrated"
         }
     }
@@ -51,57 +51,19 @@ nonisolated enum RingType: String, Codable, CaseIterable, Sendable, Identifiable
     static let allRingsBonus: Int = 50
 }
 
-nonisolated enum MoodLevel: Int, Codable, CaseIterable, Sendable, Identifiable {
-    case rough = 1
-    case meh = 2
-    case okay = 3
-    case good = 4
-    case great = 5
-
-    var id: Int { rawValue }
-
-    var emoji: String {
-        switch self {
-        case .rough: return "😣"
-        case .meh: return "😕"
-        case .okay: return "😐"
-        case .good: return "🙂"
-        case .great: return "🤩"
-        }
-    }
-
-    var label: String {
-        switch self {
-        case .rough: return "Rough"
-        case .meh: return "Meh"
-        case .okay: return "Okay"
-        case .good: return "Good"
-        case .great: return "Great"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .rough: return Color(hex: "#EF4444")
-        case .meh: return Color(hex: "#F97316")
-        case .okay: return Color(hex: "#EAB308")
-        case .good: return Color(hex: "#22C55E")
-        case .great: return Color(hex: "#AF52DE")
-        }
-    }
-}
-
-nonisolated struct MoodEntry: Codable, Identifiable, Sendable {
+nonisolated struct SleepEntry: Codable, Identifiable, Sendable {
     let id: UUID
     let date: Date
-    let level: MoodLevel
-    var note: String
+    var hours: Int
 
-    init(id: UUID = UUID(), date: Date = .now, level: MoodLevel, note: String = "") {
+    init(id: UUID = UUID(), date: Date = .now, hours: Int) {
         self.id = id
         self.date = date
-        self.level = level
-        self.note = note
+        self.hours = hours
+    }
+
+    var displayLabel: String {
+        hours >= 8 ? "8+ hrs" : "\(hours) hr\(hours == 1 ? "" : "s")"
     }
 }
 

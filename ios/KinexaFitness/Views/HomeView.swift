@@ -6,7 +6,7 @@ struct HomeView: View {
 
     @State private var nutritionVM = NutritionViewModel()
     @State private var ringsVM = ReflectionRingsViewModel()
-    @State private var showMoodSheet: Bool = false
+    @State private var showSleepSheet: Bool = false
     @State private var showRingsDetail: Bool = false
     @State private var showLogMealFromRing: Bool = false
     @State private var selectedTabForRing: AppTab? = nil
@@ -299,12 +299,10 @@ struct HomeView: View {
             PDFUploadView()
         }
         .sheet(isPresented: $showLogWalkSheet) {
-            if let walking = CardioLibrary.allWorkouts.first(where: { $0.name == "Walking" }) {
-                LogCardioSessionSheet(workout: walking)
-            }
+            LogCardioPickerSheet()
         }
-        .sheet(isPresented: $showMoodSheet) {
-            MoodCheckInSheet(ringsVM: ringsVM)
+        .sheet(isPresented: $showSleepSheet) {
+            SleepCheckInSheet(ringsVM: ringsVM)
         }
         .sheet(isPresented: $showRingsDetail) {
             RingsDetailView(
@@ -475,7 +473,7 @@ struct HomeView: View {
         case .meals:
             showLogMealFromRing = true
         case .mood:
-            showMoodSheet = true
+            showSleepSheet = true
         case .water:
             showRingsDetail = false
             showWaterSheet = true

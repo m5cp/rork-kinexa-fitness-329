@@ -12,6 +12,7 @@ struct NutritionProfileSheet: View {
     @State private var weightLbs: String = "176"
     @State private var weightKg: String = "80"
     @State private var activityLevel: ActivityLevel = .moderatelyActive
+    @State private var goalActivityLevel: ActivityLevel = .moderatelyActive
     @State private var goalType: NutritionGoalType = .maintain
     @State private var heightUnit: HeightUnit = .imperial
     @State private var weightUnit: WeightUnit = .lbs
@@ -247,55 +248,87 @@ struct NutritionProfileSheet: View {
 
     private var activityStep: some View {
         VStack(alignment: .leading, spacing: 24) {
-            stepHeader(icon: "flame.fill", title: "Activity Level", subtitle: "How active are you outside of planned workouts?")
+            stepHeader(icon: "flame.fill", title: "Activity Level", subtitle: "Pick your current level and your goal")
 
-            VStack(spacing: 10) {
-                ForEach(ActivityLevel.allCases, id: \.rawValue) { level in
-                    let isSelected = activityLevel == level
-                    Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            activityLevel = level
-                        }
-                    } label: {
-                        HStack(spacing: 14) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(isSelected ? KinexaTheme.accent.opacity(0.2) : KinexaTheme.cardSoft)
-                                    .frame(width: 44, height: 44)
-                                Image(systemName: level.icon)
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundStyle(isSelected ? KinexaTheme.accent : KinexaTheme.tertiaryText)
-                            }
-
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(level.rawValue)
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(isSelected ? KinexaTheme.primaryText : KinexaTheme.secondaryText)
-                                Text(level.subtitle)
-                                    .font(.caption)
-                                    .foregroundStyle(KinexaTheme.tertiaryText)
-                            }
-
-                            Spacer()
-
-                            if isSelected {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.title3)
-                                    .foregroundStyle(KinexaTheme.accent)
-                            }
-                        }
-                        .padding(14)
-                        .background(isSelected ? KinexaTheme.accent.opacity(0.08) : KinexaTheme.card)
-                        .clipShape(.rect(cornerRadius: 16))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(isSelected ? KinexaTheme.accent.opacity(0.3) : KinexaTheme.border)
-                        }
+            VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Current Activity")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("How active are you right now?")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                VStack(spacing: 10) {
+                    ForEach(ActivityLevel.allCases, id: \.rawValue) { level in
+                        activityLevelRow(level, selection: $activityLevel)
                     }
-                    .buttonStyle(.plain)
+                }
+            }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Goal Activity")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("Where do you want to be?")
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+                VStack(spacing: 10) {
+                    ForEach(ActivityLevel.allCases, id: \.rawValue) { level in
+                        activityLevelRow(level, selection: $goalActivityLevel)
+                    }
                 }
             }
         }
+    }
+
+    private func activityLevelRow(_ level: ActivityLevel, selection: Binding<ActivityLevel>) -> some View {
+        let isSelected = selection.wrappedValue == level
+        return Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                selection.wrappedValue = level
+            }
+        } label: {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isSelected ? KinexaTheme.accent.opacity(0.2) : KinexaTheme.cardSoft)
+                        .frame(width: 44, height: 44)
+                    Image(systemName: level.icon)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(isSelected ? KinexaTheme.accent : KinexaTheme.tertiaryText)
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(level.rawValue)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(isSelected ? KinexaTheme.primaryText : KinexaTheme.secondaryText)
+                    Text(level.subtitle)
+                        .font(.caption)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                }
+
+                Spacer()
+
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(KinexaTheme.accent)
+                }
+            }
+            .padding(14)
+            .background(isSelected ? KinexaTheme.accent.opacity(0.08) : KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 16))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(isSelected ? KinexaTheme.accent.opacity(0.3) : KinexaTheme.border)
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     private var goalAndReviewStep: some View {
@@ -314,7 +347,7 @@ struct NutritionProfileSheet: View {
                             Image(systemName: goal.icon)
                                 .font(.title2.weight(.bold))
                                 .foregroundStyle(isSelected ? .white : Color(hex: goal.color))
-                            Text(goal.rawValue)
+                            Text(goal.displayLabel)
                                 .font(.subheadline.weight(.bold))
                                 .foregroundStyle(isSelected ? .white : KinexaTheme.primaryText)
                             Text(goal.subtitle)
@@ -534,6 +567,7 @@ struct NutritionProfileSheet: View {
             heightCm: heightInCm,
             weightKg: weightInKg,
             activityLevel: activityLevel,
+            goalActivityLevel: goalActivityLevel,
             goalType: goalType,
             heightUnit: heightUnit,
             weightUnit: weightUnit,
@@ -555,6 +589,7 @@ struct NutritionProfileSheet: View {
         heightUnit = profile.heightUnit
         weightUnit = profile.weightUnit
         activityLevel = profile.activityLevel
+        goalActivityLevel = profile.goalActivityLevel
         goalType = profile.goalType
 
         if heightUnit == .imperial {

@@ -24,6 +24,8 @@ struct NutritionTabView: View {
                     headerSection
                     if !nutritionVM.isProfileConfigured {
                         profileSetupBanner
+                    } else {
+                        profileSummaryRow
                     }
                     dateSelector
                     calorieRingCard
@@ -236,6 +238,49 @@ struct NutritionTabView: View {
                 }
             }
             .clipShape(.rect(cornerRadius: 16))
+        }
+        .buttonStyle(PressScaleButtonStyle())
+    }
+
+    private var profileSummaryRow: some View {
+        let p = nutritionVM.profile
+        return Button {
+            showProfileSheet = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "person.fill")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#6366F1"), Color(hex: "#4338CA")],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .clipShape(.rect(cornerRadius: 10))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Nutrition Profile")
+                        .font(.caption.weight(.heavy))
+                        .tracking(0.5)
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                    Text("\(p.goalType.displayLabel) · \(p.calorieTarget) cal/day")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "pencil")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+                    .padding(8)
+                    .background(KinexaTheme.cardSoft)
+                    .clipShape(Circle())
+            }
+            .padding(12)
+            .background(KinexaTheme.card)
+            .clipShape(.rect(cornerRadius: 14))
+            .overlay { RoundedRectangle(cornerRadius: 14).stroke(KinexaTheme.border) }
         }
         .buttonStyle(PressScaleButtonStyle())
     }
