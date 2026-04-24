@@ -682,6 +682,96 @@ struct LogMealSheet: View {
         }
     }
 
+    private var aiDescribeTipsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Image(systemName: "lightbulb.fill")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Color(hex: "#F59E0B"))
+                Text("TIPS FOR BETTER RESULTS")
+                    .font(.system(size: 10, weight: .heavy))
+                    .tracking(0.8)
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                photoTipRow(good: true, text: "List each ingredient (e.g. chicken, rice, broccoli)")
+                photoTipRow(good: true, text: "Include portion size (1 cup, 6 oz, 2 slices)")
+                photoTipRow(good: true, text: "Mention cooking method (grilled, fried, baked)")
+                photoTipRow(good: true, text: "Note sauces, oils, or dressings")
+                photoTipRow(good: false, text: "Vague terms like “a plate of food”")
+                photoTipRow(good: false, text: "Just brand names without details")
+            }
+
+            if AITextFailureTracker.shared.failureCount > 0 {
+                Text("\(AITextFailureTracker.shared.remainingFailuresBeforeLockout) tries left before AI Describe pauses for 24 hrs")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(KinexaTheme.warning)
+                    .padding(.top, 2)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(hex: "#F59E0B").opacity(0.06))
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(hex: "#F59E0B").opacity(0.2))
+        }
+    }
+
+    private var aiTextLockoutBanner: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: "wifi.exclamationmark")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(KinexaTheme.warning)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Network issue")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("We couldn’t reach the AI service after several attempts. Please try again in \(AITextFailureTracker.shared.hoursRemaining) hrs. If this keeps happening, contact support.")
+                        .font(.system(size: 11))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+
+            Button {
+                if let url = URL(string: "mailto:contact@m5cairo.com?subject=Kinexa%20Fit%20-%20AI%20Describe%20Issue") {
+                    UIApplication.shared.open(url)
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "envelope.fill")
+                        .font(.system(size: 11, weight: .bold))
+                    Text("Email Support")
+                        .font(.caption.weight(.bold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 38)
+                .background(
+                    LinearGradient(
+                        colors: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
+                        startPoint: .leading, endPoint: .trailing
+                    )
+                )
+                .clipShape(.rect(cornerRadius: 10))
+            }
+            .buttonStyle(PressScaleButtonStyle())
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(KinexaTheme.warning.opacity(0.08))
+        .clipShape(.rect(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(KinexaTheme.warning.opacity(0.25))
+        }
+    }
+
     private var photoScanLockoutBanner: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
@@ -780,13 +870,45 @@ struct LogMealSheet: View {
             }
             .buttonStyle(PressScaleButtonStyle())
 
-            HStack(spacing: 6) {
-                Image(systemName: "info.circle.fill")
-                    .font(.system(size: 10))
-                Text("Uses Open Food Facts database")
-                    .font(.system(size: 10))
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "info.circle.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Color(hex: "#3B82F6"))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Heads up")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(KinexaTheme.primaryText)
+                        Text("There are millions of products in the Open Food Facts database, but some items may not be listed. If a barcode isn’t found, try AI Describe or contact support.")
+                            .font(.system(size: 11))
+                            .foregroundStyle(KinexaTheme.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                Button {
+                    if let url = URL(string: "mailto:contact@m5cairo.com?subject=Kinexa%20Fit%20-%20Barcode%20Not%20Found") {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "envelope.fill")
+                            .font(.system(size: 10, weight: .bold))
+                        Text("Email Support")
+                            .font(.system(size: 11, weight: .bold))
+                    }
+                    .foregroundStyle(Color(hex: "#3B82F6"))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color(hex: "#3B82F6").opacity(0.1))
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(PressScaleButtonStyle())
             }
-            .foregroundStyle(KinexaTheme.tertiaryText)
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(hex: "#3B82F6").opacity(0.05))
+            .clipShape(.rect(cornerRadius: 12))
         }
         .padding(16)
         .background(KinexaTheme.card)
@@ -802,7 +924,9 @@ struct LogMealSheet: View {
 
     private var foodInputSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if AIUsageTracker.shared.hasReachedLimit {
+            if AITextFailureTracker.shared.isLocked {
+                aiTextLockoutBanner
+            } else if AIUsageTracker.shared.hasReachedLimit {
                 foodScanLimitBanner
             } else {
                 VStack(alignment: .leading, spacing: 6) {
@@ -814,6 +938,8 @@ struct LogMealSheet: View {
                         .foregroundStyle(KinexaTheme.secondaryText)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+
+                aiDescribeTipsSection
 
                 TextField("e.g. grilled chicken breast with rice and steamed broccoli", text: $foodDescription, axis: .vertical)
                     .font(.subheadline)
@@ -1679,16 +1805,42 @@ struct LogMealSheet: View {
         errorMessage = nil
 
         do {
-            estimatedFoods = try await nutritionVM.estimateFoodFromText(description)
+            let foods = try await nutritionVM.estimateFoodFromText(description)
+            if foods.isEmpty {
+                AITextFailureTracker.shared.recordFailure()
+                errorMessage = Self.aiTextFailureMessage()
+                isEstimating = false
+                return
+            }
+            estimatedFoods = foods
             hasEstimated = true
             AIUsageTracker.shared.recordUsage()
+            AITextFailureTracker.shared.recordSuccess()
         } catch let error as GeminiError {
-            errorMessage = Self.friendlyMessage(for: error, isImage: false)
+            AITextFailureTracker.shared.recordFailure()
+            errorMessage = Self.friendlyMessage(for: error, isImage: false) + Self.aiTextFailureSuffix()
         } catch {
-            errorMessage = "AI request failed. Check your connection and try again."
+            AITextFailureTracker.shared.recordFailure()
+            errorMessage = "AI request failed. Check your connection and try again." + Self.aiTextFailureSuffix()
         }
 
         isEstimating = false
+    }
+
+    private static func aiTextFailureMessage() -> String {
+        let base = "AI couldn't estimate your meal. Try adding more detail — ingredients, cooking method, and portion size (e.g. '2 scrambled eggs, 1 slice wheat toast with butter')."
+        return base + aiTextFailureSuffix()
+    }
+
+    private static func aiTextFailureSuffix() -> String {
+        if AITextFailureTracker.shared.isLocked {
+            return " AI Describe is paused for 24 hours due to repeated issues."
+        }
+        let remaining = AITextFailureTracker.shared.remainingFailuresBeforeLockout
+        if remaining <= 3 {
+            return " (\(remaining) tries left before AI Describe pauses for 24 hrs)"
+        }
+        return ""
     }
 
     private func analyzePhoto(_ data: Data) async {

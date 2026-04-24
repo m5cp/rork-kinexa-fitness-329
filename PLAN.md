@@ -1,43 +1,24 @@
-# Home & nutrition cleanups, AI photo safeguards, and safety disclaimers
+# AI scan limits, food logging tips, new splash & app icon
 
-## Home screen
+## AI Describe (meal description)
+- Add a helpful tips card above the text box: what to include (ingredients, cooking method, portion size, sauces/oils) and what to avoid (vague terms like "a plate of food").
+- Track unsuccessful attempts. After 10 failed tries in a row, show a "Network issue — please try again in 24 hours" message and disable the Estimate button until the cooldown passes.
+- If the AI fails, do NOT consume a token/scan from the user's daily or purchased allowance.
+- Users can still earn more successful uses by purchasing tokens — only successful scans count against the quota.
 
-- Rename the "Log a Walk" quick action to **"Log Cardio"** so it matches what it actually opens.
-- Give Rowing a proper icon in the Log Cardio picker (fix the missing symbol).
-- On the **View Workout** sheet, add a clear **"Change Workout"** button that lets the user pick a new workout for today from: **Cardio, Weights, Functional Fitness,** or **Manual Build**. The chosen workout is saved as today's plan and can be logged normally. Keep the existing reset flow but behind a less prominent secondary option.
+## AI Photo Scan
+- Cap unsuccessful attempts at 10 in a row. After that, block further scans and direct the user to the AI Describe option, with a 24-hour cooldown before scanning resumes.
+- If the AI can't read the photo, show clear feedback: better lighting, cleaner background, closer shot, one dish per photo.
+- Failed scans never charge the user. Purchased token packs only apply to successful scans.
 
-## Log Meal sheet
+## Barcode Scanner
+- Add a disclaimer under the scanner: "Our database covers many products but not all. If a product isn't found, try AI Describe or email support."
+- Include a tappable "Email support" link.
 
-- Remove the **Food Search** tile entirely.
-- Remove the **Favorites** tile (the big orange one).
-- Rebalance the grid so the remaining tiles (Scan Food, Barcode, AI Describe, plus Repeat Yesterday / Templates / Enter Manually) fill the page evenly with no empty gap.
+## Splash Screen
+- Remove the blue running-person figure.
+- Replace with the new gold-and-white "K" logo on a black background.
+- Keep "KINEXA FIT" and the "RISE BEFORE THE SUN" tagline, styled in a clean black-and-white palette with subtle gold accent.
 
-## Profile
-
-- Tapping the **"No Goal Set"** card now opens the **Nutrition Profile builder** (instead of Plan My Training).
-- Remove the **"Sync with Apple Health"** row and its toggle entirely. Rebalance the App section so it looks clean.
-
-## Nutrition Profile
-
-- Add a clearly visible disclaimer banner at the top: *"These are estimates only. This is a tracking tool — not medical or nutrition advice. Do not make fitness or dietary changes without consulting a physician and registered nutritionist."*
-- Keep the calorie/macro math as-is, but label the results as "Estimated Targets."
-
-## App-wide safety disclaimers
-
-Add short, clear disclaimers in the spots where a user might misread guidance as prescription:
-
-- Top of Workouts tab, Plan My Training, and the Quick Start flow: *"Kinexa is a tracking & accountability tool. Always consult a physician before starting or changing a workout routine."*
-- Top of Nutrition tab: *"Tracking tool only — not medical or nutrition advice."*
-
-## AI Scan Food improvements
-
-- Add a **"Tips for a good photo"** helper section on the Scan Food flow with quick do/don't guidance: good lighting, plain background, food centered, one plate at a time, avoid blur/glare, include the whole plate.
-- **Don't charge a scan** if the AI fails to analyze the photo — usage is only counted on a successful result.
-- When analysis fails, show **specific, actionable feedback** (e.g. "Image too blurry — try again in better light", "Couldn't identify any food — try a plainer background or a closer shot", "Multiple items detected — photograph one plate at a time").
-- After **10 failed photo scans**, photo scanning is **locked for 24 hours**. The user is clearly redirected to **AI Describe** as an alternative, with a message: "Photo scanning is paused for 24 hours. Try AI Describe instead, or try photo again tomorrow." Successful scans reset the failure counter.
-
-## Not changing
-
-- No visual theme or color changes beyond what's listed.
-- Existing Apple Health entitlement text in legal screens stays (it's historical/legal context only); only the in-app toggle row is removed.
-
+## App Icon
+- Replace the current app icon with the new gold-and-white stylized "K" on a solid black background (matching the provided logo image).
