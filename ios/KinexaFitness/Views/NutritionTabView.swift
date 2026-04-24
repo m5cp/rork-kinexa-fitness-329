@@ -22,6 +22,9 @@ struct NutritionTabView: View {
             VStack(spacing: 0) {
                 VStack(spacing: 24) {
                     headerSection
+                    DisclaimerBanner(
+                        message: "Tracking tool only — not medical or nutrition advice. Consult a physician and registered nutritionist before changing your diet."
+                    )
                     if !nutritionVM.isProfileConfigured {
                         profileSetupBanner
                     } else {

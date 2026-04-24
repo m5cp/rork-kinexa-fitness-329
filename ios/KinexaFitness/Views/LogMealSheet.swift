@@ -325,36 +325,15 @@ struct LogMealSheet: View {
                 )
             }
 
-            HStack(spacing: 12) {
-                heroCard(
-                    icon: "sparkles",
-                    title: "AI Describe",
-                    subtitle: "Type your meal",
-                    gradient: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
-                    badge: aiBadgeText,
-                    mode: .text
-                )
-
-                heroCard(
-                    icon: "magnifyingglass",
-                    title: "Food Search",
-                    subtitle: "Search foods & brands",
-                    gradient: [Color(hex: "#0EA5E9"), Color(hex: "#0369A1")],
-                    badge: nil,
-                    mode: .database
-                )
-            }
-
-            HStack(spacing: 12) {
-                heroCard(
-                    icon: "star.fill",
-                    title: "Favorites",
-                    subtitle: "\(nutritionVM.favorites.count) saved",
-                    gradient: [Color(hex: "#F59E0B"), Color(hex: "#D97706")],
-                    badge: nil,
-                    mode: .favorites
-                )
-            }
+            heroCard(
+                icon: "sparkles",
+                title: "AI Describe",
+                subtitle: "Type your meal",
+                gradient: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
+                badge: aiBadgeText,
+                mode: .text
+            )
+            .frame(height: 120)
 
             Button {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -527,7 +506,9 @@ struct LogMealSheet: View {
                     }
             }
 
-            if AIUsageTracker.shared.hasReachedLimit {
+            if PhotoScanFailureTracker.shared.isLocked {
+                photoScanLockoutBanner
+            } else if AIUsageTracker.shared.hasReachedLimit {
                 foodScanLimitBanner
             } else {
                 VStack(alignment: .leading, spacing: 6) {
@@ -539,6 +520,8 @@ struct LogMealSheet: View {
                         .foregroundStyle(KinexaTheme.secondaryText)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+
+                photoTipsSection
 
                 Button {
                     guard !isEstimating else { return }
@@ -644,6 +627,125 @@ struct LogMealSheet: View {
         .overlay {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(Color(hex: "#22C55E").opacity(0.2))
+        }
+    }
+
+    // MARK: - Photo Tips
+
+    private var photoTipsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Image(systemName: "lightbulb.fill")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Color(hex: "#F59E0B"))
+                Text("TIPS FOR A GOOD PHOTO")
+                    .font(.system(size: 10, weight: .heavy))
+                    .tracking(0.8)
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                photoTipRow(good: true, text: "Bright, even lighting")
+                photoTipRow(good: true, text: "Plain background, food centered")
+                photoTipRow(good: true, text: "One plate or bowl in frame")
+                photoTipRow(good: true, text: "Whole plate visible, hold camera steady")
+                photoTipRow(good: false, text: "Blur, glare, or harsh shadows")
+                photoTipRow(good: false, text: "Multiple plates or crowded tables")
+            }
+
+            if PhotoScanFailureTracker.shared.failureCount > 0 {
+                Text("\(PhotoScanFailureTracker.shared.remainingFailuresBeforeLockout) tries left before photo scan pauses for 24 hrs")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(KinexaTheme.warning)
+                    .padding(.top, 2)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(hex: "#F59E0B").opacity(0.06))
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(hex: "#F59E0B").opacity(0.2))
+        }
+    }
+
+    private func photoTipRow(good: Bool, text: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: good ? "checkmark.circle.fill" : "xmark.circle.fill")
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(good ? KinexaTheme.success : KinexaTheme.danger)
+            Text(text)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(KinexaTheme.secondaryText)
+            Spacer(minLength: 0)
+        }
+    }
+
+    private var photoScanLockoutBanner: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: "clock.badge.exclamationmark.fill")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(KinexaTheme.warning)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Photo scanning paused")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text("Too many failed scans. Photo scanning unlocks in \(PhotoScanFailureTracker.shared.hoursRemaining) hrs. In the meantime, try AI Describe or enter your meal manually.")
+                        .font(.system(size: 11))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+
+            Button {
+                if !navPath.contains(.text) { navPath.append(.text) }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 11, weight: .bold))
+                    Text("Use AI Describe")
+                        .font(.caption.weight(.bold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 38)
+                .background(
+                    LinearGradient(
+                        colors: [Color(hex: "#6366F1"), Color(hex: "#8B5CF6")],
+                        startPoint: .leading, endPoint: .trailing
+                    )
+                )
+                .clipShape(.rect(cornerRadius: 10))
+            }
+            .buttonStyle(PressScaleButtonStyle())
+
+            Button {
+                showManualEntry = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "pencil.line")
+                        .font(.system(size: 11, weight: .bold))
+                    Text("Enter Manually")
+                        .font(.caption.weight(.bold))
+                }
+                .foregroundStyle(Color(hex: "#F59E0B"))
+                .frame(maxWidth: .infinity)
+                .frame(height: 38)
+                .background(Color(hex: "#F59E0B").opacity(0.12))
+                .clipShape(.rect(cornerRadius: 10))
+            }
+            .buttonStyle(PressScaleButtonStyle())
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(KinexaTheme.warning.opacity(0.08))
+        .clipShape(.rect(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(KinexaTheme.warning.opacity(0.25))
         }
     }
 
@@ -1591,6 +1693,10 @@ struct LogMealSheet: View {
 
     private func analyzePhoto(_ data: Data) async {
         guard !isEstimating else { return }
+        if PhotoScanFailureTracker.shared.isLocked {
+            errorMessage = "Photo scanning is paused for \(PhotoScanFailureTracker.shared.hoursRemaining) hrs after too many failed attempts. Try AI Describe instead, or try photo again tomorrow."
+            return
+        }
         guard !AIUsageTracker.shared.hasReachedLimit else {
             errorMessage = "You've used all \(AIUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
             return
@@ -1600,16 +1706,52 @@ struct LogMealSheet: View {
         errorMessage = nil
 
         do {
-            estimatedFoods = try await nutritionVM.estimateFoodFromImage(data)
+            let foods = try await nutritionVM.estimateFoodFromImage(data)
+            if foods.isEmpty {
+                PhotoScanFailureTracker.shared.recordFailure()
+                errorMessage = Self.photoFailureMessage(reason: .noFoodDetected)
+                isEstimating = false
+                return
+            }
+            estimatedFoods = foods
             hasEstimated = true
             AIUsageTracker.shared.recordUsage()
+            PhotoScanFailureTracker.shared.recordSuccess()
         } catch let error as GeminiError {
+            PhotoScanFailureTracker.shared.recordFailure()
             errorMessage = Self.friendlyMessage(for: error, isImage: true)
         } catch {
-            errorMessage = "Could not analyze this image. Try a clearer, well-lit photo."
+            PhotoScanFailureTracker.shared.recordFailure()
+            errorMessage = Self.photoFailureMessage(reason: .unknown)
         }
 
         isEstimating = false
+    }
+
+    private enum PhotoFailureReason {
+        case noFoodDetected
+        case blurry
+        case unknown
+    }
+
+    private static func photoFailureMessage(reason: PhotoFailureReason) -> String {
+        let remaining = PhotoScanFailureTracker.shared.remainingFailuresBeforeLockout
+        let base: String
+        switch reason {
+        case .noFoodDetected:
+            base = "Couldn't identify any food. Try a plainer background, better lighting, or a closer shot of a single plate."
+        case .blurry:
+            base = "Image looks blurry or dark. Retake in brighter light with the phone held steady."
+        case .unknown:
+            base = "Couldn't read this photo. Try brighter light, a plain background, and one plate in frame."
+        }
+        if PhotoScanFailureTracker.shared.isLocked {
+            return "Photo scanning is paused for 24 hours after too many failed attempts. Try AI Describe instead."
+        }
+        if remaining <= 3 {
+            return base + " (\(remaining) tries left before photo scan pauses for 24 hrs)"
+        }
+        return base
     }
 
     private static func friendlyMessage(for error: GeminiError, isImage: Bool) -> String {

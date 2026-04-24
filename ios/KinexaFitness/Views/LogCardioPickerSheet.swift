@@ -16,7 +16,7 @@ struct LogCardioPickerSheet: View {
         CardioActivity(name: "Run",         icon: "figure.run",            category: "Running",         isDistanceBased: true),
         CardioActivity(name: "Cycle",       icon: "figure.outdoor.cycle",  category: "Cycling",         isDistanceBased: true),
         CardioActivity(name: "Swim",        icon: "figure.pool.swim",      category: "Low Impact",      isDistanceBased: false),
-        CardioActivity(name: "Row",         icon: "figure.rowing",         category: "HIIT & Intervals",isDistanceBased: false),
+        CardioActivity(name: "Row",         icon: "oar.2.crossed",        category: "HIIT & Intervals",isDistanceBased: false),
         CardioActivity(name: "Hike",        icon: "figure.hiking",         category: "Outdoor",         isDistanceBased: true),
         CardioActivity(name: "Jump Rope",   icon: "figure.jumprope",       category: "HIIT & Intervals",isDistanceBased: false),
         CardioActivity(name: "Stair Climb", icon: "figure.stairs",         category: "Low Impact",      isDistanceBased: false),

@@ -10,6 +10,10 @@ struct ViewWorkoutSheet: View {
 
     @State private var showResetConfirm: Bool = false
     @State private var resetTrigger: Bool = false
+    @State private var showCardioPicker: Bool = false
+    @State private var showLogStrength: Bool = false
+    @State private var showFunctionalBrowser: Bool = false
+    @State private var showManualBuilder: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -25,6 +29,7 @@ struct ViewWorkoutSheet: View {
                         emptyCard
                     }
 
+                    changeWorkoutCard
                     resetRow
                 }
                 .padding(.horizontal, 20)
@@ -63,7 +68,104 @@ struct ViewWorkoutSheet: View {
                 Text("This clears today's planned workout so you can pick or generate a new one.")
             }
             .sensoryFeedback(.impact(weight: .medium), trigger: resetTrigger)
+            .sheet(isPresented: $showCardioPicker) {
+                LogCardioPickerSheet()
+            }
+            .sheet(isPresented: $showLogStrength) {
+                LogStrengthWorkoutSheet()
+            }
+            .sheet(isPresented: $showFunctionalBrowser) {
+                FunctionalFitnessBrowserView { _ in }
+            }
+            .sheet(isPresented: $showManualBuilder) {
+                ManualRoutineBuilderView(initialExercises: [])
+            }
         }
+    }
+
+    // MARK: - Change Workout
+
+    private var changeWorkoutCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(KinexaTheme.accent)
+                Text("CHANGE TODAY'S WORKOUT")
+                    .font(.caption2.weight(.heavy))
+                    .tracking(1.0)
+                    .foregroundStyle(KinexaTheme.tertiaryText)
+            }
+
+            Text("Swap in a different workout for today and log it as you go.")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(KinexaTheme.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            let cols = [GridItem(.flexible()), GridItem(.flexible())]
+            LazyVGrid(columns: cols, spacing: 10) {
+                changeTile(
+                    title: "Cardio",
+                    subtitle: "Walk · Run · Bike",
+                    icon: "heart.fill",
+                    color: Color(hex: "#10B981")
+                ) { showCardioPicker = true }
+
+                changeTile(
+                    title: "Weights",
+                    subtitle: "Log a strength session",
+                    icon: "dumbbell.fill",
+                    color: Color(hex: "#6366F1")
+                ) { showLogStrength = true }
+
+                changeTile(
+                    title: "Functional",
+                    subtitle: "WODs & circuits",
+                    icon: "bolt.heart.fill",
+                    color: Color(hex: "#F59E0B")
+                ) { showFunctionalBrowser = true }
+
+                changeTile(
+                    title: "Manual Build",
+                    subtitle: "Pick your own moves",
+                    icon: "square.and.pencil",
+                    color: Color(hex: "#EC4899")
+                ) { showManualBuilder = true }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(KinexaTheme.card)
+        .clipShape(.rect(cornerRadius: 18))
+        .overlay { RoundedRectangle(cornerRadius: 18).stroke(KinexaTheme.border) }
+    }
+
+    private func changeTile(title: String, subtitle: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 34, height: 34)
+                    .background(color)
+                    .clipShape(.rect(cornerRadius: 10))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KinexaTheme.primaryText)
+                    Text(subtitle)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(KinexaTheme.tertiaryText)
+                        .lineLimit(1)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(KinexaTheme.cardSoft)
+            .clipShape(.rect(cornerRadius: 14))
+            .overlay { RoundedRectangle(cornerRadius: 14).stroke(color.opacity(0.25)) }
+        }
+        .buttonStyle(PressScaleButtonStyle())
     }
 
     // MARK: - Empty

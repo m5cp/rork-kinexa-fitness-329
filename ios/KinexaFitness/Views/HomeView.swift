@@ -1397,8 +1397,8 @@ struct HomeView: View {
     private var quickActionsSection: some View {
         HStack(spacing: 10) {
             quickActionTile(
-                title: "Log a Walk",
-                icon: "figure.walk",
+                title: "Log Cardio",
+                icon: "heart.fill",
                 colors: [Color(hex: "#10B981"), Color(hex: "#059669")]
             ) {
                 toolTapTrigger.toggle()

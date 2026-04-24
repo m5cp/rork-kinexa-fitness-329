@@ -1,57 +1,43 @@
-# App Store submission fixes — legal content, HealthKit, Live Activities, and privacy polish
+# Home & nutrition cleanups, AI photo safeguards, and safety disclaimers
 
-## Summary of audit
+## Home screen
 
-Good news: the app is close to App Store-ready. Bundle ID, icon, launch screen, privacy manifest, IAP + Restore Purchases, and all permission usage strings are already in place. Since the app stores everything on-device with no user accounts, **Delete Account is not required** — which removes the biggest blocker.
+- Rename the "Log a Walk" quick action to **"Log Cardio"** so it matches what it actually opens.
+- Give Rowing a proper icon in the Log Cardio picker (fix the missing symbol).
+- On the **View Workout** sheet, add a clear **"Change Workout"** button that lets the user pick a new workout for today from: **Cardio, Weights, Functional Fitness,** or **Manual Build**. The chosen workout is saved as today's plan and can be logged normally. Keep the existing reset flow but behind a less prominent secondary option.
 
-Here's what needs fixing:
+## Log Meal sheet
 
-## ❌ Blocker fixes
+- Remove the **Food Search** tile entirely.
+- Remove the **Favorites** tile (the big orange one).
+- Rebalance the grid so the remaining tiles (Scan Food, Barcode, AI Describe, plus Repeat Yesterday / Templates / Enter Manually) fill the page evenly with no empty gap.
 
-- **Fill in real Privacy Policy and Terms of Use text.** Today they render blank on the Profile and Paywall screens, which is a guaranteed rejection. I'll embed a full, properly-worded generic privacy policy and terms of use that cover:
-  - On-device storage only (no account, no server sync of personal data)
-  - AI features that send text/photos to Google Gemini and Groq for processing
-  - Nutrition lookups via USDA
-  - Subscription billing via Apple and RevenueCat
-  - Motion/pedometer, HealthKit, camera, photos, calendar, and location data usage
-  - Contact info, user rights, and last-updated date
-  - Apple's standard EULA reference for Terms
+## Profile
 
-## ⚠️ Polish fixes
+- Tapping the **"No Goal Set"** card now opens the **Nutrition Profile builder** (instead of Plan My Training).
+- Remove the **"Sync with Apple Health"** row and its toggle entirely. Rebalance the App section so it looks clean.
 
-- **Enable Live Activities properly** — add the flag so the existing workout Live Activity code actually runs on real devices.
-- **Remove the unused push notification entitlement** — no push code exists in the app, so keeping the development push flag risks an automatic reviewer flag and a provisioning mismatch at upload. If you want real push later, we can add it back with proper server setup.
-- **Verify the subscription test/production key split** so real purchases work for reviewers.
+## Nutrition Profile
 
-## ✨ New feature: HealthKit integration
+- Add a clearly visible disclaimer banner at the top: *"These are estimates only. This is a tracking tool — not medical or nutrition advice. Do not make fitness or dietary changes without consulting a physician and registered nutritionist."*
+- Keep the calorie/macro math as-is, but label the results as "Estimated Targets."
 
-Add a clean, minimal HealthKit layer:
-- Ask permission the first time the user opens the Workouts or Profile screen (with a clear explainer sheet)
-- **Read** steps, active energy, and workouts so stats match the Health app
-- **Write** completed Kinexa workouts back to Health (so they appear in the Fitness / Health rings)
-- A simple toggle in Profile → Settings to enable/disable Health sync
-- Proper usage strings: "Kinexa uses Health data to show your steps and active energy, and saves your completed workouts to Health."
-- Add the HealthKit capability to the entitlements file
+## App-wide safety disclaimers
 
-## Pages / Screens affected
+Add short, clear disclaimers in the spots where a user might misread guidance as prescription:
 
-- **Profile → Privacy Policy**: now shows full embedded legal text with sections, scroll, and a last-updated date.
-- **Profile → Terms of Use**: full embedded terms text with Apple EULA reference.
-- **Paywall**: the Privacy and Terms links under the subscribe button now open populated pages.
-- **Profile → Settings**: new "Sync with Apple Health" toggle.
-- **Workouts**: first-run Health permission sheet; completed workouts auto-save to Health when sync is on.
-- **Home/Stats**: step count and active energy can be pulled from Health for accuracy (falls back to the existing pedometer if Health is off).
+- Top of Workouts tab, Plan My Training, and the Quick Start flow: *"Kinexa is a tracking & accountability tool. Always consult a physician before starting or changing a workout routine."*
+- Top of Nutrition tab: *"Tracking tool only — not medical or nutrition advice."*
 
-## Design
+## AI Scan Food improvements
 
-- Legal pages keep the existing card/list aesthetic with clean section headings, body text, and comfortable reading width.
-- HealthKit permission explainer uses a native-feeling sheet with a heart SF Symbol, two-line value propositions, and a single primary "Connect Health" button plus a "Not now" secondary.
-- No new colors or fonts — everything matches the current Kinexa look.
+- Add a **"Tips for a good photo"** helper section on the Scan Food flow with quick do/don't guidance: good lighting, plain background, food centered, one plate at a time, avoid blur/glare, include the whole plate.
+- **Don't charge a scan** if the AI fails to analyze the photo — usage is only counted on a successful result.
+- When analysis fails, show **specific, actionable feedback** (e.g. "Image too blurry — try again in better light", "Couldn't identify any food — try a plainer background or a closer shot", "Multiple items detected — photograph one plate at a time").
+- After **10 failed photo scans**, photo scanning is **locked for 24 hours**. The user is clearly redirected to **AI Describe** as an alternative, with a message: "Photo scanning is paused for 24 hours. Try AI Describe instead, or try photo again tomorrow." Successful scans reset the failure counter.
 
-## What I will NOT change
+## Not changing
 
-- No changes to the existing tab structure, onboarding, or workout/nutrition logic.
-- No account system added (you confirmed local-only).
-- No push notifications added.
+- No visual theme or color changes beyond what's listed.
+- Existing Apple Health entitlement text in legal screens stays (it's historical/legal context only); only the in-app toggle row is removed.
 
-After the changes, I'll run a build to confirm everything compiles, then you'll be ready to archive and submit to App Store Connect.

@@ -29,6 +29,9 @@ struct NutritionProfileSheet: View {
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
+                        DisclaimerBanner(
+                            message: "These are estimates only. This is a tracking tool — not medical or nutrition advice. Do not make fitness or dietary changes without consulting a physician and registered nutritionist."
+                        )
                         switch currentStep {
                         case 0: basicInfoStep
                         case 1: bodyMeasurementsStep
@@ -383,7 +386,7 @@ struct NutritionProfileSheet: View {
                 Image(systemName: "chart.bar.fill")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(KinexaTheme.success)
-                Text("Your Calculated Targets")
+                Text("Estimated Targets")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(KinexaTheme.primaryText)
                 Spacer()

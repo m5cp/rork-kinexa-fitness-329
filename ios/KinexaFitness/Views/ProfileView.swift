@@ -22,6 +22,7 @@ struct ProfileView: View {
     @State private var showUpgrade = false
     @State private var showTokenStore = false
     @State private var showRingGoalsSheet = false
+    @State private var showNutritionProfileSheet = false
     @State private var ringsVM = ReflectionRingsViewModel()
     @State private var nutritionVM = NutritionViewModel()
     @State private var restoreTrigger = false
@@ -496,31 +497,47 @@ struct ProfileView: View {
                 }
                 .padding(.vertical, 4)
             } else {
-                VStack(spacing: 12) {
+                Button {
+                    showNutritionProfileSheet = true
+                } label: {
                     HStack(spacing: 14) {
                         Image(systemName: "target")
                             .font(.title3.weight(.bold))
-                            .foregroundStyle(KinexaTheme.secondaryText)
+                            .foregroundStyle(.white)
                             .frame(width: 44, height: 44)
-                            .background(KinexaTheme.cardSoft)
+                            .background(
+                                LinearGradient(
+                                    colors: [KinexaTheme.accent, KinexaTheme.accent2],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
                             .clipShape(RoundedRectangle(cornerRadius: 12))
 
                         VStack(alignment: .leading, spacing: 3) {
-                            Text("No Goal Set")
+                            Text("Set Your Nutrition Profile")
                                 .font(.subheadline.weight(.bold))
                                 .foregroundStyle(KinexaTheme.primaryText)
-                            Text("Open Plan My Training to set your training goal and plan duration")
+                            Text("Tap to calculate estimated calorie & macro targets")
                                 .font(.caption2.weight(.medium))
                                 .foregroundStyle(KinexaTheme.tertiaryText)
                                 .lineLimit(2)
                         }
 
                         Spacer(minLength: 0)
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(KinexaTheme.tertiaryText)
                     }
                     .padding(.vertical, 4)
+                    .contentShape(Rectangle())
                 }
-                .padding(.vertical, 4)
+                .buttonStyle(.plain)
             }
+        }
+        .sheet(isPresented: $showNutritionProfileSheet) {
+            NutritionProfileSheet(nutritionVM: nutritionVM)
         }
     }
 
@@ -594,10 +611,6 @@ struct ProfileView: View {
     private var appControlsSection: some View {
         settingsSection(title: "APP", icon: "gearshape") {
             appearanceRow
-
-            sectionDivider
-
-            healthSyncRow
 
             sectionDivider
 
