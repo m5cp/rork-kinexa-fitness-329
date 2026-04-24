@@ -76,6 +76,19 @@ struct SplashView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 180, height: 180)
+                    .mask {
+                        RadialGradient(
+                            colors: [
+                                .black,
+                                .black,
+                                .black.opacity(0.85),
+                                .clear
+                            ],
+                            center: .center,
+                            startRadius: 10,
+                            endRadius: 100
+                        )
+                    }
                     .shadow(color: gold.opacity(iconGlowPulse * 0.6), radius: 40)
                     .shadow(color: .white.opacity(iconGlowPulse * 0.15), radius: 60)
                     .scaleEffect(iconScale)
