@@ -27,10 +27,12 @@ struct KinexaFitnessApp: App {
                 .preferredColorScheme(AppearanceMode(rawValue: appearanceModeRaw)?.colorScheme)
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
-                        viewModel.pedometer.refreshTodaySteps()
-                        Task {
-                            try? await Task.sleep(for: .milliseconds(300))
-                            viewModel.syncTodaySteps()
+                        if viewModel.pedometer.hasOptedIn {
+                            viewModel.pedometer.refreshTodaySteps()
+                            Task {
+                                try? await Task.sleep(for: .milliseconds(300))
+                                viewModel.syncTodaySteps()
+                            }
                         }
                         viewModel.syncWidgetData()
                     }

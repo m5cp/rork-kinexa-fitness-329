@@ -59,6 +59,8 @@ struct HomeView: View {
     @State private var showWaterSheet: Bool = false
     @State private var showViewWorkoutSheet: Bool = false
     @State private var selectedTab: AppTab? = nil
+    @State private var showMotionAccessAlert: Bool = false
+    @State private var pendingFitnessRingAction: Bool = false
 
     private let calendar = Calendar.current
 
@@ -304,6 +306,27 @@ struct HomeView: View {
         .sheet(isPresented: $showSleepSheet) {
             SleepCheckInSheet(ringsVM: ringsVM)
         }
+        .alert("Allow Motion & Fitness?", isPresented: $showMotionAccessAlert) {
+            Button("Not Now", role: .cancel) {
+                if pendingFitnessRingAction {
+                    pendingFitnessRingAction = false
+                    proceedWithFitnessRing()
+                }
+            }
+            Button("Allow") {
+                vm.pedometer.enableAndRefresh()
+                Task {
+                    try? await Task.sleep(for: .milliseconds(300))
+                    vm.syncTodaySteps()
+                }
+                if pendingFitnessRingAction {
+                    pendingFitnessRingAction = false
+                    proceedWithFitnessRing()
+                }
+            }
+        } message: {
+            Text("Kinexa can count your daily steps using your iPhone's motion sensor. You'll see the system prompt next. You can change this anytime in Settings.")
+        }
         .sheet(isPresented: $showRingsDetail) {
             RingsDetailView(
                 nutritionVM: nutritionVM,
@@ -465,10 +488,11 @@ struct HomeView: View {
     private func handleRingTap(_ ring: RingType) {
         switch ring {
         case .fitness:
-            if let today = vm.todayWorkout, !today.isRestDay {
-                showWorkoutDetail = true
+            if !vm.pedometer.hasOptedIn {
+                pendingFitnessRingAction = true
+                showMotionAccessAlert = true
             } else {
-                showQuickStartSheet = true
+                proceedWithFitnessRing()
             }
         case .meals:
             showLogMealFromRing = true
@@ -477,6 +501,14 @@ struct HomeView: View {
         case .water:
             showRingsDetail = false
             showWaterSheet = true
+        }
+    }
+
+    private func proceedWithFitnessRing() {
+        if let today = vm.todayWorkout, !today.isRestDay {
+            showWorkoutDetail = true
+        } else {
+            showQuickStartSheet = true
         }
     }
 
