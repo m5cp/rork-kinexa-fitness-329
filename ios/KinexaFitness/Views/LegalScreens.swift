@@ -1,5 +1,24 @@
 import SwiftUI
 
+nonisolated enum LegalURLs {
+    static let privacyPolicy = URL(string: "https://m5cairo.com/portfolio/kinexa-fitness/privacy-policy/")!
+    static let termsOfUse = URL(string: "https://m5cairo.com/portfolio/kinexa-fitness/terms-of-use/")!
+    static let disclaimer = URL(string: "https://m5cairo.com/portfolio/kinexa-fitness/disclaimer/")!
+    static let riskDisclosure = URL(string: "https://m5cairo.com/portfolio/kinexa-fitness/risk-disclosure/")!
+    static let appleEULA = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
+
+    static func url(for title: String) -> URL? {
+        switch title {
+        case "Privacy Policy": return privacyPolicy
+        case "Terms of Use": return termsOfUse
+        case "Disclaimer": return disclaimer
+        case "Risks": return riskDisclosure
+        case "EULA": return appleEULA
+        default: return nil
+        }
+    }
+}
+
 nonisolated struct LegalSection: Identifiable {
     let id = UUID()
     let icon: String
@@ -15,6 +34,7 @@ struct LegalDetailView: View {
     let subtitle: String
     let lastUpdated: String
     let sections: [LegalSection]
+    var onlineURL: URL? = nil
 
     var body: some View {
         ZStack {
@@ -29,6 +49,31 @@ struct LegalDetailView: View {
                         ForEach(Array(sections.enumerated()), id: \.element.id) { index, section in
                             sectionCard(section, index: index)
                         }
+                    }
+
+                    if let onlineURL {
+                        Link(destination: onlineURL) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "safari.fill")
+                                    .font(.subheadline.weight(.semibold))
+                                Text("View Online")
+                                    .font(.subheadline.weight(.semibold))
+                                Image(systemName: "arrow.up.right.square")
+                                    .font(.caption.weight(.bold))
+                            }
+                            .foregroundStyle(accentColor)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 12)
+                            .frame(maxWidth: .infinity)
+                            .background(accentColor.opacity(0.12))
+                            .clipShape(.rect(cornerRadius: 14))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 14)
+                                    .stroke(accentColor.opacity(0.3))
+                            }
+                        }
+                        .padding(.top, 20)
+                        .accessibilityHint("Opens the latest version in Safari")
                     }
 
                     footerBadge
@@ -159,7 +204,8 @@ struct LegalTextView: View {
             accentColor: page.accent,
             subtitle: page.subtitle,
             lastUpdated: page.updated,
-            sections: page.sections
+            sections: page.sections,
+            onlineURL: LegalURLs.url(for: page.title)
         )
     }
 }
