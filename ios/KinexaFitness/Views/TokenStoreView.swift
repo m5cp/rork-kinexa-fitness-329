@@ -336,7 +336,7 @@ struct TokenStoreView: View {
                                 .foregroundStyle(KinexaTheme.heroAmber)
                         }
 
-                        Text("That's ~$0.04/scan vs $0.20–$0.30/token")
+                        Text("From ~$0.01/scan annually vs $0.20–$0.30/token")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(KinexaTheme.accent)
                     }

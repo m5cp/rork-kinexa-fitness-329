@@ -11,9 +11,9 @@ struct UpgradeView: View {
     @State private var purchaseTrigger: Bool = false
 
     private let proFeatures: [(icon: String, title: String, desc: String)] = [
-        ("fork.knife", "20 Food Scans / Day", "Up from 5 on free"),
-        ("figure.strengthtraining.traditional", "15 AI Workouts / Day", "Up from 3 on free"),
-        ("calendar.badge.plus", "Full Plan Builder", "Weights, cardio & functional fitness"),
+        ("sparkles", "15 AI Scans / Day", "Up from 3 lifetime on free"),
+        ("figure.strengthtraining.traditional", "AI Workout Generator", "Weights, cardio & functional"),
+        ("calendar.badge.plus", "Full Plan Builder", "Build & schedule custom plans"),
         ("chart.line.uptrend.xyaxis", "Advanced Progress", "Trends, PR history & exports"),
         ("square.and.arrow.up.fill", "PDF & Calendar Export", "Share plans and schedules")
     ]
@@ -302,7 +302,7 @@ struct UpgradeView: View {
             if let intro = package.storeProduct.introductoryDiscount {
                 return "\(intro.subscriptionPeriod.value)-\(intro.subscriptionPeriod.unit == .day ? "day" : intro.subscriptionPeriod.unit == .week ? "week" : "month") free trial"
             }
-            return "Save 50% vs monthly"
+            return "Save 58% vs monthly"
         default:
             return ""
         }
