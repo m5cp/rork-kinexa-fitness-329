@@ -414,8 +414,10 @@ final class NutritionViewModel {
         )
     }
 
-    func analyzeMeal(_ meal: MealEntry) async {
-        guard !meal.foods.isEmpty else { return }
+    @discardableResult
+    func analyzeMeal(_ meal: MealEntry) async -> Bool {
+        guard !meal.foods.isEmpty else { return false }
+        guard AIUsageTracker.shared.canUseAI else { return false }
         isAnalyzing = true
         defer { isAnalyzing = false }
 
@@ -435,12 +437,18 @@ final class NutritionViewModel {
         do {
             let insight = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiMealInsight.self)
             mealInsights[meal.id] = insight
-        } catch {}
+            AIUsageTracker.shared.recordUsage()
+            return true
+        } catch {
+            return false
+        }
     }
 
-    func generateDailyInsight() async {
+    @discardableResult
+    func generateDailyInsight() async -> Bool {
         let dayMeals = mealsForSelectedDate
-        guard !dayMeals.isEmpty else { return }
+        guard !dayMeals.isEmpty else { return false }
+        guard AIUsageTracker.shared.canUseAI else { return false }
         isAnalyzing = true
         defer { isAnalyzing = false }
 
@@ -466,11 +474,16 @@ final class NutritionViewModel {
         do {
             let insight = try await gemini.generateJSON(prompt: prompt, systemPrompt: systemPrompt, type: GeminiDailyInsight.self)
             dailyInsight = insight
-        } catch {}
+            AIUsageTracker.shared.recordUsage()
+            return true
+        } catch {
+            return false
+        }
     }
 
     func generateMealSuggestion() async -> String? {
         guard isGeminiConfigured else { return nil }
+        guard AIUsageTracker.shared.canUseAI else { return nil }
         let remaining = dailyGoal.calories - todayNutrition.calories
         let remainingP = dailyGoal.protein - todayNutrition.protein
         let remainingC = dailyGoal.carbs - todayNutrition.carbs
@@ -492,7 +505,12 @@ final class NutritionViewModel {
 
         let systemPrompt = "You are a practical sports nutrition advisor. Suggest real, easily available foods. Be specific with portions. Keep it brief."
 
-        return try? await gemini.generateText(prompt: prompt, systemPrompt: systemPrompt, maxTokens: 256)
+        let result = try? await gemini.generateText(prompt: prompt, systemPrompt: systemPrompt, maxTokens: 256)
+        if let text = result, !text.isEmpty {
+            AIUsageTracker.shared.recordUsage()
+            return text
+        }
+        return nil
     }
 
     // MARK: - Persistence

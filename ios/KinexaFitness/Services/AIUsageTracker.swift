@@ -47,6 +47,20 @@ final class AIUsageTracker {
     var hasFreeTrialRemaining: Bool { !isPremium && remainingToday > 0 }
     var freeTrialUsed: Bool { !isPremium && remainingToday <= 0 }
 
+    var canUseAI: Bool { !hasReachedLimit }
+
+    var limitReachedTitle: String {
+        isPremium ? "Daily AI scans used" : "AI scans used up"
+    }
+
+    var limitReachedMessage: String {
+        if isPremium {
+            return "You've used today's \(Self.premiumDailyLimit) AI scans. Buy a token pack to keep going, or come back tomorrow."
+        } else {
+            return "You've used all your free AI scans. Subscribe for \(Self.premiumDailyLimit)/day, or buy a token pack."
+        }
+    }
+
     private init() {
         loadDailyUsage()
         loadTokens()

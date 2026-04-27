@@ -10,6 +10,8 @@ struct MealDetailSheet: View {
     @State private var isAnalyzing: Bool = false
     @State private var showDeleteConfirm: Bool = false
     @State private var showUpgrade: Bool = false
+    @State private var showTokenStore: Bool = false
+    @State private var showOutOfTokens: Bool = false
     @State private var showSaveTemplate: Bool = false
     @State private var showServingAdjuster: Bool = false
     @State private var logAgainToast: String?
@@ -44,6 +46,16 @@ struct MealDetailSheet: View {
             }
             .sheet(isPresented: $showUpgrade) {
                 UpgradeView()
+            }
+            .sheet(isPresented: $showTokenStore) {
+                TokenStoreView()
+            }
+            .sheet(isPresented: $showOutOfTokens) {
+                OutOfTokensSheet(
+                    isPremium: store.isPremium,
+                    onBuyTokens: { showTokenStore = true },
+                    onSubscribe: { showUpgrade = true }
+                )
             }
             .sheet(isPresented: $showSaveTemplate) {
                 SaveTemplateSheet(meal: meal) { title in
@@ -299,6 +311,10 @@ struct MealDetailSheet: View {
                 Spacer()
                 if insight == nil && !isAnalyzing {
                     Button {
+                        guard AIUsageTracker.shared.canUseAI else {
+                            showOutOfTokens = true
+                            return
+                        }
                         isAnalyzing = true
                         Task {
                             await nutritionVM.analyzeMeal(meal)

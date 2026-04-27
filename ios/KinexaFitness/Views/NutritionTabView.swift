@@ -16,6 +16,7 @@ struct NutritionTabView: View {
     @State private var isLoadingSuggestion: Bool = false
     @State private var showUpgrade: Bool = false
     @State private var showTokenStore: Bool = false
+    @State private var showOutOfTokens: Bool = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -137,6 +138,13 @@ struct NutritionTabView: View {
         }
         .sheet(isPresented: $showUpgrade) {
             UpgradeView()
+        }
+        .sheet(isPresented: $showOutOfTokens) {
+            OutOfTokensSheet(
+                isPremium: store.isPremium,
+                onBuyTokens: { showTokenStore = true },
+                onSubscribe: { showUpgrade = true }
+            )
         }
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.3)) {
@@ -667,6 +675,10 @@ struct NutritionTabView: View {
                     .lineSpacing(3)
             } else {
                 Button {
+                    guard AIUsageTracker.shared.canUseAI else {
+                        showOutOfTokens = true
+                        return
+                    }
                     isLoadingSuggestion = true
                     Task {
                         mealSuggestion = await nutritionVM.generateMealSuggestion()
@@ -727,6 +739,10 @@ struct NutritionTabView: View {
 
     private var aiInsightButton: some View {
         Button {
+            guard AIUsageTracker.shared.canUseAI else {
+                showOutOfTokens = true
+                return
+            }
             showDailyInsight = true
             Task { await nutritionVM.generateDailyInsight() }
         } label: {

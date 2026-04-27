@@ -1614,7 +1614,7 @@ struct LogMealSheet: View {
                     Text("Daily AI scans used up")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(KinexaTheme.primaryText)
-                    Text("You've used all \(AIUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow.")
+                    Text(AIUsageTracker.shared.limitReachedMessage)
                         .font(.system(size: 11))
                         .foregroundStyle(KinexaTheme.tertiaryText)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1797,7 +1797,7 @@ struct LogMealSheet: View {
         let description = foodDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !description.isEmpty else { return }
         guard !AIUsageTracker.shared.hasReachedLimit else {
-            errorMessage = "You've used all \(AIUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
+            errorMessage = AIUsageTracker.shared.limitReachedMessage
             return
         }
 
@@ -1850,7 +1850,7 @@ struct LogMealSheet: View {
             return
         }
         guard !AIUsageTracker.shared.hasReachedLimit else {
-            errorMessage = "You've used all \(AIUsageTracker.shared.dailyLimit) AI scans today. They refresh tomorrow."
+            errorMessage = AIUsageTracker.shared.limitReachedMessage
             return
         }
 
