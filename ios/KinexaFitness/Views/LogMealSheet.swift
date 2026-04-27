@@ -1611,7 +1611,7 @@ struct LogMealSheet: View {
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(KinexaTheme.warning)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Daily AI scans used up")
+                    Text(AIUsageTracker.shared.limitReachedTitle)
                         .font(.caption.weight(.bold))
                         .foregroundStyle(KinexaTheme.primaryText)
                     Text(AIUsageTracker.shared.limitReachedMessage)
