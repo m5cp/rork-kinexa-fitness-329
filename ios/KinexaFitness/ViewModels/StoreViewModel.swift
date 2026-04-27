@@ -13,11 +13,11 @@ class StoreViewModel {
     var tokenPurchaseSuccess = false
 
     var testBypassEnabled: Bool {
-        get { UserDefaults.standard.bool(forKey: "kinexa_test_bypass") }
+        get { UserDefaults.standard.bool(forKey: "kynexa_test_bypass") }
         set {
-            UserDefaults.standard.set(newValue, forKey: "kinexa_test_bypass")
+            UserDefaults.standard.set(newValue, forKey: "kynexa_test_bypass")
             if let group = UserDefaults(suiteName: "group.com.kinexafitness.shared") {
-                group.set(newValue, forKey: "kinexa_test_bypass")
+                group.set(newValue, forKey: "kynexa_test_bypass")
             }
         }
     }

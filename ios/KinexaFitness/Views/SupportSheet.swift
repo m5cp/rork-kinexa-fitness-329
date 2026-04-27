@@ -140,7 +140,7 @@ struct SupportSheet: View {
 
     private var sendEmailButton: some View {
         Button {
-            if let url = URL(string: "mailto:\(supportEmail)?subject=Kinexa%20Fit%20Support"),
+            if let url = URL(string: "mailto:\(supportEmail)?subject=Kynexa%20Fit%20Support"),
                UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url)
             }

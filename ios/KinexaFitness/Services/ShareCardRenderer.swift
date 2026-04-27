@@ -64,16 +64,16 @@ enum ShareCardRenderer {
     static func fallbackText(cardType: ShareCardType) -> String {
         switch cardType {
         case .workout(let title, let exercises, _):
-            return "Kinexa Fitness — \(title)\n\(exercises.count) exercises\n#KinexaFitness"
+            return "Kynexa Fitness — \(title)\n\(exercises.count) exercises\n#KynexaFitness"
         case .progress(let completed, let planned, let streak, let steps):
-            return "Kinexa Fitness — Weekly Progress\n\(completed)/\(planned) done · \(streak) day streak · \(steps) steps\n#KinexaFitness"
+            return "Kynexa Fitness — Weekly Progress\n\(completed)/\(planned) done · \(streak) day streak · \(steps) steps\n#KynexaFitness"
         case .completion(let title, let count, let duration):
-            return "Kinexa Fitness — Completed: \(title)\n\(count) exercises · \(duration)\n#KinexaFitness"
+            return "Kynexa Fitness — Completed: \(title)\n\(count) exercises · \(duration)\n#KynexaFitness"
         case .completedWorkout(let record):
             let prefix = record.source == .wod ? "FunctionFitness: " : ""
-            return "Kinexa Fitness — \(prefix)\(record.title)\n\(record.exerciseCount) exercises\n#KinexaFitness"
+            return "Kynexa Fitness — \(prefix)\(record.title)\n\(record.exerciseCount) exercises\n#KynexaFitness"
         case .quickStart(let record):
-            return "Kinexa Fitness — \(record.activity.rawValue)\nDuration: \(record.formattedDuration)\n#KinexaFitness"
+            return "Kynexa Fitness — \(record.activity.rawValue)\nDuration: \(record.formattedDuration)\n#KynexaFitness"
         }
     }
 }
@@ -145,14 +145,14 @@ enum ShareCardCGHelpers {
             .font: UIFont.systemFont(ofSize: 20, weight: .semibold),
             .foregroundColor: UIColor.white.withAlphaComponent(0.25)
         ]
-        let leftStr = NSAttributedString(string: "Kinexa Fitness", attributes: leftAttrs)
+        let leftStr = NSAttributedString(string: "Kynexa Fitness", attributes: leftAttrs)
         leftStr.draw(at: CGPoint(x: 60, y: y + 20))
 
         let rightAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 20, weight: .medium),
             .foregroundColor: UIColor.white.withAlphaComponent(0.2)
         ]
-        let rightStr = NSAttributedString(string: "#KinexaFitness", attributes: rightAttrs)
+        let rightStr = NSAttributedString(string: "#KynexaFitness", attributes: rightAttrs)
         let rightSize = rightStr.size()
         rightStr.draw(at: CGPoint(x: width - 60 - rightSize.width, y: y + 20))
     }

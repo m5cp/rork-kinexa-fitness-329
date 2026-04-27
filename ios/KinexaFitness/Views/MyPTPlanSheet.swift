@@ -1016,7 +1016,7 @@ struct PlanShareSheet: View {
                                     .foregroundStyle(KinexaTheme.secondaryText)
                             }
 
-                            Text("Scan with Kinexa Fitness to import this plan")
+                            Text("Scan with Kynexa Fitness to import this plan")
                                 .font(.caption)
                                 .foregroundStyle(KinexaTheme.tertiaryText)
                                 .multilineTextAlignment(.center)

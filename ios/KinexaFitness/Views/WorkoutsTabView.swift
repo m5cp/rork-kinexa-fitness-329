@@ -21,7 +21,7 @@ struct WorkoutsTabView: View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 28) {
                 DisclaimerBanner(
-                    message: "Kinexa is a tracking & accountability tool. Always consult a physician before starting or changing a workout routine."
+                    message: "Kynexa is a tracking & accountability tool. Always consult a physician before starting or changing a workout routine."
                 )
                 topActionButtons
                 plannerBlocks

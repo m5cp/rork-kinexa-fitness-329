@@ -636,7 +636,7 @@ struct PTWODShareSheet: View {
         for exercise in workout.exercises {
             text += "• \(exercise.name) — \(exercise.displayDetail)\n"
         }
-        text += "\n#KinexaFitness #Fitness"
+        text += "\n#KynexaFitness #Fitness"
         return text
     }
 }

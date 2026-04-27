@@ -413,7 +413,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				CODE_SIGN_ENTITLEMENTS = KinexaFitness/KinexaFitness.entitlements;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kinexa Fitness";
+				INFOPLIST_KEY_CFBundleDisplayName = "Kynexa Fitness";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Take photos of food to log nutrition, scan barcodes for product lookup, and scan QR codes to import workout plans.";
@@ -456,7 +456,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kinexa Fitness";
+				INFOPLIST_KEY_CFBundleDisplayName = "Kynexa Fitness";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Take photos of food to log nutrition, scan barcodes for product lookup, and scan QR codes to import workout plans.";

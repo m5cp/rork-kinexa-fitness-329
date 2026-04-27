@@ -83,7 +83,7 @@ struct WorkoutCompletionShareSheet: View {
 
                         Button {
                             if let image = renderedImage {
-                                let text = "Completed: \(title)\n\(exerciseCount) exercises\n#KinexaFitness"
+                                let text = "Completed: \(title)\n\(exerciseCount) exercises\n#KynexaFitness"
                                 let activityVC = UIActivityViewController(activityItems: [image, text], applicationActivities: nil)
                                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                                       let rootVC = windowScene.windows.first?.rootViewController else { return }

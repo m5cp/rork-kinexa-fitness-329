@@ -49,7 +49,7 @@ final class CalendarExportService {
                 notes += " (\(exercise.notes))"
             }
         }
-        notes += "\n\nExported from Kinexa Fitness"
+        notes += "\n\nExported from Kynexa Fitness"
         event.notes = notes
         event.calendar = store.defaultCalendarForNewEvents
 
@@ -88,7 +88,7 @@ final class CalendarExportService {
             for exercise in day.exercises {
                 notes += "\n• \(exercise.name) — \(exercise.displayDetail)"
             }
-            notes += "\n\nExported from Kinexa Fitness"
+            notes += "\n\nExported from Kynexa Fitness"
             event.notes = notes
             event.calendar = store.defaultCalendarForNewEvents
 
@@ -134,7 +134,7 @@ final class CalendarExportService {
                     notes += "\n• \(movement.name)\(detail.isEmpty ? "" : " — \(detail)")"
                 }
             }
-            notes += "\n\nExported from Kinexa Fitness"
+            notes += "\n\nExported from Kynexa Fitness"
             event.notes = notes
             event.calendar = store.defaultCalendarForNewEvents
 
@@ -176,7 +176,7 @@ final class CalendarExportService {
                 notes += "\n• \(movement.name)\(detail.isEmpty ? "" : " — \(detail)")"
             }
         }
-        notes += "\n\nExported from Kinexa Fitness"
+        notes += "\n\nExported from Kynexa Fitness"
         event.notes = notes
         event.calendar = store.defaultCalendarForNewEvents
 
@@ -223,7 +223,7 @@ final class CalendarExportService {
             for exercise in day.exercises {
                 notes += "\n• \(exercise.name) — \(exercise.displayDetail)"
             }
-            notes += "\n\nExported from Kinexa Fitness"
+            notes += "\n\nExported from Kynexa Fitness"
             event.notes = notes
             event.calendar = store.defaultCalendarForNewEvents
 
@@ -277,7 +277,7 @@ final class CalendarExportService {
                     notes += "\n• \(movement.name)\(detail.isEmpty ? "" : " — \(detail)")"
                 }
             }
-            notes += "\n\nExported from Kinexa Fitness"
+            notes += "\n\nExported from Kynexa Fitness"
             event.notes = notes
             event.calendar = store.defaultCalendarForNewEvents
 
@@ -312,7 +312,7 @@ final class CalendarExportService {
         event.title = "\(prefix) \(title)"
         event.startDate = cal.date(bySettingHour: 6, minute: 30, second: 0, of: date) ?? date
         event.endDate = cal.date(byAdding: .minute, value: max(durationMinutes, 15), to: event.startDate)
-        event.notes = notes + "\n\nExported from Kinexa Fitness"
+        event.notes = notes + "\n\nExported from Kynexa Fitness"
         event.calendar = store.defaultCalendarForNewEvents
 
         do {
@@ -350,7 +350,7 @@ final class CalendarExportService {
         let existing = store.events(matching: predicate)
 
         for event in existing where event.title?.hasPrefix(prefix) == true {
-            if event.notes?.contains("Exported from Kinexa Fitness") == true {
+            if event.notes?.contains("Exported from Kynexa Fitness") == true {
                 try? store.remove(event, span: .thisEvent)
             }
         }

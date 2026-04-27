@@ -38,7 +38,7 @@ enum MilestoneService {
             subtitle: match.2,
             icon: "flame.fill",
             color: Color(hex: "#F59E0B"),
-            shareText: "\(match.1) — \(streak)-day training streak on Kinexa Fitness #KinexaFitness"
+            shareText: "\(match.1) — \(streak)-day training streak on Kynexa Fitness #KynexaFitness"
         )
     }
 
@@ -66,7 +66,7 @@ enum MilestoneService {
             subtitle: match.2,
             icon: "star.fill",
             color: Color(hex: "#22C55E"),
-            shareText: "\(match.1) — \(totalWorkouts) workouts on Kinexa Fitness #KinexaFitness"
+            shareText: "\(match.1) — \(totalWorkouts) workouts on Kynexa Fitness #KynexaFitness"
         )
     }
 

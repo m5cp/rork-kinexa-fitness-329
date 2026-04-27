@@ -967,7 +967,7 @@ struct NutritionTabView: View {
         let tempDir = FileManager.default.temporaryDirectory
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        let fileName = "Kinexa_Nutrition_\(formatter.string(from: today)).pdf"
+        let fileName = "Kynexa_Nutrition_\(formatter.string(from: today)).pdf"
         let fileURL = tempDir.appendingPathComponent(fileName)
 
         try? pdfData.write(to: fileURL)

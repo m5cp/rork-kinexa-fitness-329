@@ -739,7 +739,7 @@ struct LogMealSheet: View {
             }
 
             Button {
-                if let url = URL(string: "mailto:contact@m5cairo.com?subject=Kinexa%20Fit%20-%20AI%20Describe%20Issue") {
+                if let url = URL(string: "mailto:contact@m5cairo.com?subject=Kynexa%20Fit%20-%20AI%20Describe%20Issue") {
                     UIApplication.shared.open(url)
                 }
             } label: {
@@ -887,7 +887,7 @@ struct LogMealSheet: View {
                 }
 
                 Button {
-                    if let url = URL(string: "mailto:contact@m5cairo.com?subject=Kinexa%20Fit%20-%20Barcode%20Not%20Found") {
+                    if let url = URL(string: "mailto:contact@m5cairo.com?subject=Kynexa%20Fit%20-%20Barcode%20Not%20Found") {
                         UIApplication.shared.open(url)
                     }
                 } label: {

@@ -523,7 +523,7 @@ final class AppViewModel {
             text += "\n"
         }
 
-        text += "#KinexaFitness"
+        text += "#KynexaFitness"
         return text
     }
 
@@ -772,7 +772,7 @@ final class AppViewModel {
             text += "\n"
         }
 
-        text += "#KinexaFitness"
+        text += "#KynexaFitness"
         return text
     }
 

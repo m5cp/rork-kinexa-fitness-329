@@ -45,7 +45,7 @@ nonisolated class BarcodeLookupService: Sendable {
         }
 
         var request = URLRequest(url: url)
-        request.setValue("KinexaFitness/1.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("KynexaFitness/1.0", forHTTPHeaderField: "User-Agent")
 
         let (data, response) = try await URLSession.shared.data(for: request)
 

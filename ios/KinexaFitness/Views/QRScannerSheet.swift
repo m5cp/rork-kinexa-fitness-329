@@ -202,7 +202,7 @@ struct QRScannerSheet: View {
             return
         }
 
-        errorMessage = "Could not decode workout. Make sure the QR code is from Kinexa Fitness."
+        errorMessage = "Could not decode workout. Make sure the QR code is from Kynexa Fitness."
     }
 }
 

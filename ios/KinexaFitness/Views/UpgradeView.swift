@@ -109,7 +109,7 @@ struct UpgradeView: View {
             .opacity(animateIn ? 1 : 0)
 
             VStack(spacing: 6) {
-                Text("Unlock Kinexa Pro")
+                Text("Unlock Kynexa Pro")
                     .font(.title.weight(.bold))
                     .foregroundStyle(KinexaTheme.primaryText)
 

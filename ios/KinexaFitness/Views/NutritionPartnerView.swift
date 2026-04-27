@@ -234,7 +234,7 @@ struct NutritionPartnerView: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(KinexaTheme.tertiaryText)
 
-            Text("Kinexa Fit partners with independent nutrition professionals. All consultations are provided directly by the partner and are not medical advice.")
+            Text("Kynexa Fit partners with independent nutrition professionals. All consultations are provided directly by the partner and are not medical advice.")
                 .font(.caption2)
                 .foregroundStyle(KinexaTheme.tertiaryText)
                 .lineSpacing(3)

@@ -247,7 +247,7 @@ struct ProfileView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(KinexaTheme.heroAmber)
                         .frame(width: 24)
-                    Text("Kinexa Pro Active")
+                    Text("Kynexa Pro Active")
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(KinexaTheme.primaryText)
                     Spacer()
