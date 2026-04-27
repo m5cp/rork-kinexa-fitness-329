@@ -20,7 +20,7 @@ struct SplashView: View {
     @State private var exitScale: Double = 1.0
     @State private var exitOpacity: Double = 1.0
 
-    private let titleText = "KINEXA FIT"
+    private let titleText = "KYNEXA FIT"
     private let gold = Color(red: 0.90, green: 0.74, blue: 0.28)
 
     var body: some View {
