@@ -1,38 +1,19 @@
-# Rename project from Kinexa to Kynexa everywhere
+# Fix paywall showing "0 Tokens" by matching App Store Connect product IDs
 
-I'll do a complete project-wide rename so the spelling **Kynexa** is consistent everywhere — including folders, the Xcode project, and every line of code. This way if you push to GitHub, everything transfers correctly with the right name.
+**The problem**
 
-## What will change
+Your paywall shows "0 Tokens" for every pack because the app is looking for product IDs that don't exist in App Store Connect. Your store has `kinexa_tokens_10`, `kinexa_tokens_30`, and `kinexa_tokens_100`, but the app code was written for older IDs. When it can't find a match, it shows 0.
 
-**Project & folder names**
-- `KinexaFitness/` folder → `KynexaFitness/`
-- `KinexaFitness.xcodeproj` → `KynexaFitness.xcodeproj`
-- Test folders renamed to `KynexaFitnessTests` and `KynexaFitnessUITests`
-- Entitlements file renamed to `KynexaFitness.entitlements`
+**The fix**
 
-**Xcode targets & build settings**
-- App target, test target, and UI test target all renamed to `KynexaFitness*`
-- Bundle path references and test host paths updated
-- Permission descriptions updated to say "Kynexa Fitness" (Health, etc.)
+- Update the app to recognize your three current packs:
+  - Starter Token Pack ($3.99) → grants **10 tokens**
+  - Plus Token Pack ($9.99) → grants **30 tokens**
+  - Power Token Pack ($24.99) → grants **100 tokens**
+- Update the "Best Value" highlight to point at the Power pack (100 tokens) and the "Most Popular" badge to point at the Plus pack (30 tokens).
+- Clean up the pack subtitles so they just read "Starter Pack", "Plus Pack", and "Power Pack" — no "Save 23%" / "Save 33%" claims.
+- Verify the build succeeds.
 
-**Code identifiers**
-- `KinexaTheme` → `KynexaTheme` everywhere it's used
-- `KinexaFitnessApp` → `KynexaFitnessApp`
-- All `@testable import KinexaFitness` → `KynexaFitness`
-- Any other `Kinexa*` type names, variables, and comments
+**Result**
 
-**User-facing text**
-- App display name: **Kynexa Fitness**
-- All visible strings throughout the app
-- Settings deep-link text ("Settings → Kynexa Fitness → Calendars")
-- Disclaimers, paywall copy, onboarding text
-
-**Project metadata**
-- `rork.json` app name → "Kynexa Fitness"
-
-## What stays the same
-- Your bundle identifier (so TestFlight/App Store builds keep working without resubmitting under a new app record)
-- Your RevenueCat product IDs and API keys
-- All app functionality, designs, and assets
-
-After the rename I'll run a full build to confirm everything still compiles, then you can safely push to GitHub with the correct **Kynexa** spelling throughout.
+The paywall will correctly display "10 Tokens · $3.99", "30 Tokens · $9.99", and "100 Tokens · $24.99", and purchases will credit the right amount to the user's balance.

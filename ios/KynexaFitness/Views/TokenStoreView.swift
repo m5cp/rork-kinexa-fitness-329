@@ -186,8 +186,8 @@ struct TokenStoreView: View {
     private func tokenPackCard(_ package: Package) -> some View {
         let identifier = package.storeProduct.productIdentifier
         let tokenCount = AIUsageTracker.shared.tokenCountForProduct(identifier)
-        let isBestValue = identifier == "kinexa_tokens_500"
-        let isPopular = identifier == "kinexa_tokens_150"
+        let isBestValue = identifier == "kinexa_tokens_100"
+        let isPopular = identifier == "kinexa_tokens_30"
 
         return Button {
             if !store.isPremium {
@@ -293,9 +293,9 @@ struct TokenStoreView: View {
 
     private func packSubtitle(_ identifier: String) -> String {
         switch identifier {
-        case "kinexa_tokens_50": return "Quick Top-Up"
-        case "kinexa_tokens_150": return "Plus Pack · Save 23%"
-        case "kinexa_tokens_500": return "Power Pack · Save 33%"
+        case "kinexa_tokens_10": return "Starter Pack"
+        case "kinexa_tokens_30": return "Plus Pack"
+        case "kinexa_tokens_100": return "Power Pack"
         default: return ""
         }
     }

@@ -84,9 +84,9 @@ final class AIUsageTracker {
 
     func tokenCountForProduct(_ identifier: String) -> Int {
         switch identifier {
-        case "kinexa_tokens_50": return 10
-        case "kinexa_tokens_150": return 30
-        case "kinexa_tokens_500": return 100
+        case "kinexa_tokens_10": return 10
+        case "kinexa_tokens_30": return 30
+        case "kinexa_tokens_100": return 100
         default: return 0
         }
     }
