@@ -10,6 +10,13 @@ final class HealthKitService {
 
     var isAvailable: Bool { HKHealthStore.isHealthDataAvailable() }
 
+    var writeAuthorizationStatus: HKAuthorizationStatus {
+        guard isAvailable else { return .notDetermined }
+        return store.authorizationStatus(for: HKObjectType.workoutType())
+    }
+
+    var isWriteDenied: Bool { writeAuthorizationStatus == .sharingDenied }
+
     var todaySteps: Int = 0
     var todayActiveEnergyKcal: Double = 0
     var lastAuthorizationGranted: Bool = false

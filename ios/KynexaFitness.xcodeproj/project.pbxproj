@@ -417,8 +417,8 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Take photos of food to log nutrition, scan barcodes for product lookup, and scan QR codes to import workout plans.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Kynexa Fitness reads your steps, active energy, and workouts so your daily activity stats match the Health app.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Kynexa Fitness saves your completed workouts to the Health app so they count toward your activity rings and workout history.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Kynexa Fitness reads your step count, active energy, and workout history from Apple Health only to display your daily activity inside the app. Your Health data stays on your device — it is never uploaded, sold, shared, or used for advertising.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Kynexa Fitness saves the workouts you complete in this app to Apple Health so they count toward your activity rings and workout history. You can revoke this access at any time in Settings > Privacy & Security > Health.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Track distance and pace during outdoor activities like running, biking, and hiking.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Track your daily steps and activity.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose a profile photo, save share cards, or select food photos for nutrition tracking.";
@@ -460,8 +460,8 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add workouts to your calendar for scheduling and reminders.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Take photos of food to log nutrition, scan barcodes for product lookup, and scan QR codes to import workout plans.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Kynexa Fitness reads your steps, active energy, and workouts so your daily activity stats match the Health app.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Kynexa Fitness saves your completed workouts to the Health app so they count toward your activity rings and workout history.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Kynexa Fitness reads your step count, active energy, and workout history from Apple Health only to display your daily activity inside the app. Your Health data stays on your device — it is never uploaded, sold, shared, or used for advertising.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Kynexa Fitness saves the workouts you complete in this app to Apple Health so they count toward your activity rings and workout history. You can revoke this access at any time in Settings > Privacy & Security > Health.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Track distance and pace during outdoor activities like running, biking, and hiking.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Track your daily steps and activity.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose a profile photo, save share cards, or select food photos for nutrition tracking.";

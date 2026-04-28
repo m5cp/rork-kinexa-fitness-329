@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import HealthKit
 
 struct ProfileView: View {
     @Environment(AppViewModel.self) private var vm
@@ -46,6 +47,7 @@ struct ProfileView: View {
                     currentGoalSection
                     notificationsSection
                     appControlsSection
+                    privacyHealthSection
                     supportSection
                     legalSection
                     footer
@@ -607,6 +609,9 @@ struct ProfileView: View {
     @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
     @AppStorage("healthSyncEnabled") private var healthSyncEnabled = false
     @State private var healthToggleTrigger = false
+    @State private var showHealthPermissionSheet = false
+    @State private var showHealthDisclosureSheet = false
+    @State private var healthAccessDenied = false
 
     private var appControlsSection: some View {
         settingsSection(title: "APP", icon: "gearshape") {
@@ -648,29 +653,102 @@ struct ProfileView: View {
                 Text("Sync with Apple Health")
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(KynexaTheme.primaryText)
-                Text("Save completed workouts to Health")
-                    .font(.caption2)
-                    .foregroundStyle(KynexaTheme.tertiaryText)
+                if healthAccessDenied {
+                    Text("Access denied — tap to open Settings")
+                        .font(.caption2)
+                        .foregroundStyle(KynexaTheme.danger)
+                } else {
+                    Text("Save completed workouts to Health")
+                        .font(.caption2)
+                        .foregroundStyle(KynexaTheme.tertiaryText)
+                }
             }
 
             Spacer()
 
-            Toggle("", isOn: $healthSyncEnabled)
-                .labelsHidden()
-                .tint(KynexaTheme.accent)
+            if healthAccessDenied {
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    Image(systemName: "arrow.up.right.square")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(KynexaTheme.danger)
+                }
+                .buttonStyle(.plain)
+            } else {
+                Toggle("", isOn: $healthSyncEnabled)
+                    .labelsHidden()
+                    .tint(KynexaTheme.accent)
+            }
         }
         .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if healthAccessDenied, let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        }
         .sensoryFeedback(.selection, trigger: healthToggleTrigger)
+        .onAppear {
+            refreshHealthAccessStatus()
+        }
         .onChange(of: healthSyncEnabled) { _, newValue in
             healthToggleTrigger.toggle()
             if newValue {
-                Task {
-                    let granted = await HealthKitService.shared.requestAuthorization()
+                let status = HealthKitService.shared.writeAuthorizationStatus
+                if status == .sharingDenied {
+                    healthAccessDenied = true
+                    healthSyncEnabled = false
+                } else if status == .notDetermined {
+                    showHealthPermissionSheet = true
+                }
+            }
+        }
+        .sheet(isPresented: $showHealthPermissionSheet) {
+            HealthPermissionSheet(
+                onConnect: {
+                    await HealthKitService.shared.requestAuthorization()
+                },
+                onConnected: { granted in
                     if !granted {
                         healthSyncEnabled = false
                     }
+                    refreshHealthAccessStatus()
                 }
+            )
+        }
+    }
+
+    private func refreshHealthAccessStatus() {
+        let status = HealthKitService.shared.writeAuthorizationStatus
+        healthAccessDenied = (status == .sharingDenied)
+        if healthAccessDenied { healthSyncEnabled = false }
+    }
+
+    private var privacyHealthSection: some View {
+        settingsSection(title: "PRIVACY & HEALTH", icon: "lock.shield") {
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            } label: {
+                settingsRow(icon: "heart.text.square.fill", title: "Manage Health Access", color: Color(hex: "#EF4444"), showChevron: true)
             }
+            .accessibilityHint("Opens iOS Settings to manage Apple Health permissions")
+
+            sectionDivider
+
+            Button {
+                showHealthDisclosureSheet = true
+            } label: {
+                settingsRow(icon: "info.circle.fill", title: "How we use Health data", color: KynexaTheme.accent, showChevron: true)
+            }
+            .accessibilityHint("View what Health data the app reads and writes")
+        }
+        .sheet(isPresented: $showHealthDisclosureSheet) {
+            HealthDataDisclosureSheet()
         }
     }
 
