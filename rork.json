@@ -2,7 +2,7 @@
   "$schema": "https://rork.com/schema/rork.json",
   "apps": [
     {
-      "name": "Kinexa Fitness",
+      "name": "Kynexa Fitness",
       "path": "ios",
       "framework": "swift"
     }
