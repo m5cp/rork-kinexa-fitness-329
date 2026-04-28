@@ -302,7 +302,7 @@ struct UpgradeView: View {
             if let intro = package.storeProduct.introductoryDiscount {
                 return "\(intro.subscriptionPeriod.value)-\(intro.subscriptionPeriod.unit == .day ? "day" : intro.subscriptionPeriod.unit == .week ? "week" : "month") free trial"
             }
-            return "Save 58% vs monthly"
+            return "Save 50% vs monthly"
         default:
             return ""
         }
