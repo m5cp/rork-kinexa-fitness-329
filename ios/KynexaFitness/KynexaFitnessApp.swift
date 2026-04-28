@@ -8,6 +8,8 @@ struct KynexaFitnessApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var viewModel = AppViewModel()
     @State private var store = StoreViewModel()
+    @State private var nutritionVM = NutritionViewModel()
+    @State private var ringsVM = ReflectionRingsViewModel()
 
     init() {
         #if DEBUG
@@ -24,6 +26,8 @@ struct KynexaFitnessApp: App {
             RootView()
                 .environment(viewModel)
                 .environment(store)
+                .environment(nutritionVM)
+                .environment(ringsVM)
                 .preferredColorScheme(AppearanceMode(rawValue: appearanceModeRaw)?.colorScheme)
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {

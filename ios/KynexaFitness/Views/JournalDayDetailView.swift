@@ -2,7 +2,7 @@ import SwiftUI
 
 struct JournalDayDetailView: View {
     @Environment(AppViewModel.self) private var vm
-    @State private var nutritionVM = NutritionViewModel()
+    @Environment(NutritionViewModel.self) private var nutritionVM
 
     let date: Date
 

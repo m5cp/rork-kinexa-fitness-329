@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ActivityJournalView: View {
     @Environment(AppViewModel.self) private var vm
-    @State private var nutritionVM = NutritionViewModel()
+    @Environment(NutritionViewModel.self) private var nutritionVM
 
     @State private var displayedMonth: Date = Calendar.current.startOfDay(for: .now)
     @State private var selectedDate: Date = Calendar.current.startOfDay(for: .now)

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct NutritionTabView: View {
     @Environment(StoreViewModel.self) private var store
-    @State private var nutritionVM = NutritionViewModel()
+    @Environment(NutritionViewModel.self) private var nutritionVM
     @State private var showLogMeal: Bool = false
     @State private var showGoalSheet: Bool = false
     @State private var showProfileSheet: Bool = false

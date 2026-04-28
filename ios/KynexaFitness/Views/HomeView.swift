@@ -4,8 +4,8 @@ struct HomeView: View {
     @Environment(AppViewModel.self) private var vm
     @Environment(StoreViewModel.self) private var store
 
-    @State private var nutritionVM = NutritionViewModel()
-    @State private var ringsVM = ReflectionRingsViewModel()
+    @Environment(NutritionViewModel.self) private var nutritionVM
+    @Environment(ReflectionRingsViewModel.self) private var ringsVM
     @State private var showSleepSheet: Bool = false
     @State private var showRingsDetail: Bool = false
     @State private var showLogMealFromRing: Bool = false
@@ -1427,29 +1427,42 @@ struct HomeView: View {
     // MARK: - Quick Actions (Walk / Food / Workout)
 
     private var quickActionsSection: some View {
-        HStack(spacing: 10) {
-            quickActionTile(
-                title: "Log Cardio",
-                icon: "heart.fill",
-                colors: [Color(hex: "#10B981"), Color(hex: "#059669")]
-            ) {
-                toolTapTrigger.toggle()
-                showLogWalkSheet = true
+        VStack(spacing: 10) {
+            HStack(spacing: 10) {
+                quickActionTile(
+                    title: "Log Cardio",
+                    icon: "heart.fill",
+                    colors: [Color(hex: "#10B981"), Color(hex: "#059669")]
+                ) {
+                    toolTapTrigger.toggle()
+                    showLogWalkSheet = true
+                }
+
+                quickActionMenuTile(
+                    title: "Log Meals & Water",
+                    icon: "fork.knife",
+                    colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")]
+                )
             }
 
-            quickActionMenuTile(
-                title: "Log Meals & Water",
-                icon: "fork.knife",
-                colors: [Color(hex: "#F59E0B"), Color(hex: "#D97706")]
-            )
+            HStack(spacing: 10) {
+                quickActionTile(
+                    title: "Log Sleep",
+                    icon: "moon.fill",
+                    colors: [Color(hex: "#8B5CF6"), Color(hex: "#6D28D9")]
+                ) {
+                    toolTapTrigger.toggle()
+                    showSleepSheet = true
+                }
 
-            quickActionTile(
-                title: "View Workout",
-                icon: "dumbbell.fill",
-                colors: [Color(hex: "#6366F1"), Color(hex: "#4F46E5")]
-            ) {
-                toolTapTrigger.toggle()
-                showViewWorkoutSheet = true
+                quickActionTile(
+                    title: "View Workout",
+                    icon: "dumbbell.fill",
+                    colors: [Color(hex: "#6366F1"), Color(hex: "#4F46E5")]
+                ) {
+                    toolTapTrigger.toggle()
+                    showViewWorkoutSheet = true
+                }
             }
         }
         .opacity(animateHero ? 1 : 0)

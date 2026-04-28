@@ -23,8 +23,8 @@ struct ProfileView: View {
     @State private var showTokenStore = false
     @State private var showRingGoalsSheet = false
     @State private var showNutritionProfileSheet = false
-    @State private var ringsVM = ReflectionRingsViewModel()
-    @State private var nutritionVM = NutritionViewModel()
+    @Environment(ReflectionRingsViewModel.self) private var ringsVM
+    @Environment(NutritionViewModel.self) private var nutritionVM
     @State private var restoreTrigger = false
     @State private var imageManager = ProfileImageManager()
     @State private var isEditingName: Bool = false

@@ -1,6 +1,13 @@
 import UIKit
 import PDFKit
 
+nonisolated enum PDFColors {
+    static let primary = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 1)
+    static let secondary = UIColor(red: 0.30, green: 0.30, blue: 0.30, alpha: 1)
+    static let tertiary = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 1)
+    static let separator = UIColor(red: 0.75, green: 0.75, blue: 0.75, alpha: 1)
+}
+
 enum DailyJournalPDFService {
     static func generateDayPDF(
         date: Date,
@@ -22,6 +29,8 @@ enum DailyJournalPDFService {
 
         let data = renderer.pdfData { context in
             context.beginPage()
+            UIColor.white.setFill()
+            context.cgContext.fill(CGRect(x: 0, y: 0, width: pageWidth, height: pageHeight))
             var y: CGFloat = margin
 
             y = drawTitle(at: y, width: contentWidth, margin: margin, date: date, ctx: context.cgContext)
@@ -77,7 +86,7 @@ enum DailyJournalPDFService {
 
         let titleAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 24, weight: .bold),
-            .foregroundColor: UIColor.label
+            .foregroundColor: PDFColors.primary
         ]
         "Daily Activity Report".draw(at: CGPoint(x: margin, y: yPos), withAttributes: titleAttrs)
         yPos += 32
@@ -87,12 +96,12 @@ enum DailyJournalPDFService {
         let dateStr = formatter.string(from: date)
         let dateAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 14, weight: .medium),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
         dateStr.draw(at: CGPoint(x: margin, y: yPos), withAttributes: dateAttrs)
         yPos += 22
 
-        ctx.setStrokeColor(UIColor.separator.cgColor)
+        ctx.setStrokeColor(PDFColors.separator.cgColor)
         ctx.setLineWidth(1)
         ctx.move(to: CGPoint(x: margin, y: yPos))
         ctx.addLine(to: CGPoint(x: margin + width, y: yPos))
@@ -108,11 +117,11 @@ enum DailyJournalPDFService {
         let boxWidth = width / 4
         let valueAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 18, weight: .bold),
-            .foregroundColor: UIColor.label
+            .foregroundColor: PDFColors.primary
         ]
         let labelAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 9, weight: .medium),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
 
         let stats: [(String, String)] = [
@@ -133,7 +142,7 @@ enum DailyJournalPDFService {
         }
         yPos += 46
 
-        ctx.setStrokeColor(UIColor.separator.withAlphaComponent(0.3).cgColor)
+        ctx.setStrokeColor(PDFColors.separator.withAlphaComponent(0.3).cgColor)
         ctx.setLineWidth(0.5)
         ctx.move(to: CGPoint(x: margin, y: yPos))
         ctx.addLine(to: CGPoint(x: margin + width, y: yPos))
@@ -147,7 +156,7 @@ enum DailyJournalPDFService {
         var yPos = y
         let attrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 12, weight: .heavy),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
         title.draw(at: CGPoint(x: margin, y: yPos), withAttributes: attrs)
         yPos += 22
@@ -159,15 +168,15 @@ enum DailyJournalPDFService {
 
         let titleAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 13, weight: .bold),
-            .foregroundColor: UIColor.label
+            .foregroundColor: PDFColors.primary
         ]
         let detailAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 10, weight: .medium),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
         let exerciseAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 9, weight: .regular),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
 
         let timeF = DateFormatter()
@@ -202,11 +211,11 @@ enum DailyJournalPDFService {
 
         let titleAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 13, weight: .bold),
-            .foregroundColor: UIColor.label
+            .foregroundColor: PDFColors.primary
         ]
         let detailAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 10, weight: .medium),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
 
         "♥ \(session.workoutName)".draw(at: CGPoint(x: margin + 4, y: yPos), withAttributes: titleAttrs)
@@ -226,11 +235,11 @@ enum DailyJournalPDFService {
 
         let titleAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 13, weight: .bold),
-            .foregroundColor: UIColor.label
+            .foregroundColor: PDFColors.primary
         ]
         let detailAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 10, weight: .medium),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
 
         "⚡ \(qs.activity.rawValue)".draw(at: CGPoint(x: margin + 4, y: yPos), withAttributes: titleAttrs)
@@ -249,11 +258,11 @@ enum DailyJournalPDFService {
 
         let headerAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 11, weight: .bold),
-            .foregroundColor: UIColor.label
+            .foregroundColor: PDFColors.primary
         ]
         let valAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 10, weight: .medium),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
 
         "Daily Totals vs Goals".draw(at: CGPoint(x: margin + 4, y: yPos), withAttributes: headerAttrs)
@@ -281,15 +290,15 @@ enum DailyJournalPDFService {
 
         let mealAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 11, weight: .semibold),
-            .foregroundColor: UIColor.label
+            .foregroundColor: PDFColors.primary
         ]
         let calAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 10, weight: .medium),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
         let foodAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 9, weight: .regular),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: PDFColors.secondary
         ]
 
         meal.mealType.rawValue.draw(at: CGPoint(x: margin + 8, y: yPos), withAttributes: mealAttrs)
@@ -311,7 +320,7 @@ enum DailyJournalPDFService {
     private static func drawEmptyNote(_ text: String, at y: CGFloat, margin: CGFloat) -> CGFloat {
         let attrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 10, weight: .regular),
-            .foregroundColor: UIColor.tertiaryLabel
+            .foregroundColor: PDFColors.tertiary
         ]
         text.draw(at: CGPoint(x: margin + 8, y: y), withAttributes: attrs)
         return y + 20
@@ -320,7 +329,7 @@ enum DailyJournalPDFService {
     private static func drawFooter(at y: CGFloat, width: CGFloat, margin: CGFloat, ctx: CGContext) {
         let attrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 8, weight: .regular),
-            .foregroundColor: UIColor.tertiaryLabel
+            .foregroundColor: PDFColors.tertiary
         ]
         let formatter = DateFormatter()
         formatter.dateStyle = .long

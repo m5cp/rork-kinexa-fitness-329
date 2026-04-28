@@ -1,19 +1,21 @@
-# Fix paywall showing "0 Tokens" by matching App Store Connect product IDs
+# Fix PDF colors, add Log Sleep button, and sync data across all tabs
 
-**The problem**
+**The root cause of the sync issue:** Each screen (Home, Nutrition, Profile, Activity Journal, Journal Day Detail) was creating its own separate copy of the nutrition and rings data. So logging a meal on Home updated Home's copy only, and Nutrition still showed empty until you logged again there. Same for water, sleep, and workouts.
 
-Your paywall shows "0 Tokens" for every pack because the app is looking for product IDs that don't exist in App Store Connect. Your store has `kinexa_tokens_10`, `kinexa_tokens_30`, and `kinexa_tokens_100`, but the app code was written for older IDs. When it can't find a match, it shows 0.
+### Fixes
 
-**The fix**
+**1. One shared source of truth for everything**
 
-- Update the app to recognize your three current packs:
-  - Starter Token Pack ($3.99) → grants **10 tokens**
-  - Plus Token Pack ($9.99) → grants **30 tokens**
-  - Power Token Pack ($24.99) → grants **100 tokens**
-- Update the "Best Value" highlight to point at the Power pack (100 tokens) and the "Most Popular" badge to point at the Plus pack (30 tokens).
-- Clean up the pack subtitles so they just read "Starter Pack", "Plus Pack", and "Power Pack" — no "Save 23%" / "Save 33%" claims.
-- Verify the build succeeds.
+- Create one shared Nutrition store and one shared Reflection Rings store at the top of the app, and pass them down to every screen.
+- Now logging a meal, water, sleep, or workout anywhere instantly updates Home, Nutrition, Workouts, Progress, and the Reflection Rings — no double-logging.
 
-**Result**
+**2. Add a Log Sleep button on Home**
 
-The paywall will correctly display "10 Tokens · $3.99", "30 Tokens · $9.99", and "100 Tokens · $24.99", and purchases will credit the right amount to the user's balance.
+- Add a fourth quick action tile so Home has: Log Cardio · Log Meals & Water · Log Sleep · View Workout.
+- Tapping Log Sleep opens the same sleep check-in sheet used by the Rest ring.
+
+**3. Fix the white-on-white PDF export**
+
+- The daily journal PDF was using system text colors that turned white in dark mode, making the PDF unreadable.
+- Switch all PDF text and lines to fixed black/dark gray and the page background to white so the PDF always looks the same — black text on a white page — when shared, printed, or opened in Files.
+
