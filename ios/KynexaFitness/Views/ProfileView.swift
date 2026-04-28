@@ -729,6 +729,10 @@ struct ProfileView: View {
 
     private var privacyHealthSection: some View {
         settingsSection(title: "PRIVACY & HEALTH", icon: "lock.shield") {
+            healthSyncRow
+
+            sectionDivider
+
             Button {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
