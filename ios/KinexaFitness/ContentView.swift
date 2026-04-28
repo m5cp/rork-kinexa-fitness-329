@@ -29,7 +29,7 @@ struct RootView: View {
                 .zIndex(2)
             }
 
-            if !hasConfirmedAge {
+            if !showSplash && !hasConfirmedAge {
                 AgeGateView {
                     withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
                         hasConfirmedAge = true

@@ -21,7 +21,7 @@ struct AgeGateView: View {
                     Text("Age Verification")
                         .font(.largeTitle.bold())
 
-                    Text("Kinexa Fitness is intended for users 18 years of age or older.")
+                    Text("Kynexa Fitness is intended for users 18 years of age or older.")
                         .font(.body)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -65,7 +65,7 @@ struct AgeGateView: View {
         .alert("Sorry", isPresented: $showDeclineAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("You must be 18 or older to use Kinexa Fitness.")
+            Text("You must be 18 or older to use Kynexa Fitness.")
         }
     }
 }
