@@ -1,6 +1,7 @@
 import SwiftUI
 import PhotosUI
 import HealthKit
+import RevenueCat
 
 struct ProfileView: View {
     @Environment(AppViewModel.self) private var vm
@@ -27,6 +28,7 @@ struct ProfileView: View {
     @Environment(ReflectionRingsViewModel.self) private var ringsVM
     @Environment(NutritionViewModel.self) private var nutritionVM
     @State private var restoreTrigger = false
+    @State private var redeemTrigger = false
     @State private var imageManager = ProfileImageManager()
     @State private var isEditingName: Bool = false
     @State private var devTapCount: Int = 0
@@ -322,6 +324,16 @@ struct ProfileView: View {
             } label: {
                 settingsRow(icon: "creditcard", title: "Manage Subscription", color: KynexaTheme.slateAccent, showChevron: true)
             }
+
+            sectionDivider
+
+            Button {
+                redeemTrigger.toggle()
+                Purchases.shared.presentCodeRedemptionSheet()
+            } label: {
+                settingsRow(icon: "gift.fill", title: "Redeem Code", color: Color(hex: "#EC4899"), showChevron: true)
+            }
+            .sensoryFeedback(.impact(weight: .light), trigger: redeemTrigger)
         }
         .sheet(isPresented: $showUpgrade) {
             UpgradeView()
