@@ -875,10 +875,6 @@ struct ProfileView: View {
 
     private var footer: some View {
         VStack(spacing: 6) {
-            Text("KINEXA FIT")
-                .font(.caption.weight(.heavy))
-                .tracking(2.0)
-                .foregroundStyle(KynexaTheme.tertiaryText)
             Text("Rise Before The Sun")
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(KynexaTheme.tertiaryText.opacity(0.6))

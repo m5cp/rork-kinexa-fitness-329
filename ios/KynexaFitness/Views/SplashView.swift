@@ -99,41 +99,6 @@ struct SplashView: View {
             Spacer().frame(height: 48)
 
             VStack(spacing: 14) {
-                HStack(spacing: 2.5) {
-                    ForEach(Array(titleText.enumerated()), id: \.offset) { index, char in
-                        Text(String(char))
-                            .font(.system(size: 30, weight: .black, design: .default))
-                            .tracking(2)
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [.white, .white.opacity(0.75)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .opacity(titleLetterOpacities[index])
-                            .offset(y: titleLetterOffsets[index])
-                    }
-                }
-                .overlay {
-                    LinearGradient(
-                        colors: [.clear, gold.opacity(0.7), .clear],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                    .frame(width: 80)
-                    .offset(x: shimmerX)
-                    .mask {
-                        HStack(spacing: 2.5) {
-                            ForEach(Array(titleText.enumerated()), id: \.offset) { _, char in
-                                Text(String(char))
-                                    .font(.system(size: 30, weight: .black, design: .default))
-                                    .tracking(2)
-                            }
-                        }
-                    }
-                }
-
                 HStack(spacing: 0) {
                     Rectangle()
                         .fill(

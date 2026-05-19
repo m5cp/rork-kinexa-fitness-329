@@ -90,12 +90,6 @@ struct HomeView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("KINEXA FIT")
-                    .font(.caption.weight(.heavy))
-                    .tracking(2.4)
-                    .foregroundStyle(KynexaTheme.secondaryText)
-            }
             ToolbarItem(placement: .topBarLeading) {
                 tokenBalancePill
             }

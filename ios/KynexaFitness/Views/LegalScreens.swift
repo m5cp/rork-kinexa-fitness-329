@@ -76,9 +76,8 @@ struct LegalDetailView: View {
                         .accessibilityHint("Opens the latest version in Safari")
                     }
 
-                    footerBadge
-                        .padding(.top, 28)
-                        .padding(.bottom, 60)
+                    Spacer()
+                        .frame(height: 60)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
@@ -175,21 +174,6 @@ struct LegalDetailView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private var footerBadge: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "checkmark.shield.fill")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(KynexaTheme.accent)
-            Text("KINEXA FIT")
-                .font(.caption2.weight(.heavy))
-                .tracking(1.5)
-                .foregroundStyle(KynexaTheme.tertiaryText)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(KynexaTheme.cardSoft)
-        .clipShape(Capsule())
-    }
 }
 
 struct LegalTextView: View {
